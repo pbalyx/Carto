@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"> 	
+    <title>Carto_tools</title>
+	<link rel="stylesheet" type="text/css" href="../lib/leaflet_src/leaflet.css">	 
+	<script src="../lib/leaflet_src/leaflet-src.js" ></script>   <!-- version 1.6.0 -->
+
+	<style>
+	html {
+		overscroll-behavior: none !important;	
+	}
+	#main {
+		position: fixed;
+		top: 3px;
+		left: 3px;
+		width: 99%;
+		height: 99%; /* Ajuster la hauteur du cadre principal selon vos besoins */
+		display: flex;
+		flex-direction: column;
+		border: 1px solid blue;
+	} 
+	.map {
+		flex: 1; /* Fait en sorte que la carte prenne tout l'espace disponible en hauteur */
+ 	}
+	.map:hover {
+		cursor: default;
+	}
+
+	/* Surcharge de la règle will-change dans Leaflet */
+	.leaflet-zoom-anim .leaflet-zoom-animated {
+		will-change: auto !important;
+	}
+	.leaflet-fade-anim .leaflet-tile {
+		will-change: auto !important;
+	}
+
+	.leaflet-tooltip {
+		padding: 0px 4px 0px 4px ;
+		background-color: aquamarine;
+		font-size: 12px;
+		font-weight: bold;
+		line-height: 12px;
+		border: 1px solid blue;
+
+	}
+	.curPt_tooltip {
+		padding: 1px 4px 0px 4px ;
+		font-weight: 600;
+		font-size: 1.1em;
+		line-height: 1.2em;
+		background-color: Aquamarine;
+		border: 1px solid Blue;
+	}
+
+
+	#zoom_div {
+		position: absolute;
+		bottom:25px;
+		left: 8px;
+		background-color:white;
+		z-index:400;
+	}
+	
+	#menubar {
+		display: block; 
+		position:absolute;
+		left: 50px;
+		top :12px;
+		padding: 2px;
+		padding-right:10px;*/
+		background-color: #808080;
+		z-index: 1000; /*leaflet va jusqu'à 800!*/
+	}
+	
+	.input_file {
+		display: none;
+	}
+	
+	.d_menu {
+		position: relative;
+		display: inline-block;
+	}
+	.d_menu:hover .d_sub {
+		display: block;
+	}
+	.d_menu:hover .b_menu {
+/*		background-color: #FFAA2A;*/
+		background-color: orange;
+	}
+	
+	.b_menu {
+/*		background-color: #FFD455;
+		color: black;
+		padding: 10px;
+		font-size: 10px; 
+		border: none;*/
+		cursor: pointer;
+	}
+	.d_sub {
+		display: none;
+		position: absolute;
+		background-color: white;
+		min-width: 140px;
+	/*	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
+		z-index: 900;
+	}
+			
+	.d_sub button, label {
+		color: black;
+		background-color: MediumSpringGreen;
+/*		background-color: #D4FF2A;*/
+		display: block;
+	}
+	.d_sub button:hover, label:hover {
+/*		background-color: #FF7F00;*/
+		background-color: orange;
+	}
+	
+	.header {
+		position: relative; 
+		width: 100%;
+		height:22px;
+		background-color: Gray;
+		z-index:2;
+		cursor: move;
+	}
+	
+	.b_header {
+		background-color: MediumSpringGreen;
+	}
+	.b_header:hover {
+		background-color: orange;	
+	}
+	
+	.subHeader {
+		width: 100%;
+		height:22px;
+		background-color: lightGray;
+		z-index:2;	
+	}
+	
+	.b_close {
+		background-color: white;
+		color:red;
+		font-size: 13px;
+		font-weight: bold;
+		position: absolute;
+		right:0; top:0;
+		padding:0px 5px;
+		z-index:4;
+	}
+	
+	.overlayDiv {
+		position: absolute; 
+		top: 18px;
+		background-color: lavender;
+		border: 1px solid blue;	
+	}
+	
+	
+	#statusDiv {
+		left: 20px;
+		top: 140px;
+		width: 150px;
+		overflow:hidden;
+		resize: both;
+		padding-bottom: 8px;
+    }
+
+	#curPtDiv {
+		left: 20px;
+		top: 150px;
+		width: 300px;
+		resize: both;
+		overflow:hidden;
+/*		padding-left: 12px;	
+		padding-right: 12px;	*/
+    }
+	
+	#distDiv {
+		left: 20px;
+		top: 250px;
+		width: 300px;
+		resize: both;
+		overflow:hidden;
+
+    }
+	
+	
+	#osmDiv {
+		left: 25%;
+		width: 566px;
+		resize: both;
+		overflow:hidden;
+		padding-bottom: 8px;
+    }
+	
+	#elements_div {
+		max-height: 300px;	
+		padding: 8px;
+		overflow: auto;
+		display: none;
+	}
+	
+	#importDiv {
+		left: 20px;
+		top: 150px;
+		width: 280px;
+		resize: both;
+		overflow:hidden;
+		padding-bottom: 8px;
+    }
+	
+	#importDivIn {
+		max-height: 300px;	
+		padding: 8px;
+		overflow: auto;
+	}
+
+	#infoDiv {
+		left: 650px;
+		width: 560px;
+		resize: both;
+		overflow:hidden;
+		padding-bottom: 8px;
+    }
+
+	#features_div {
+		max-height: 300px;	
+		padding: 8px;
+		overflow: auto;
+		display: block;
+	}
+	
+	#tags_div {
+		max-height: 300px;	
+		padding: 8px;
+		overflow: auto;
+		display: none;
+	}
+	
+	table, th, td {
+		border:1px solid black;
+		border-collapse: collapse;
+		text-align:  left;
+		padding-left: 8px;
+		background-color: white;
+	}
+	table:hover {
+		cursor: pointer;
+	}
+/*
+@media screen and (max-width: 650px) {
+	#main {
+		height: 88vh;
+		width: 98%;
+	}
+	#info {
+		font-size: 0.8em;
+	}
+	#help_div {
+		font-size: 0.8em;
+		top: 60px;
+		left: 52px;
+		width: 84vw;
+	}
+
+}
+*/
+
+	#photoDiv {
+		position: absolute; 
+		display: none; 
+		width: 30%;
+		height: auto;
+		left: 10px;
+		top: 30%;
+		background-color: white;
+		border: 1px solid blue;
+/*		z-index: 900; */
+		resize: both;
+		overflow: hidden;
+    }
+		
+
+	</style>
+
+</head>
+<body>
+	<div id="main">
+		<div id="menubar" >
+		
+			<div id= "d_layer" class= "d_menu"   >
+				<button id="b_layer" class= "b_menu" >Calque 1</button>
+				<div id= "sub_layer" class= "d_sub"    >
+					<button id="b_layer_1" class= "b_submenu" >Calque 1 -x-</button>
+					<button id="b_layer_2" class= "b_submenu" >Calque 2</button>
+					<button id="b_layer_3" class= "b_submenu" >Calque 3</button>
+				</div>		
+			</div>
+			
+			<div id= "d_Action" class= "d_menu" >
+				<button id="b_Action" class= "b_menu" >Action</button>
+				<div id="sub_fileX" class= "d_sub">
+					<button id="b_calque" class= "b_submenu" style="display:none"   >Choix Calque</button>
+				<input type="file" id="file_selectX" class = "input_file" />	
+					<label id= "input_fileX"  for="file_selectX">
+							Ajouter un fichier</label>
+					<button id="b_osmImport" class= "b_submenu" >Importer OSM</button>
+					<button id="b_undo" class= "b_submenu" >Annuler</button>
+					<button id="b_center_file" class= "b_submenu" >Centrer sur calque</button>
+					<button id="b_close_file" class= "b_submenu" >Vider</button>
+					<button id="b_save" class= "b_submenu" style="display:none"  >Enregistrer</button>
+					<button id="b_test" class= "b_submenu" >Test</button>
+				</div>
+			</div>
+			
+			<div id= "d_tools" class= "d_menu">
+				<button id="b_tools" class= "b_menu">Point</button>
+					<div id="dSub_tools" class= "d_sub" >
+						<button id="b_osmExplore" class= "b_submenu" >Explorer OSM</button>
+						<button id="b_coords" class= "b_submenu" >Coordonnées</button>
+<!--						<button id="b_dist" class= "b_submenu" >Distance</button> -->
+						<button id="b_centerPoint" class= "b_submenu" >Centrer</button>
+						<button id="b_dist" class= "b_submenu" >distance</button>
+					</div>
+			</div>		
+			<div id= "d_dist" class= "d_menu">
+				<button class= "b_menu">Panoramax</button>				
+					<div id="dSub_dist" class= "d_sub" >
+					<button id="b_pxImportAround" class= "b_submenu" >Chercher autour</button>
+					<button id="b_pxImportBox" class= "b_submenu" >Chercher carte</button>
+					<button id="b_center_panox" class= "b_submenu" >Centrer</button>
+					<button id="b_panoxClear" class= "b_submenu" >Vider</button>
+					</div>
+			</div>		
+
+			<div id= "d_loc" class= "d_menu">
+				<button id="b_aff" class= "b_menu">GPS</button>
+					<div id="dSub_aff" class= "d_sub" >
+						<button id="b_loc" class= "b_submenu" >Localisation</button>
+						<button id="b_center_loc" class= "b_submenu" >Centrer</button>
+						<button id="b_wpt" class= "b_submenu" >Add wpt</button>
+						<button id="b_trkpt" class= "b_submenu" >Add trkpt</button>
+						<button id="b_save_gpx" class= "b_submenu" >Save GPX</button>
+					</div>
+			</div>		
+
+			<div id= "d_aff" class= "d_menu">
+				<button id="b_aff" class= "b_menu">Affiche</button>
+					<div id="dSub_aff" class= "d_sub" >
+						<button id="b_info" class= "b_submenu" >Info</button>
+						<button id="b_status" class= "b_submenu" >Status</button>
+						<button id="b_version" class= "b_submenu" >0.0</button>
+					</div>
+			</div>		
+
+		</div>
+		<div id="map" class="map"></div>
+		<div id="zoom_div">z:</div>
+	</div>
+	
+	<div id="statusDiv" style ="display: none" class = "overlayDiv" >		
+		<div id= "statusHeader" class= "header" >
+			Status&nbsp 
+			<button id="bCloseStatus" class = "b_close">X</button>
+		</div>
+		<div id= "statusTxt">
+		</div>
+	</div>
+	
+	<div id= "curPtDiv" style ="display: none" class = "overlayDiv" >
+		<div id= "curPtHeader" class= "header" >
+			<span>Point</span>
+			<button id="bCloseCurPt" class = "b_close">X</button>
+		</div>	
+			&nbsp
+			<button id="b_copyCoords" >Copier</button>
+			<button id="b_copy1" >Copier 1</button>
+			<button id="b_copy2" >Copier 2</button>
+			<button id="b_paste" >Coller</button>
+			<button id="b_center" >Centrer</button>
+		<div id= "editCoordsDiv" >
+			<input type="checkbox" id= "cb_LatLng" >LatLng</input> 
+			<input type="text" id= "editLonLat" ></input> 
+			<button id="b_editOk" style ="display: none">Ok</button>
+			<button id="b_editCancel" style ="display: none" >X</button>
+		</div>
+		<span id= "curPtElev"></span>
+	</div>
+
+	<div id= "distDiv" style ="display: none"  class = "overlayDiv" >
+		<div id= "distHeader" class= "header" >
+			<span>Distance</span>
+			<button id="bCloseDist" class = "b_close">X</button>
+		</div>	
+			
+			
+			
+		<div id= "editDistDiv" >
+			<span>Point1</span><input type="text" id= "editPt1" ></input>
+				<button id="b_cur1" > + </button> 
+				<button id="b_paste1" >coller</button> 
+			<span>Point2</span><input type="text" id= "editPt2" ></input>
+				<button id="b_cur2" > + </button> 
+				<button id="b_paste2" >coller</button> 
+			
+			<br><button id="b_calc" >Distance</button>&nbsp<span id = "distSpan"> : </span>
+			<button id="b_distOk" style ="display: none">Ok</button>
+			<button id="b_distCancel" style ="display: none" >X</button>
+		</div>
+	</div>
+
+	<div id="osmDiv" style ="display: none" class = "overlayDiv"  >		
+		<div id= "osmHeader" class= "header">
+			<span id= "headerTitlle">OpenStreetMap</span> 
+			<button id="b_request" class= "b_header">Rechercher</button>
+			<span id="osmStatus" style= "padding: 2px"></span>
+			<button id="bCloseOsm" class = "b_close">X</button>
+		</div>
+		<div id= "elements_div">
+			<div class="subHeader">Elements</div>
+			<table id= "elements_table" >
+				<tr id="elements_table_head">
+				</tr> 
+			</table>
+		</div>
+		<div id= "tags_div">
+			<div id="tags_header" class="subHeader">Tags&nbsp&nbsp
+				<button id = "b_back_to_list" class= "b_header">Retour à la liste</button>		
+				<button id= "b_call_osm" class= "b_header">Voir sur OSM</button>
+			</div>
+			<table id= "tags_table" >
+				<tr id="tags_table_head">
+				</tr> 
+			</table>
+		</div>
+	</div>
+	
+	<div id= "importDiv" style= "display: none" class = "overlayDiv" >
+		<div id= "importHeader" class= "header">
+			<span>Importer OSM </span> 
+			<button id="b_import" class= "b_header">Importer</button>
+<!--			<button id="b_showFeat" class= "b_header">Détails</button>-->
+			<span id="importStatus" style= "padding: 2px"></span>
+			<button id="bCloseImport" class = "b_close">X</button>
+		</div>
+		<div id= "importDivIn">
+			<div class="subHeader">Elements</div>
+			<input type="radio" name="subType" value="route" id="route" checked>
+			<span for="route">Routes</span><br>
+			<input type="radio" name="subType" value="guidepost" id="guidepost">
+			<span for="guidepost">Poteaux</span><br>
+			<input type="radio" name="subType" value="network_map" id="network_map">
+			<span for="network_map">Info rando</span><br>
+			<input type="radio" name="subType" value="network_node" id="network_node">
+			<span for="network_node">Carrefours</span><br>
+			<input type="radio" name="subType" value="other" id="other">
+			<span for="xs">Autre</span>
+		</div>
+	</div>
+
+	<div id="infoDiv" style ="display: none" class = "overlayDiv">		
+		<div id= "infoHeader" class= "header" >
+			Info&nbsp 
+			<button id="b_layer_1b" class= "b_header" style="background-color:Orange" >Calque 1</button>
+			<button id="b_layer_2b" class= "b_header" >Calque 2</button>
+			<button id="b_layer_3b" class= "b_header" >Calque 3</button>
+			<span id="featuresCount" style= "padding: 2px; background-color: Azure">
+				&nbsp0 éléments</span>
+			<button id="bCloseInfo" class = "b_close">X</button>
+		</div>
+		<div id= "features_div">
+			<div class="subHeader">Features</div>
+			<table id= "features_table" >
+				<tr id="features_table_head">
+				</tr> 
+			</table>
+		</div>		
+	</div>
+	
+	<div id="photoDiv">		
+		<div id= "photoHeader" class= "header">
+			Photo&nbsp 
+				<span id="photoName"></span>
+			<button id= "bPrevPoint" class= "bPrevNextPoint"  disabled><b>&lt</b></button>
+			<button id= "bNextPoint" class= "bPrevNextPoint"  disabled><b>&gt</b></button>	
+			<button id="bClosePhoto" class = "b_close">X</button>
+		</div>
+		<img  id="image" alt="pas de photo ?" style="max-width:100%">
+	</div>
+	
+
+	
+	<script src='../lib/osmtogeojson.js'></script> 
+	<script src="../lib/panox.js"> </script>
+	<script src="./Carto_tools.js"> </script>
+
+</body>
+</html>
+	
