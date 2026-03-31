@@ -14,7 +14,7 @@
 		background-color: #ddffff; /*	color: #205090;*/
 		font-size: 1.25em;
 		margin-left: 5%;
-		margin-right: 5%;
+		margin-right: 10%;
 	}
 	h1
 	{
@@ -36,22 +36,45 @@
 
 	h3
 	{
+		font-style: italic;
+		text-indent: 5%;
 		font-size: 1.4em;
 		font-weight:normal;   
 		margin-top: 0.5em;   
 		margin-bottom: 0em;
 	}
 
+	#gototop {
+		position: fixed;
+		top: 50px;
+		right: 20px;
+		width: 50px;
+		text-align: center;
+		background-color: #00ffff;
+		border-style: outset;
+		padding: 5px;
+	}
 
 </style>
 
 
 <body>
 	<h1>Panoramax des sentiers</h1>
-
+	<div id="gototop"><a href = "#">Top</a></div>
 	<p>&nbsp;</p>
-	
-	<h2>Constat</h2>
+	<ol>
+		<li><a href = "#constat">Constat</a></li>	
+		<li><a href = "#contribuer">Contribuer à Panoramax sans matériel spécial</a></li>	
+		<li><a href = "#baba">Prise en main de Baba</a></li>	
+		<li><a href = "#trucs">Quelques trucs, conseils, suggestions</a>
+			<ul>
+				<li><a href = "#decoupage">Découpage en séquences</a></li>
+				<li><a href = "#intersections">Intersections</a></li>				
+			</ul>
+		</li>	
+	</ol>
+
+	<h2 id="constat">Constat</h2>
 
 	<p>Quand on regarde Panoramax, en dehors des agglomérations et des routes, dans la plupart des régions c'est le grand désert.</p>
 
@@ -61,12 +84,12 @@
 	&nbsp&nbsp- Comment avoir plus de contributeurs ? <br>
 	&nbsp&nbsp- La couverture complète 360° est-elle indispensable pour les sentiers ?.</p>
 
-	<h2>Contribuer à Panoramax sans matériel spécial</h2>
+	<h2 id="contribuer">Contribuer à Panoramax sans matériel spécial</h2>
 	<p>Beaucoup de randonneurs se baladent maintenant avec un smartphone et une application quelconque de cartographie, la plupart du temps avec un suivi gps.	<br>
 	Avec ce matériel, lors d'une randonnée ordinaire, on peut caractériser les sentiers avec quelques dizaines de photos prises en cours de route et envoyer les résultats sur Panoramax le soir en rentrant.</p>
 	<p>Pour cela, l'application Baba offre une solution simple. </p>
 	
-	<h2>Prise en main de Baba</h2>
+	<h2 id="baba">Prise en main de Baba</h2>
 	<p>
 		Dans l'ensemble, l'appli Baba se passe de mode d'emploi. L'utilisation des trois fenêtres principales liste, carte et photo est très intuitive. Il y a seulement quelques points que je n'ai pas repéré tout de suite :
 	</p>
@@ -82,22 +105,20 @@
 	  </li>
 	  <li>
 		<p>
-		Dans les paramètres on a le choix de conserver les photos ou de les effacer après l'envoi dans Panoramax. Je conseille de les conserver tant qu'on n'est pas sûr que tout s'est bien passé pour l'envoi. Les photos sont stockées dans le répertoire <i>pictures/baba</i>, on peut toujours les effacer après.  
+		Dans les paramètres on a le choix de conserver les photos ou de les effacer après l'envoi dans Panoramax. Il vaut mieux les conserver tant qu'on n'est pas sûr que tout s'est bien passé pour la réception. Les photos sont stockées dans le répertoire <i>pictures/baba</i>, on peut toujours les effacer après.  
 	  </li>
 	</ul>
 	
 
-	<h2>Quelques trucs, conseils, suggestions </h2>
+	<h2 id="trucs">Quelques trucs, conseils, suggestions </h2>
 	
-	<h3> Découpage des séquences</h3>
+	<h3 id ="decoupage"> Découpage en séquences</h3>
 	
 	<p>J'ai commencé sur OpenStreetMap par la cartoraphie des réseaux de sentiers. Ces réseaux, qui permettaient au randonneur de construire un itinéraire personnalisé sont malheureusement de plus en plus abandonnés et remplacés par des boucles prédéfinies.<br>
 	Pour les photos sur Panoramax, j'ai gardé le principe du réseau : une séquence = un sentier entre deux intersections importantes.
-	
+	<h3 id ="intersections">Intersections</h3>
 	
 	</p>
-	
-	
 
 </body>
 </html>
