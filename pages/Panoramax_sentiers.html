@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <link href="./style.css" rel="stylesheet" type="text/css" />-->
     <title>Panoramax des sentiers</title>
-<!--    <link href="./style.css" rel="stylesheet" type="text/css" />-->
 </head>
 
 <style>
@@ -38,7 +38,7 @@
 	{
 		font-style: italic;
 		text-indent: 5%;
-		font-size: 1.4em;
+		font-size: 1.2em;
 		font-weight:normal;   
 		margin-top: 0.5em;   
 		margin-bottom: 0em;
@@ -52,7 +52,6 @@
 		text-align: center;
 		background-color: #00ffff;
 		border-style: outset;
-		padding: 5px;
 	}
 
 </style>
@@ -66,7 +65,12 @@
 		<li><a href = "#constat">Constat</a></li>	
 		<li><a href = "#contribuer">Contribuer à Panoramax sans matériel spécial</a></li>	
 		<li><a href = "#baba">Prise en main de Baba</a></li>	
-		<li><a href = "#trucs">Quelques trucs, conseils, suggestions</a>
+		<li><a href = "#voir">Voir les photos</a></li>	
+			<ul>
+				<li><a href = "#visionneuses">Visionneuses Panoramax</a></li>
+				<li><a href = "#autres_vues">Autres vues</a></li>				
+			</ul>
+		<li><a href = "#trucs">Prendre des photos, trucs, conseils, suggestions</a>
 			<ul>
 				<li><a href = "#decoupage">Découpage en séquences</a></li>
 				<li><a href = "#intersections">Intersections</a></li>				
@@ -82,12 +86,12 @@
 	Quand on veut planifier une sortie dans un endroit qu'on ne connait pas, on aimerait bien avoir un aperçu de quelques chemins pour voir ce qui parait intéressant, ce qui semble facile ou difficile. <br>
 	Malheureusement, à part un petit nombre de passionnés, peu de contributeurs se baladent, à pied ou à vélo avec une caméra 360° en prenant une vue tous les quelques mètres. La couverture des chemins dans une région donnée avance donc très lentement, ou la plupart du temps pas du tout. D'où, deux questions : <br>
 	&nbsp&nbsp- Comment avoir plus de contributeurs ? <br>
-	&nbsp&nbsp- La couverture complète 360° est-elle indispensable pour les sentiers ?.</p>
+	&nbsp&nbsp- La couverture continue avec des vues à 360° est-elle indispensable pour les sentiers ?.</p>
 
 	<h2 id="contribuer">Contribuer à Panoramax sans matériel spécial</h2>
 	<p>Beaucoup de randonneurs se baladent maintenant avec un smartphone et une application quelconque de cartographie, la plupart du temps avec un suivi gps.	<br>
 	Avec ce matériel, lors d'une randonnée ordinaire, on peut caractériser les sentiers avec quelques dizaines de photos prises en cours de route et envoyer les résultats sur Panoramax le soir en rentrant.</p>
-	<p>Pour cela, l'application Baba offre une solution simple. </p>
+	<p>Pour cela, l'application Baba offre une solution simple, à la portée de tout le monde. </p>
 	
 	<h2 id="baba">Prise en main de Baba</h2>
 	<p>
@@ -109,8 +113,39 @@
 	  </li>
 	</ul>
 	
+	<h2 id="voir">Voir les photos</h2>
+	<h3 id ="visionneuses">Visionneuses Panoramax</h3>
+	<p>
+	Panoramax est une fédération d'instances indépendantes. Les photos publiques de toutes les instances sont réunies dans un métacatalogue et peuvent être vues sur la visionneuse générale : <a href= "https://api.panoramax.xyz/" target="blank">https://api.panoramax.xyz/</a>.
+	Comme OpenStreetMap, Panoramax est avant tout une base de données, le fond de carte pour la visualisation des photos est donc très simple, l'implémentation de cartes plus évoluées étant laissée aux utilisateurs.
+	</p>
+<br>
+	<div style="position: relative; left:30%"">
+		<img src="./images/panox.jpg" style= "width: 40%">
+	</div>
+<br>
+	Comme on peut le voir sur la copie d'écran ci-dessus, ce fond de carte est un peu trop simple pour l'utilisation sur les sentiers mais pour l'instant c'est le seul dont on dispose.
+	
+	<h3 id ="autres_vues">Autres vues</h3>
+	<p>
+	<a href= "https://cartes.app/?style=outdoors&rue=oui&terrain=oui#14.99/44.55693/4.42194" target="blank">Cartes.app</a> pourra être une autre façon de visualiser les photos Panoramax mais pour l'instant seules les photos 360° apparaissent sur le fond de carte. Ce filtrage trop rigoureux devrait être relaché dans l'avenir.
+	<div style="position: relative; left:30%"">
+		<img src="./images/cartes.jpg" style= "width: 40%">
+	</div>
+	
+	</p>
+	<p>
+	Pour aller plus loin, j'ai essayé de mettre une visualisation minimum dans la page web que j'utilise pour préparer mes sorties. Cette page me permet de jongler entre différents fonds de carte et calques superposés (voir ci-dessous). Elle est au stade expérimental et le restera sans doute mais vous pouvez <a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html" target="blank">tester ici</a> 
+	</p>
+	<div style="position: relative; left:10%"">
+		<img src="./images/carto_tools_1.jpg" style= "width: 40%">
+		&nbsp&nbsp
+		<img src="./images/carto_tools_2.jpg" style= "width: 40%">	
+	</div>
 
-	<h2 id="trucs">Quelques trucs, conseils, suggestions </h2>
+	<p>&nbsp&nbsp</p>
+
+	<h2 id="trucs">Prendre des photos, trucs, conseils, suggestions </h2>
 	
 	<h3 id ="decoupage"> Découpage en séquences</h3>
 	
