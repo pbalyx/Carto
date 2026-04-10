@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8" />
-<!--     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <link href="./style.css" rel="stylesheet" type="text/css" />-->
+
     <title>Panoramax des sentiers</title>
 </head>
 
@@ -28,20 +27,26 @@
 	}
 	h2
 	{
-		font-size: 1.4em;
+		font-size: 1.5em;
 		font-weight:normal;   
-		margin-top: 0.1em;   
-		margin-bottom: 0.1em;
+		margin-top: 1.0em;   
+		margin-bottom: 0.01em;
 	}
 
 	h3
 	{
 		font-style: italic;
 		text-indent: 5%;
-		font-size: 1.2em;
+		font-size: 1.3em;
 		font-weight:normal;   
 		margin-top: 0.5em;   
 		margin-bottom: 0em;
+	}
+	
+	p{
+		margin-bottom: 0.2em;
+		margin-top: 0.5em;   
+	
 	}
 
 	#gototop {
@@ -72,31 +77,35 @@
 			</ul>
 		<li><a href = "#trucs">Prendre des photos, trucs, conseils, suggestions</a>
 			<ul>
-				<li><a href = "#decoupage">Découpage</a></li>
+				<li><a href = "#reseau">Réseau de sentiers</a></li>
 				<li><a href = "#sequence">Séquences</a></li>
 				<li><a href = "#intersections">Intersections</a></li>				
+				<li><a href = "#travers">Vues en travers</a></li>				
 			</ul>
 		</li>	
+		<li><a href = "#conclure">Pour conclure</a></li>
+
 	</ol>
 
 	<h2 id="constat">Constat</h2>
 
 	<p>Quand on regarde Panoramax, en dehors des agglomérations et des routes, dans la plupart des régions c'est le grand désert.</p>
 
-	<p>Pourtant, pour les randonneurs par exemple, ce serait bien de pouvoir utiliser Panoramax comme le StreetView des sentiers.
-	Quand on veut planifier une sortie dans un endroit qu'on ne connait pas, on aimerait bien avoir un aperçu de quelques chemins pour voir ce qui parait intéressant, ce qui semble facile ou difficile. <br>
-	Malheureusement, à part un petit nombre de passionnés, peu de contributeurs se baladent, à pied ou à vélo avec une caméra 360° en prenant une vue tous les quelques mètres. La couverture des chemins dans une région donnée avance donc très lentement, ou la plupart du temps pas du tout. D'où, deux questions : <br>
+	<p>Pour les randonneurs, ce serait bien de pouvoir utiliser Panoramax comme le StreetView des sentiers.
+	Quand on veut planifier une sortie dans un endroit qu'on ne connait pas, on aimerait avoir un aperçu de quelques chemins pour voir ce qui parait intéressant, ce qui semble facile ou difficile. <br>
+	Malheureusement, à part un petit nombre de passionnés, peu de contributeurs se baladent, à pied ou à vélo avec une caméra 360° en prenant une vue tous les quelques mètres. La couverture des chemins dans une région donnée avance donc très lentement ou, la plupart du temps, pas du tout. D'où, deux questions : <br>
 	&nbsp&nbsp- Comment avoir plus de contributeurs ? <br>
-	&nbsp&nbsp- La couverture continue avec des vues à 360° est-elle indispensable pour les sentiers ?.</p>
+	&nbsp&nbsp- La couverture continue avec des vues à 360° est-elle indispensable pour les sentiers ?</p>
 
 	<h2 id="contribuer">Contribuer à Panoramax sans matériel spécial</h2>
 	<p>Beaucoup de randonneurs se baladent maintenant avec un smartphone et une application quelconque de cartographie, la plupart du temps avec un suivi gps.	<br>
 	Avec ce matériel, lors d'une randonnée ordinaire, on peut caractériser les sentiers avec quelques dizaines de photos prises en cours de route et envoyer les résultats sur Panoramax le soir en rentrant.</p>
-	<p>Pour cela, l'application Baba offre une solution simple, à la portée de tout le monde. </p>
+	<p>Pour cela, <a href= "https://forum.openstreetmap.fr/t/baba-nouvelle-application-pour-contribuer-a-panoramax/29948/191" target="blank">l'application Baba</a> offre une solution simple, à la portée de tout le monde. </p>
 	
 	<h2 id="baba">Prise en main de Baba</h2>
 	<p>
-		Dans l'ensemble, l'appli Baba se passe de mode d'emploi. L'utilisation des trois fenêtres principales liste, carte et photo est très intuitive. Il y a seulement quelques points que je n'ai pas repéré tout de suite :
+		Je n'ai pas trouvé de mode d'emploi de l'application Baba mais, dans l'ensemble on peut s'en passer. L'utilisation des trois fenêtres principales liste, carte et photo est très intuitive. <br>
+		Il y a seulement quelques points qui ne sautent pas aux yeux pour un novice et que je n'avais pas repéré tout de suite :
 	</p>
 	<ul>
 	  <li>
@@ -113,66 +122,152 @@
 		Dans les paramètres on a le choix de conserver les photos ou de les effacer après l'envoi dans Panoramax. Il vaut mieux les conserver tant qu'on n'est pas sûr que tout s'est bien passé pour la réception. Les photos sont stockées dans le répertoire <i>pictures/baba</i>, on peut toujours les effacer après.  
 	  </li>
 	</ul>
+	<p>
+	<i>Note</i> : Ces points concernent la version que j'ai utilisée (1.19). Ils n'ont pas changé dans la version suivante (1.20) mais celle-ci a introduit de nouvelles icônes et de nouvelles fonctionnalités que je n'ai pas fini d'explorer.
+	</p>
 	
 	<h2 id="voir">Voir les photos</h2>
 	<h3 id ="visionneuses">Visionneuses Panoramax</h3>
 	<p>
-	Panoramax est une fédération d'instances indépendantes. Les photos publiques de toutes les instances sont réunies dans un métacatalogue et peuvent être vues sur la visionneuse générale : <a href= "https://api.panoramax.xyz/" target="blank">api.panoramax.xyz/</a>.
-	Comme OpenStreetMap, Panoramax est avant tout une base de données, le fond de carte pour la visualisation des photos est donc très simple, l'implémentation de cartes plus évoluées étant laissée aux utilisateurs.
+	Panoramax est une fédération d'instances indépendantes. Les photos publiques de toutes les instances sont réunies dans un métacatalogue et peuvent être vues sur les visionneuses générales : <a href= "https://api.panoramax.xyz/?focus=map&map=12.2/44.64615/4.3114" target="blank">api.panoramax.xyz/</a>
+	ou 
+	<a href= "https://explore.panoramax.fr/?focus=map&map=12.2/44.64615/4.3114" target="blank">explore.panoramax.fr/</a>.<br>
+	</p>
+	<p>
+	Comme OpenStreetMap, Panoramax est avant tout une base de données. Le fond de carte pour la visualisation des photos est donc très simple, l'implémentation de cartes plus évoluées étant laissée aux utilisateurs.<br>
 	</p>
 <br>
 	<div style="position: relative; left:30%"">
 		<img src="./images/panox.jpg" style= "width: 40%">
+		<br><span><i>Fond de Carte api.panoramax</i></span>
 	</div>
 <br>
-	Comme on peut le voir sur la copie d'écran ci-dessus, ce fond de carte est un peu trop simple pour l'utilisation sur les sentiers mais pour l'instant c'est le seul dont on dispose.
+	Comme on peut le voir sur la copie d'écran ci-dessus, ce fond de carte un peu trop épuré n'est pas du tout adapté pour une utilisation sur les sentiers mais pour l'instant c'est le seul dont on dispose.
 	
 	<h3 id ="autres_vues">Autres vues</h3>
 	<p>
-	<a href= "https://cartes.app/?style=outdoors&rue=oui&terrain=oui#14.99/44.55693/4.42194" target="blank">Cartes.app</a> pourra être une autre façon de visualiser les photos Panoramax mais pour l'instant seules les photos 360° apparaissent sur le fond de carte. Ce filtrage trop rigoureux devrait être relaché dans l'avenir.
+	<a href= "https://cartes.app/?style=outdoors&rue=oui&terrain=oui#14.99/44.55693/4.42194" target="blank">Cartes.app</a> a commmencé à intégrer les photos Panoramax mais pour l'instant seules les photos 360° apparaissent sur le fond de carte. Ce filtrage trop rigoureux devrait être relaché dans l'avenir.
 	<div style="position: relative; left:30%"">
 		<img src="./images/cartes.jpg" style= "width: 40%">
+		<br><span><i>Dans la même zone, fond Plein air de Cartes.app</i></span>
 	</div>
 	
 	</p>
 	<p>
-	Pour aller plus loin, j'ai essayé de mettre une visualisation minimum dans la page web que j'utilise pour préparer mes sorties. Cette page me permet de jongler entre différents fonds de carte et calques superposés (voir ci-dessous). Elle est au stade expérimental et le restera sans doute mais vous pouvez <a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html" target="blank">tester ici</a> 
+	On peut espérer que d'autres implémentations paraitront dans l'avenir.
 	</p>
-	<div style="position: relative; left:10%"">
-		<img src="./images/carto_tools_1.jpg" style= "width: 40%">
-		&nbsp&nbsp
-		<img src="./images/carto_tools_2.jpg" style= "width: 40%">	
+	<p>
+	Pour mon usage, j'ai ajouté une visualisation simplifiée de Panoramax dans la page web que j'utilise pour préparer mes sorties. Cette page me permet de jongler entre différents fonds de carte et calques superposés (voir ci-dessous). Elle est au stade expérimental et le restera sans doute mais ellle donnera peut être des idées à d'autres développeurs.  <a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html" target="blank">Elle peut être testée ici</a> 
+	</p>
+	<div style="position: relative; left:5%; display: flex; flex-direction: row">
+		<div style= "width: 40%">
+		<img src="./images/carto_tools_1.jpg" style= "width: 100%">
+		<br><span><i>Fond OpenTopoMap, photo visible</i></span>
+		</div>
+		<div style= "width: 5%">.</div>
+		<div style= "width: 40%">
+		<img src="./images/carto_tools_2.jpg" style= "width: 100%">	
+		<br><span><i>Fond MNT Lidar HD + Waymarked Trail, photo cachée</i></span>
+		</div>
 	</div>
+	
 
-	<p>&nbsp&nbsp</p>
+	<p></p>
 
 	<h2 id="trucs">Prendre des photos: trucs, conseils, suggestions </h2>
 	
-	<h3 id ="decoupage"> Découpage</h3>
-	
-	<p>J'ai commencé sur OpenStreetMap par la cartoraphie des réseaux de sentiers. Ces réseaux, qui permettaient au randonneur de construire un itinéraire personnalisé sont malheureusement de plus en plus abandonnés et remplacés par des boucles prédéfinies.<br>
-	Pour les photos sur Panoramax, j'ai gardé le principe du réseau : une séquence = un sentier entre deux intersections importantes.
-	J'ai commencé à couvrir les <a href= "https://api.panoramax.xyz/?focus=map&map=11.48/44.5407/4.405&speed=250&theme=default&users=defaulthttps://api.panoramax.xyz/?focus=map&map=11.48/44.5407/4.405&speed=250&theme=default&users=default" target="blank">sentiers du plateau des gras</a> en Ardèche sud.
-	
-	
+	<p>Après quelques mois d'utilisation de baba et d'aller-retours entre l'acquisition et la visualisation, j'ai dégagé quelques idées de base sur la façon d'organiser les prises de vue pour avoir un résultat clair et agréable à suivre.</p>
+ 	<p>
+	J'ai mis en pratique ces idées sur des sentiers en Ardèche sud. Je vous invite à <a href= "https://api.panoramax.xyz/?focus=map&map=15/44.549719/4.421036&pic=1c9a269c-dc13-4407-b353-d07ed6725b05&seq=5b8320e4-96d3-475e-bf43-01ed664f89d1" target="blank">explorer cette région sur Panoramax</a> pour illustrer les conseils qui suivent.
 	</p>
+	<h3 id ="reseau">Réseau de sentiers</h3>
+	
+	<p>
+	J'ai commencé sur OpenStreetMap par la cartographie des réseaux de sentiers. Ces réseaux permettaient au randonneur de construire un itinéraire personnalisé. Ils sont malheureusement de plus en plus abandonnés et remplacés par des boucles prédéfinies.<br>
+	Pour les photos sur Panoramax, j'ai gardé le principe du réseau : une séquence = un sentier entre deux intersections.<br>
+	Ce découpage en séquences courtes a aussi l'avantage de faciliter les mises à jour lorsqu'une portion de sentier est dégradée ou devient interdite pour une raison quelconque.
+	</p>		
+
 	<h3 id ="sequence">Séquences</h3>
 	<ul>
 		<li>
-			Pour définir le regroupement des photos en séquence, avec baba il suffit de choisir le début et la fin, indépendamment de l'intervalle de temps et de distance entre deux prises de vue. Lorsque la distance entre points est trop grande (plus de 75 m), le trait sur la carte est discontinu et, selon le zoom, les points isolés peuvent même disparaître mais le déroulement de la séquence avec les flèches avant-arrière reste continu. 
+			Avec baba, pour définir le regroupement des photos en séquence, il suffit de choisir le début et la fin, indépendamment de l'intervalle de temps et de distance entre deux prises de vue. On peut même poursuivre une séquence après un arrêt repas sans discontinuité <br>
+			Sur les visionneuses, lorsque la distance entre points est trop grande (plus de 75 m), le trait sur la carte est discontinu. Selon le zoom, des points isolés peuvent même ne pas apparaître mais la séquence reste complète et son déroulement avec les flèches avant-arrière reste continu. 
 		</li>
 		<li>
 			Pour que l'étendue complète de la séquence apparaisse clairement sur la carte il est donc préférable de mettre, pour débuter et pour terminer, des points à moins de 75m d'intervalle, soit une centaine de pas.
 		</li>
 		<li>
-			Pour pallier l'absence de vue à 360°, on peut très bien prendre des vues intermédiaires en travers. Baba repère l'orientation de la prise de vue avec la boussole du smartphone. La direction correcte est onc indiquée à la relecture. Pour faciliter le déroulement de la lecture, il est conseillé d'encadrer ces vues par une vue avant et après dans le sens de la marche. 
+			Quand il y a des virages, pour que le tracé suive à peu près le sentier	il faut là aussi prendre quelques points rapprochés même s'il n'y a pas grand chose à voir.
 		</li>
-		
 		<li>
+			Un truc pour avoir un déroulement agréable à la relecture est de prendre une photo aux alentours du dernier point visible sur la photo précédente. Cela donne en général une densité d'une quarantaine de points au kilomètre.
 		</li>
 	</ul>	
 	
 	<h3 id ="intersections">Intersections</h3>
+	<p>
+	<ul>
+		<li>
+	Pour mettre en valeur l'organisation en réseau, lorsqu'une séquence se termine à une intersection, on peut utiliser les flèches jaunes de saut à une autre séquence pour continuer sur les sentiers voisins.
+	
+<br>.
+	<div style="position: relative; left:20%"">
+		<img src="./images/fleches_osm.jpg" style= "width: 50%">
+	</div>
+<br>
+		</li>
+		<li>
+	Pour que les flèches apparaissent, il faut que les points voisins soient à moins de 15 m et que les directions de prise de vue ne diffèrent pas de plus de 100°. Il faut donc, dans la mesure du possible terminer ou commencer la séquence très près du carrefour et orienter l'appareil perpendiculairement aux autres trajets.
+		</li>
+		<li>
+	<i>Note </i>: Pour le moment, sur les instances du métacatalogue, (api.panoramax.xyz ou explore.panoramax) les flèchhes n'apparaissent pas comme elles deraient à cause d'un bug. 
+
+	La vue ci dessus provient de 
+	<a href= "https://panoramax.openstreetmap.fr/?s=fp;s2;pf854e6d5-20fb-410c-9896-aae8f9c7da81;c315.00/0.00/30;m18.55/44.5705831/4.4385919;vd;bs;udefault" target="blank">la visionneuse de l'instance osm</a> 
+	sur laquelle le bug a été corrigé. 
+		</li>
+	</ul>	
+	</p>
+
+	<h3 id ="travers">Vues en travers</h3>
+	<ul>
+		<li>
+			Pour pallier l'absence de vue à 360°, on peut très bien prendre des photos intermédiaires en travers. Baba repère l'orientation de la prise de vue avec la boussole du smartphone. Cette orientation, indiquée sur la mini-carte de la visionneuse, montre clairement ce qui a été photograhié.
+		</li>
+		<li>
+			Pour faciliter le déroulement de la lecture, une bonne méthode est d'encadrer une photo en travers par des photos dans le sens de la marche avant et après. 
+		</li>
+		<li>
+			Pour certains endroits remarquables, panorama d'un sommet, carrefour de plusieurs chemins... on aurait quand même envie d'avoir par ci par là une vraie vue à 360°. La plupart des smartphones peuvent faire une vue panoramique. Reste juste à la transformer pour qu'elle soit comprise par la visionneuse. Des solutions existent mais je n'ai pas encore eu le temps de creuser le problème.
+		</li>
+
+	</ul>	
+
+	
+	<h2 id="conclure">Pour conclure</h2>
+	<p>
+	En plus des deux points déjà mentionnés: la simplicité et l'absence de matériel spécial, cette façon de contribuer à Panoramax présente d'autres petits avantages:
+	</p>
+	<ul>
+		<li>
+		La prise de vue n'étant pas automatique, on peut choisir ce qu'on photographie: détail remarquable, paysage, difficulté sur le chemin...<br>
+		</li>
+		<li>
+		On peut choisir aussi quand et comment on prend la photo: se mettre à l'ombre d'un tronc pour les photos à contre jour, attendre une trouée dans la végétation pour voir le paysage...	
+		</li>
+		<li>
+		Le petit nombre de points dans une séquence met en valeur les points que le photographe a jugés importants. Ce choix laisse peut-être d'autres choses de côté mais il faut bien laisser au randonneur le plaisir de découvrir.
+		</li>
+		<li>
+		Lors d'une rando en groupe, il suffit de marcher en tête pour avoir des chemins dégagés. Avec une caméra 360°, difficile de n'avoir personne à la fois devant et derrière sauf si on randonne seul, ce qui est une limitation.
+		</li>
+	</ul>
+		Il n'y a plus qu'à espérer que d'autres randonneurs se laisseront convaincre par la simplicité de la méthode et que la couverture des sentiers aumentera rapidement.
+		
+	<p>&nbsp
+	</p>
+	
 
 </body>
 </html>
