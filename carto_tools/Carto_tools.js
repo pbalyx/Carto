@@ -1,5 +1,5 @@
 ///
-const version ="0.5.8";
+const version ="0.5.9";
 const subV = ""; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
@@ -19,6 +19,7 @@ const subV = "";
 // 0.5.7 : essai pour voir les photos panoramax
 //		_b : ok à nettoyer
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
+// 0.5.9 : panoramax en cours
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
@@ -152,17 +153,12 @@ function layer_onEachFeatureDo(feature, layer) {
 
 function onCalqueClick(e) {
 	if (osmMode != "panox") {
-///		e.target.bindPopup();
+//// todo		e.target.bindPopup();
 	} else { 	
 		e.target.unbindPopup();
-		pointclicked(e);
+		pointclicked(e); //function in panoramax region
 	}
 }
-
-async function pointclicked(e) {
-	manageItem(e.target.feature, true);
-}
-
 
 var defaultStyle = {
 	color: "green",
@@ -1578,7 +1574,11 @@ var currentCollectionCount = 0;
 var currentImageIndex = 0;
 var next_apiUrl, prev_apiUrl;
 
-
+// if prevNextMode new feature and image is fetched using prev and next url in current feature
+// else new feature is got by its index in already loaded collection
+// prevNextMode is set if feature is not found in current collection
+var prevNextMode = false;
+	
 bClosePhoto.onclick = hidePhoto;
 	function hidePhoto(){
 		photoDiv.style.display = "none";			
@@ -1605,6 +1605,10 @@ img.addEventListener('load', (event) => {
 			checkBottom();
 		});
 
+function pointclicked(e) {
+	manageItem(e.target.feature, true);
+}
+
 bPrevPoint.onclick = () => {
 	if (currentImageIndex > 0) {
 		currentImageIndex--;
@@ -1617,8 +1621,6 @@ bPrevPoint.onclick = () => {
 	}
 }
 
-var prevNextMode = false;
-	
 bNextPoint.onclick = () => {
 	if (currentImageIndex < currentCollectionCount) {
 		currentImageIndex++;
@@ -1631,23 +1633,27 @@ bNextPoint.onclick = () => {
 	}
 }
 
-async function managePrevNext(apiUrl) {
-///	console.log("apiUrl", apiUrl);
+async function managePrevNext(prevNextUrl) {
+///	console.log("prevNextUrl", prevNextUrl);
 //  this take more time (500 ms) than direct call 
-	const res = await fetch(apiUrl);
+	const res = await fetch(prevNextUrl);
 	const data = await res.json();
 	manageItem(data, false);
 }
-	
+
+// check what to do with new feature	
 async function manageItem(_feature, checkSeq) {
+
     const imgIndex = await updateCollection(_feature, checkSeq);	
 	if (imgIndex < 0) {
 		prevNextMode = true;
+////		alert("imgIndex < 0; prevNextMode");
 	}
 	else {
 		prevNextMode = false;
 	}
 	currentImageIndex = imgIndex;
+	
 ///	console.log("imgIndex", imgIndex,"  collection count", calques[seqNum].layerJson.features.length);
 	const nextLink = _feature.links.find(obj => obj?.rel === "next");
 	if (nextLink) {
@@ -1677,12 +1683,16 @@ function showImage(_feature) {
 ///	console.log("img", _feature.assets.sd);
 }
 
-var azimuthPtr = L.polyline([], {color: 'red'}).addTo(map);
+var azimuthPtr = L.polyline([], {color: 'blue'});
 
+// set a larger marker on selected feature
+// set azimuth if present in feature
+// set map current_point on this feature (useful to search around it if end of sequence)
 function showSelectedPoint(_feature) {
 	// set marker on selected point in the sequence
+///	console.log (calques[seqNum].layer._layers);
 	calques[seqNum].layer.eachLayer(function (subLayer) { 	
-		if (subLayer.feature.id == _feature.id) {
+		if (subLayer.feature && subLayer.feature.id == _feature.id) {
 			subLayer.setStyle(styleSelected);
 		} else {
 			subLayer.setStyle(style2);		
@@ -1694,9 +1704,8 @@ function showSelectedPoint(_feature) {
 	if (azimuth) {
 		const longueur = 50 * Math.pow(2, 17 - map.getZoom());
 		const polyL = buildPolyLine(_feature.geometry.coordinates, azimuth, longueur);
-		azimuthPtr.setLatLngs(polyL);
+		azimuthPtr.setLatLngs(polyL).addTo(calques[seqNum].layer);;
 	}
-	// set current point on last panox point
 	curPt_latlng.lat = ptLngLat[1];
 	curPt_latlng.lng = ptLngLat[0];
 	
@@ -1708,17 +1717,6 @@ function pxClear() {
 
 }
 
-/*
-function showImageByNum(imageIndex) {
-	try {
-		var imgFeature = calques[seqNum].layerJson.features[imageIndex];
-///		console.log(imageIndex, imgFeature);
-		manageItem(imgFeature);
-	} catch {
-		console.log("erreur sans doute séquences trop longues");
-	}
-}
-*/
  async function pxImportAround(boxSize) {
 	osmMode = "panox";
 	const dataJson = await px_getFeaturesAround(coordsStr(), boxSize);
@@ -1744,10 +1742,17 @@ async function updateCollection(_feature, checkSeq){
 		currentCollectionId = newCollectionId;
 		calques[seqNum].clearLayer();
 		dataJson = await px_getFeaturesInCollection(currentCollectionId);
-		updateCalque(panoxNum, dataJson);
-		updateCalque(seqNum, dataJson);
 		currentCollectionCount = dataJson.features.length; 
 	    imgIndex = dataJson.features.findIndex(checkId);
+		// on a chargé les 1000 premiers points de la collection dans dataJson
+		// si la collection est trop grande ils peuvent être tous hors de la carte
+		// dans ce cas imgIndex est négatif et il est inutile de les ajouter
+		if (imgIndex >=0) {
+		// charger la collection dans son calque
+			updateCalque(panoxNum, dataJson);
+		// la collection peut dépasser les points déjà chargés
+			updateCalque(seqNum, dataJson);
+		}
 	} else {
 		dataJson = calques[seqNum].layerJson;
 	    imgIndex = dataJson.features.findIndex(checkId);
@@ -2134,7 +2139,7 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test1;
+b_test.onclick = test;
 
 function test1() {
 ///	console.log("collection", calques[seqNum].layerJson);
@@ -2142,29 +2147,15 @@ function test1() {
 }
 
 async function test() {
-var colId = "3ce69743-1145-4d7f-996e-927da309eaca";  // RN102 : 
+//var colId = "3ce69743-1145-4d7f-996e-927da309eaca";  // RN102 : 
 //var colId = "55c51472-14d5-4a10-ae30-41e1a07bd886"; //vinobre 
+var colId = "5b99d0f3-474b-41dd-a23a-de0ee4aa013c"; //bayssac 
 
     const url = `https://api.panoramax.xyz/api/collections/${colId}/items?limit=1000`;
     const res = await fetch(url);
     const data = await res.json();
 console.log("col", data);
 
-//		var imgFeature = calques[seqNum].layerJson.features[currentImageIndex];
-//		console.log(imgFeature);
-///map.fitBounds(polyLine.getBounds());
-//	px_getFeaturesInCollection(collection_id);
-//	px_getCollection("12ade388-09b5-407b-af30-c832b6879757");
-/*var box = map.getBounds();
-	callPx_bbJs(box);
-var tmpStr = bboxStr(box);;
-console.log(tmpStr);
-tmpStr = bboxAround(coordsStr(), 1000);
-console.log(tmpStr);
-
-callPanox(tmpStr);
-//geoFindMe();
-//saveData();*/
 
 }
 
