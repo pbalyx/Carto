@@ -1,6 +1,6 @@
 ///
 const version ="0.5.9";
-const subV = "_c"; 
+const subV = "_d"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -19,8 +19,8 @@ const subV = "_c";
 // 0.5.7 : essai pour voir les photos panoramax
 //		_b : ok à nettoyer
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
-// 0.5.9 : panoramax en cours
-//		-c calques panox en 3 et 4 actions séparées par features/assets tout ok
+// 0.5.9 : panoramax en cours calques panox en 3 et 4 
+//		-d actions séparées par features/assets gpx name in metadata ok
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
@@ -1808,7 +1808,8 @@ function toJsonTxt(gpxText) {
 	const propEnd = '},'
 	const geomStart = '"geometry": {"type":"LineString","coordinates": [';
 	const geomEnd = ']}';
-
+	var singleName = ""; // used if only one track and name in metadata
+	
 	function trkptStr(trkPtXml) {
 		var strTmp = '[';
 	//	strTmp += trkPtXml.attributes[1].nodeValue;
@@ -1826,14 +1827,21 @@ function toJsonTxt(gpxText) {
 	
 	function trkStr(trkXml) {
 		var strTmp = featureStart;
-		var xmlNameNode = trkXml.getElementsByTagName("name")
-		if (xmlNameNode.length > 0) {
-			var name = '"' + xmlNameNode[0].childNodes[0].nodeValue + '"';
+		var _name = singleName;
+		// if one sinle track, singleName has been filled, else find it in each track
+		if (_name == "") {
+			var xmlNameNode = trkXml.getElementsByTagName("name")		
+			if (xmlNameNode.length > 0) {
+				_name = xmlNameNode[0].childNodes[0].nodeValue;
+			}	
+		}
+		if (_name != "") {
+			var nameStr = '"' + _name + '"';
 			strTmp += propStart;
-			strTmp += '"name": ' + name;
+			strTmp += '"name": ' + nameStr;
 			strTmp += propEnd;
 		}
-		
+		console.log(strTmp);
 		///geometry
 		strTmp += geomStart;
 		var trkpts = Array.from(trkXml.getElementsByTagName("trkpt"));
@@ -1860,6 +1868,10 @@ function toJsonTxt(gpxText) {
 		xmlDoc = parser.parseFromString(gpxText,"text/xml");
 		var _jsonTxt = jsonTxtStart;
 		var tracks = xmlDoc.getElementsByTagName("trk");
+		if (tracks.length == 1) { //single track
+			var nameNodes =  xmlDoc.getElementsByTagName("name");
+			singleName =nameNodes[0].childNodes[0].nodeValue;
+		}
 		for (var i = 0; i<tracks.length; i++) {
 			_jsonTxt += trkStr(tracks[i]);
 				if (i < tracks.length - 1) {_jsonTxt += ',';}
