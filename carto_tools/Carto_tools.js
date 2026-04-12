@@ -1,6 +1,6 @@
 ///
 const version ="0.5.9";
-const subV = ""; 
+const subV = "_c"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -20,6 +20,7 @@ const subV = "";
 //		_b : ok à nettoyer
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
 // 0.5.9 : panoramax en cours
+//		-c calques panox en 3 et 4 actions séparées par features/assets tout ok
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
@@ -121,44 +122,49 @@ var url_strava4 = 'https://content-a.strava.com/anon/globalheat/all/purple/{z}/{
 
 function layer_onEachFeatureDo(feature, layer) {
 	var popupStr = '';
-	if (feature.properties) { 
-		if (feature.properties.name) {
-			popupStr += '<b>'+feature.properties.name+'</b>';
-		} else if (feature.properties.lwn_ref) {
-			popupStr += '<b>'+feature.properties.lwn_ref+'</b>';
-		} else if (feature.id) {
-			popupStr += '<b>'+feature.id+'</b>';
+	if (feature.assets) {
+		layer.on('click', onCalqueClickPanox);
+	} else {
+		if (feature.properties) { 
+			if (feature.properties.name) {
+				popupStr += '<b>'+feature.properties.name+'</b>';
+			} else if (feature.properties.lwn_ref) {
+				popupStr += '<b>'+feature.properties.lwn_ref+'</b>';
+			} else if (feature.id) {
+				popupStr += '<b>'+feature.id+'</b>';
+			}
+			if (feature.properties.distance) {
+				popupStr += '<br /> Longueur: '+ feature.properties.distance +' km';
+			}
+			if (feature.properties.ascent) {
+				popupStr += '<br /> Denivelé:  +'+ feature.properties.ascent +' m  -'+ feature.properties.descent+ ' m';
+			}
+			if (feature.properties.ele) {
+				popupStr += '<br /> '+ feature.properties.ele +' m';
+			}
+			if (feature.properties.note) {
+				popupStr += '<br /> note: <i>'+ feature.properties.note +'</i>';
+			}
+			if (feature.properties.desc) {
+				popupStr += '<br /> desc: '+ feature.properties.desc ;
+			}
 		}
-		if (feature.properties.distance) {
-			popupStr += '<br /> Longueur: '+ feature.properties.distance +' km';
-		}
-		if (feature.properties.ascent) {
-			popupStr += '<br /> Denivelé:  +'+ feature.properties.ascent +' m  -'+ feature.properties.descent+ ' m';
-		}
-		if (feature.properties.ele) {
-			popupStr += '<br /> '+ feature.properties.ele +' m';
-		}
-		if (feature.properties.note) {
-			popupStr += '<br /> note: <i>'+ feature.properties.note +'</i>';
-		}
-		if (feature.properties.desc) {
-			popupStr += '<br /> desc: '+ feature.properties.desc ;
-		}
-	}
-		layer.on('click', onCalqueClick);
-
-	layer.bindPopup(popupStr);
-///	layer.unbindPopup();
-}
-
-function onCalqueClick(e) {
-	if (osmMode != "panox") {
-//// todo		e.target.bindPopup();
-	} else { 	
-		e.target.unbindPopup();
-		pointclicked(e); //function in panoramax region
+///		console.log(popupStr);
+		layer.bindPopup(popupStr);
+		layer.on('click', onCalqueClickNormal);
 	}
 }
+
+function onCalqueClickPanox(e) {
+///	console.dir(e.target)	
+	panox_click(e); //function in panoramax zone	
+}
+
+function onCalqueClickNormal(e) {
+///	console.dir(e.target)
+		e.target.bindPopup();
+}
+
 
 var defaultStyle = {
 	color: "green",
@@ -171,11 +177,13 @@ var defaultStyle = {
 };
 
 const style1 = {"color": "red",	"fillColor": "Yellow"};
-const style2 = {"color": "Blue",	"fillColor": "LightBlue",  "radius":"5"};
+const style2 = {"color": "Navy",	"fillColor": "Chartreuse",  "radius":"5"};
 const style3 = {"color": "Maroon",	"fillColor": "green"};
-const styles = [style1, style2, style3];
+const stylePanox = {"color": "red",	"fillColor": "Yellow"};
+const styleSeq = {"color": "Blue",	"fillColor": "LightBlue",  "radius":"5"};
+const styles = [style1, style2, style3, stylePanox, styleSeq];
 
-const styleSelected = {"color": "Blue",	"fillColor": "Yellow", "radius":"8"};
+const styleSelected = {"color": "Blue",	"fillColor": "PowderBlue", "radius":"8"};
 
 function isPresentBad(_feature, _featuresList) {
 	var _isPresent = false;
@@ -254,12 +262,12 @@ function CalqueObj (_name) {
 		this.layer.addData(this.layerJson.features);
 		fillCircleMarkers(this.layer); // needed to overwrite fill=false for markers
 	}
-	this.addedFeaturesList = [];
+	this.lastAddedFeaturesList = [];  // used to undo last action
 	this.addFeatures = function(_addedJson) {
-		this.addedFeaturesList = [];
+		this.lastAddedFeaturesList = [];
 		for (var i = 0; i < _addedJson.features.length; i++) {
 			if (!isPresent(_addedJson.features[i], this.layerJson.features)) {
-				this.addedFeaturesList.push(_addedJson.features[i]);
+				this.lastAddedFeaturesList.push(_addedJson.features[i]);
 				this.layerJson.features.push(_addedJson.features[i]);
 			}
 		}
@@ -271,12 +279,12 @@ function CalqueObj (_name) {
 		var _tmpFeaturesList = [];
 //		console.log("avant ",this.layerJson.features);
 		for (var i = 0; i < this.layerJson.features.length; i++) {
-			if (!isPresent(this.layerJson.features[i], this.addedFeaturesList)) {
+			if (!isPresent(this.layerJson.features[i], this.lastAddedFeaturesList)) {
 				_tmpFeaturesList.push(this.layerJson.features[i]);
 			}
 		}
 		this.layerJson.features = _tmpFeaturesList;
-		this.addedFeaturesList =[];	
+		this.lastAddedFeaturesList =[];	
 //		console.log("après ",this.layerJson.features);
 		this.updateLayer();	
 		fill_features_table();
@@ -291,7 +299,7 @@ function CalqueObj (_name) {
 function updateCalque(_num, _addedJson) {
 	var calque = calques[_num];
 	var isNew = (calque.layerJson.features.length == 0);
-//console.log(isNew, calque.layerJson.features.length);
+/// console.log(_num, isNew, calque.layerJson.features.length);
 	try {
 	calque.addFeatures(_addedJson);
 	if (isNew) {
@@ -310,7 +318,9 @@ function updateCalque(_num, _addedJson) {
 var calque1 = new CalqueObj("Calque1");
 var calque2 = new CalqueObj("Calque2");
 var calque3 = new CalqueObj("Calque3");
-const calques = [calque1, calque2, calque3];
+var calquePanox = new CalqueObj("Panoramax");
+var calqueSeq = new CalqueObj("Sequence");
+const calques = [calque1, calque2, calque3, calquePanox, calqueSeq];
 
 // endregion
 
@@ -344,6 +354,8 @@ var overlayMaps = {
 overlayMaps[calque1.name] = calque1.layer;
 overlayMaps[calque2.name] = calque2.layer;
 overlayMaps[calque3.name] = calque3.layer;
+overlayMaps[calquePanox.name] = calquePanox.layer;
+overlayMaps[calqueSeq.name] = calqueSeq.layer;
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
@@ -401,7 +413,7 @@ map.on("overlayadd", e => {
 });
 
 map.on("click", function(e){
-	if (osmMode == "explore") {
+	if (actionMode == "explore") {
 		osm_latlng = e.latlng;
 		osmMark.setLatLng(osm_latlng);
 	} else {
@@ -540,8 +552,8 @@ function updateLayerMenu() {
 //----------- file ---------------
 
 // read file in handleFileSelect
-b_osmImport.onclick =  ()=>{
-	if (osmMode != "import") { osmMode = "import" } else {osmMode = "none"};
+b_networkImport.onclick =  ()=>{
+	if (actionMode != "import") { actionMode = "import" } else {actionMode = "none"};
 	show_hideOsm();
 }
 
@@ -589,7 +601,7 @@ b_center.onclick = ()=> {
 }
 
 b_osmExplore.onclick = ()=>{
-	if (osmMode != "explore") { osmMode = "explore" } else {osmMode = "none"};
+	if (actionMode != "explore") { actionMode = "explore" } else {actionMode = "none"};
 //	osmExploreMode = !osmExploreMode;
 	show_hideOsm();
 }
@@ -645,7 +657,7 @@ function show_hideCoords(vis){
 		curPtDiv.style.display = "block";			
 		update3DCoords();
 		b_coords.innerHTML = "Coordonnées -x-";
-		osmMode = "none";
+		actionMode = "none";
 		show_hideOsm();
 	}
 	else {
@@ -691,7 +703,6 @@ var curPtMov2 = moveableMarker(map, curPt2Mark)	//même marker mais déplaçable
 
 function coordsStr() {
 	var latLngStr;
-///	console.log(cb_LatLng.checked);
 	if (cb_LatLng.checked) {
 		latLngStr = curPt_latlng.lat.toFixed(5)+ ', ' + curPt_latlng.lng.toFixed(5);
 	} else {
@@ -1085,18 +1096,18 @@ function osmId(_feature) {
 
 // region OSM
 
-var osmMode = "none"; // "none", "import", "explore", "panox"
+var actionMode = "none"; // "none", "import", "explore"
 
 function show_hideOsm(){
-		if(osmMode == "none") {
+		if(actionMode == "none") {
 			osmDiv.style.display = "none";
 			importDiv.style.display = "none";
 			b_osmExplore.innerHTML = "Explorer OSM";
-			b_osmImport.innerHTML = "Importer OSM";
+			b_networkImport.innerHTML = "Importer sentiers";
 			osmMark.removeFrom(map);
 			curPtMark.addTo(map);		
 		} 
-		else if(osmMode == "explore") {
+		else if(actionMode == "explore") {
 			osmStatus.innerHTML = "";
 			osmDiv.style.display = "block";
 			elements_div.style.display = "block";
@@ -1109,22 +1120,22 @@ function show_hideOsm(){
 			objectsFound_array.length = 0;
 			fill_elements_table();
 			
-			b_osmImport.innerHTML = "Importer OSM";
+			b_networkImport.innerHTML = "Importer sentiers";
 			importDiv.style.display = "none";
 
 			show_hideCoords(false);
 		}
-		else if (osmMode == "import") {
+		else if (actionMode == "import") {
 			osmStatus.innerHTML = "";
 			osmDiv.style.display = "none";
 			importDiv.style.display = "block";
 ///			elements_div.style.display = "none";
 			b_osmExplore.innerHTML = "Explorer OSM";
-			b_osmImport.innerHTML = "Importer OSM -x-";
+			b_networkImport.innerHTML = "Importer sentiers -x-";
 ///			b_request.innerHTML = "Importer";
 
 			show_hideCoords(false);
-		} else {alert("osmMode", osmMode);
+		} else {alert("actionMode", actionMode);
 	}
 }
 	
@@ -1283,7 +1294,7 @@ var searchRadius = 32;
 var osm_latlng = L.latLng([0,0]);
 
 bCloseOsm.onclick = () =>{	
-		osmMode = "none";
+		actionMode = "none";
 		show_hideOsm();
 	}
 
@@ -1518,7 +1529,7 @@ b_import.onclick = () => {
 
 
 bCloseImport.onclick = () =>{	
-	osmMode = "none";
+	actionMode = "none";
 	show_hideOsm();
 }
 
@@ -1541,7 +1552,7 @@ function display_resultImport(osm_data) {
 		geojson_tmp = osmtogeojson(osm_data, {flatProperties:false});		
 		geojson_tmp1 = reformatJson(geojson_tmp);
 		updateCalque(calqueIndex, geojson_tmp1);
-		console.log(geojson_tmp1);
+///		console.log(geojson_tmp1);
 	}
 	catch(err) {
 ///			trucDiv.innerHTML += err;
@@ -1566,8 +1577,8 @@ function display_resultImport(osm_data) {
 
 // region Panoramax
 
-const panoxNum = 0;
-const seqNum = 1;
+const panoxNum = 3;
+const seqNum = 4;
 var img = document.getElementById("image");
 var currentCollectionId;
 var currentCollectionCount = 0;
@@ -1605,7 +1616,7 @@ img.addEventListener('load', (event) => {
 			checkBottom();
 		});
 
-function pointclicked(e) {
+function panox_click(e) {
 	manageItem(e.target.feature, true);
 }
 
@@ -1671,10 +1682,10 @@ async function manageItem(_feature, checkSeq) {
 	}
 
 	showImage(_feature);
-	showSelectedPoint(_feature);	
 	if (!nextLink || !prevLink) {		
-		pxImportAround(200); // show other points around
+//// todo : azimuth bug		pxImportAround(200); // show other points around
 	}
+	showSelectedPoint(_feature);	
 }
 
 function showImage(_feature) {
@@ -1695,7 +1706,7 @@ function showSelectedPoint(_feature) {
 		if (subLayer.feature && subLayer.feature.id == _feature.id) {
 			subLayer.setStyle(styleSelected);
 		} else {
-			subLayer.setStyle(style2);		
+			subLayer.setStyle(styles[seqNum]);		
 		}
 	});	
 	// build azimuth pointer
@@ -1718,15 +1729,15 @@ function pxClear() {
 }
 
  async function pxImportAround(boxSize) {
-	osmMode = "panox";
+/////	actionMode = "panox";
 	const dataJson = await px_getFeaturesAround(coordsStr(), boxSize);
 ///	console.log(dataJson);
 	updateCalque(panoxNum, dataJson);
-	updateCalque(seqNum, {"features":[]});// notjin to add but set calque seq above calque panox
+	updateCalque(seqNum, {"features":[]});// nothing to add but set calque seq above calque panox
 }
 
  async function pxImportBox() {
-	osmMode = "panox";
+////	actionMode = "panox";
 	const bbxStr = bboxStr(map.getBounds());
 	const dataJson = await px_getFeaturesBbox(bbxStr);
 ///	console.log(dataJson);
@@ -1748,9 +1759,9 @@ async function updateCollection(_feature, checkSeq){
 		// si la collection est trop grande ils peuvent être tous hors de la carte
 		// dans ce cas imgIndex est négatif et il est inutile de les ajouter
 		if (imgIndex >=0) {
-		// charger la collection dans son calque
-			updateCalque(panoxNum, dataJson);
 		// la collection peut dépasser les points déjà chargés
+			updateCalque(panoxNum, dataJson);
+		// charger la collection dans son calque
 			updateCalque(seqNum, dataJson);
 		}
 	} else {
@@ -1782,11 +1793,12 @@ function read_File(_file) {
 		input_Text = evt.target.result;
 		var layerJson = toJsonObj(input_Text);
 		updateCalque(calqueIndex, layerJson);
+///		console.log(input_Text, layerJson);
 	}
 }
 
 function toJsonTxt(gpxText) {
-
+//// todo get name if it is in metadata and if there is only one track
 	const jsonTxtStart = '{"type": "FeatureCollection","features": ['; 
 //	const jsonTxtEnd = ']}}]}';
 	const jsonTxtEnd = ']}';
@@ -1846,14 +1858,14 @@ function toJsonTxt(gpxText) {
 		
 		parser = new DOMParser();
 		xmlDoc = parser.parseFromString(gpxText,"text/xml");
-		jsonTxt = jsonTxtStart;
+		var _jsonTxt = jsonTxtStart;
 		var tracks = xmlDoc.getElementsByTagName("trk");
 		for (var i = 0; i<tracks.length; i++) {
-			jsonTxt += trkStr(tracks[i]);
-				if (i < tracks.length - 1) {jsonTxt += ',';}
+			_jsonTxt += trkStr(tracks[i]);
+				if (i < tracks.length - 1) {_jsonTxt += ',';}
 		}
-		jsonTxt += jsonTxtEnd;
-		return jsonTxt;
+		_jsonTxt += jsonTxtEnd;
+		return _jsonTxt;
 	}
 	catch (ex) {
 			alert('error toJsonTxt : \n' + ex.message);
