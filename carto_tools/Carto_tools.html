@@ -155,10 +155,20 @@
 	.overlayDiv {
 		position: absolute; 
 		top: 18px;
-		background-color: lavender;
+		background-color: AliceBlue;
 		border: 1px solid blue;	
 	}
 	
+	.bPrevNextPoint {
+		background-color: LightBlue;	
+		height:24px;
+		color:Maroon;
+	}
+	
+	.bPrevNextPoint:disabled { 
+		background-color: lightGray;
+		color:SeaShell;
+	}
 	
 	#statusDiv {
 		left: 20px;
@@ -227,7 +237,7 @@
 		padding-bottom: 8px;
     }
 
-	#features_div {
+	.subInfo_div {
 		max-height: 300px;	
 		padding: 8px;
 		overflow: auto;
@@ -331,10 +341,10 @@
 			<div id= "d_dist" class= "d_menu">
 				<button class= "b_menu">Panoramax</button>				
 					<div id="dSub_dist" class= "d_sub" >
-					<button id="b_pxImportBox" class= "b_submenu" >Chercher sur carte</button>
-					<button id="b_pxImportAround" class= "b_submenu" >Chercher autour</button>
-					<button id="b_center_panox" class= "b_submenu" >Centrer</button>
-					<button id="b_panoxClear" class= "b_submenu" >Vider</button>
+					<button id="b_panoramaxInBox" class= "b_submenu" >Chercher sur carte</button>
+					<button id="b_panoramaxAround" class= "b_submenu" >Chercher autour</button>
+					<button id="b_panoramaxCenter" class= "b_submenu" >Centrer</button>
+					<button id="b_panoramaxClear" class= "b_submenu" >Vider</button>
 					</div>
 			</div>		
 
@@ -466,19 +476,26 @@
 	<div id="infoDiv" style ="display: none" class = "overlayDiv">		
 		<div id= "infoHeader" class= "header" >
 			Info&nbsp 
+			<button id="b_element" class= "b_header" > -> Panoramax</button>
 			<button id="b_layer_1b" class= "b_header" style="background-color:Orange" >Calque 1</button>
 			<button id="b_layer_2b" class= "b_header" >Calque 2</button>
 			<button id="b_layer_3b" class= "b_header" >Calque 3</button>
-			<span id="featuresCount" style= "padding: 2px; background-color: Azure">
-				&nbsp0 éléments</span>
 			<button id="bCloseInfo" class = "b_close">X</button>
 		</div>
-		<div id= "features_div">
-			<div class="subHeader">Features</div>
+		<div id= "features_div" class = "subInfo_div">
+			<div class="subHeader">Features
+			<span id="countSpan" style= "padding: 2px; background-color: Azure">
+				&nbsp0 items</span>
+			
+			</div>
 			<table id= "features_table" >
 				<tr id="features_table_head">
 				</tr> 
 			</table>
+		</div>		
+		<div id= "element_div" class = "subInfo_div" style ="display: none" >
+			<div class="subHeader">Image info</div>
+			<div id = "elementInfo_div"></div>
 		</div>		
 	</div>
 	
@@ -488,6 +505,8 @@
 				<span id="photoName"></span>
 			<button id= "bPrevPoint" class= "bPrevNextPoint"  disabled><b>&lt</b></button>
 			<button id= "bNextPoint" class= "bPrevNextPoint"  disabled><b>&gt</b></button>	
+			<button id= "bImgHD" class= "bPrevNextPoint" ><b>Image hd</b></button>	
+			<button id= "bInfo" class= "bPrevNextPoint" ><b>Info</b></button>	
 			<button id="bClosePhoto" class = "b_close">X</button>
 		</div>
 		<img  id="image" alt="pas de photo ?" style="max-width:100%">

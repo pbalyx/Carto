@@ -1,6 +1,6 @@
 ///
 const version ="0.5.9";
-const subV = "_d"; 
+const subV = "_f"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -20,7 +20,7 @@ const subV = "_d";
 //		_b : ok à nettoyer
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
-//		-d actions séparées par features/assets gpx name in metadata ok
+//		-f feature json et image dans nouvvelle fenetre
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
@@ -490,14 +490,16 @@ function moveableMarker(map, marker) {
 // region menu
 
 var calqueIndex = 0;
+var calqueMode = true;
 
 b_calque.onclick = ()=>{
 alert("A faire");
 }
-var sub_layer = document.getElementById("sub_layer");
+/// var sub_layer = document.getElementById("sub_layer");
 b_layer_1.onclick = setLayer;
 b_layer_2.onclick = setLayer;
 b_layer_3.onclick = setLayer;
+b_element.onclick = setLayer;
 b_layer_1b.onclick = setLayer;
 b_layer_2b.onclick = setLayer;
 b_layer_3b.onclick = setLayer;
@@ -505,28 +507,35 @@ b_layer_3b.onclick = setLayer;
 function setLayer(ev) {
 	var b_id = ev.target.id;
 //	console.log(b_id);
-	switch (b_id) {
-		case "b_layer_1": 
-		case "b_layer_1b": 
-			calqueIndex = 0;
-			break;
-		case "b_layer_2": 
-		case "b_layer_2b": 
-			calqueIndex = 1;
-			break;
-		case "b_layer_3": 
-		case "b_layer_3b": 
-			calqueIndex = 2;
-			break;
-	}
-	updateLayerMenu();
-	fill_features_table();
+	if (b_id == "b_element") {
+		updateInfoMode(!calqueMode);
+	} else {
+		switch (b_id) {
+			case "b_layer_1": 
+			case "b_layer_1b": 
+				calqueIndex = 0;
+				break;
+			case "b_layer_2": 
+			case "b_layer_2b": 
+				calqueIndex = 1;
+				break;
+			case "b_layer_3": 
+			case "b_layer_3b": 
+				calqueIndex = 2;
+				break;
+		}
+		updateLayerMenu();
+		fill_features_table();
+	} 
+
 }
 
 function updateLayerMenu() {
+	b_element.innerHTML = "Element";
 	b_layer_1.innerHTML = calque1.name;
 	b_layer_2.innerHTML = calque2.name;
 	b_layer_3.innerHTML = calque3.name;
+	b_element.style.backgroundColor = "MediumSpringGreen";
 	b_layer_1b.style.backgroundColor = "MediumSpringGreen";
 	b_layer_2b.style.backgroundColor = "MediumSpringGreen";
 	b_layer_3b.style.backgroundColor = "MediumSpringGreen";
@@ -557,11 +566,12 @@ b_networkImport.onclick =  ()=>{
 	show_hideOsm();
 }
 
-b_pxImportAround.onclick =  ()=>{ 
-	pxImportAround(1000);
+b_panoramaxAround.onclick =  ()=>{ 
+	panoramaxAround(1000);
 }
-b_pxImportBox.onclick = pxImportBox;
-b_panoxClear.onclick = pxClear;
+
+b_panoramaxInBox.onclick = panoramaxInBox;
+b_panoramaxClear.onclick = panoramaxClear;
 
 b_undo.onclick = () => {	
 	calques[calqueIndex].undoLast();
@@ -569,9 +579,14 @@ b_undo.onclick = () => {
 }
 
 b_center_file.onclick = centerCalque;
-b_center_panox.onclick = centerCalque;
-function centerCalque() {
-	var bounds = calques[calqueIndex].layer.getBounds();
+b_panoramaxCenter.onclick = centerCalque;
+function centerCalque(ev) {
+///  console.log(ev.target);
+	var _index = calqueIndex;
+	if (ev.target.id == "b_panoramaxCenter") {
+		_index = 3;
+	}
+	var bounds = calques[_index].layer.getBounds();
 	if (bounds.isValid()) {
 		map.fitBounds(bounds);
 	}
@@ -1008,7 +1023,9 @@ function dragstatusDiv(){
 // region infoDiv
 var infoDiv = document.getElementById("infoDiv");
 var infoHeader = document.getElementById("infoHeader");
-var featuresCount = document.getElementById("featuresCount");
+var countSpan = document.getElementById("countSpan");
+var element_div = document.getElementById("element_div"); 
+var elementInfo_div = document.getElementById("elementInfo_div"); 
 var features_div = document.getElementById("features_div"); 
 var features_table = document.getElementById("features_table");
 var features_table_head = document.getElementById("features_table_head"); 
@@ -1041,10 +1058,27 @@ function draginfoDiv(){
 	dragElement(infoHeader, infoDiv );
 }
 
+function updateInfoMode(_calqueMode) {
+	calqueMode = _calqueMode;
+	if (calqueMode) {
+		b_layer_1b.style.display = "inline";	
+		b_layer_2b.style.display = "inline";	
+		b_layer_3b.style.display = "inline";
+		b_element.innerHTML = " -> Panoramax";
+		features_div.style.display = "block";
+		element_div.style.display = "none";	
+	} else {
+		b_layer_1b.style.display = "none";	
+		b_layer_2b.style.display = "none";	
+		b_layer_3b.style.display = "none";	
+		b_element.innerHTML = " -> Calques";
+		features_div.style.display = "none";
+		element_div.style.display = "block";		
+	}
+
+}
+
 function init_features_table() {
-/*	for (var i = features_table.rows.length -1; i > 0; i--) {
-		features_table.deleteRow(-1);
-	}*/
 	features_table_head.innerHTML = 
 	`
 		<th style="width:55px">type</th>
@@ -1060,7 +1094,7 @@ function fill_features_table() {
 		features_table.deleteRow(-1);
 	}
 	var nbFeatures = calques[calqueIndex].layerJson.features.length;
-	featuresCount.innerHTML = nbFeatures + " éléments: ";
+	countSpan.innerHTML = nbFeatures + " items: ";
 //	console.log(calques[calqueIndex].layerJson.features);
 	calques[calqueIndex].layerJson.features.forEach(function (item) {
 		var row = features_table.insertRow();
@@ -1584,7 +1618,9 @@ var currentCollectionId;
 var currentCollectionCount = 0;
 var currentImageIndex = 0;
 var next_apiUrl, prev_apiUrl;
-
+var currentFeature;
+var currentFeatureUrl;
+var currentFeatureImgUrl;
 // if prevNextMode new feature and image is fetched using prev and next url in current feature
 // else new feature is got by its index in already loaded collection
 // prevNextMode is set if feature is not found in current collection
@@ -1618,6 +1654,31 @@ img.addEventListener('load', (event) => {
 
 function panox_click(e) {
 	manageItem(e.target.feature, true);
+}
+
+bImgHD.onclick = () => {
+	window.open(currentFeatureImgUrl);  
+}
+
+bInfo.onclick = () => {
+	window.open(currentFeatureUrl);  
+/*	show_hideInfo(true);	
+	updateInfoMode(false);
+	updatePanoxInfo(currentFeature);*/
+///	console.dir(currentFeature);
+}
+
+function updatePanoxInfo(_feature) {
+	elementInfo_div.innerHTML = "id: " + _feature.id;
+	elementInfo_div.innerHTML += 
+		"<br>date: " + _feature.properties.datetime.substring(0,10) + 
+		",  time: " + _feature.properties.datetime.substring(11,19);
+	elementInfo_div.innerHTML += 
+		"<br>assets: " + _feature.assets.hd.href.substring(0,35) + "...";
+	elementInfo_div.innerHTML += 
+		"<br>geovisio:rank: " + _feature.properties["geovisio:rank_in_collection"];
+	elementInfo_div.innerHTML += 
+		"<br>provider[0].name: " + _feature.providers[0].name;
 }
 
 bPrevPoint.onclick = () => {
@@ -1683,8 +1744,12 @@ async function manageItem(_feature, checkSeq) {
 
 	showImage(_feature);
 	if (!nextLink || !prevLink) {		
-//// todo : azimuth bug		pxImportAround(200); // show other points around
+//// todo : azimuth bug		panoramaxAround(200); // show other points around
 	}
+	currentFeature = _feature; //to display info
+	currentFeatureUrl = _feature.links[1].href;
+	currentFeatureImgUrl = _feature.assets.hd.href;
+	updatePanoxInfo(_feature);
 	showSelectedPoint(_feature);	
 }
 
@@ -1698,7 +1763,7 @@ var azimuthPtr = L.polyline([], {color: 'blue'});
 
 // set a larger marker on selected feature
 // set azimuth if present in feature
-// set map current_point on this feature (useful to search around it if end of sequence)
+// set map current_point on this feature (useful to search around)
 function showSelectedPoint(_feature) {
 	// set marker on selected point in the sequence
 ///	console.log (calques[seqNum].layer._layers);
@@ -1722,13 +1787,13 @@ function showSelectedPoint(_feature) {
 	
 }
 
-function pxClear() {
+function panoramaxClear() {
 	calques[panoxNum].clearLayer();
 	calques[seqNum].clearLayer();
 
 }
 
- async function pxImportAround(boxSize) {
+ async function panoramaxAround(boxSize) {
 /////	actionMode = "panox";
 	const dataJson = await px_getFeaturesAround(coordsStr(), boxSize);
 ///	console.log(dataJson);
@@ -1736,7 +1801,7 @@ function pxClear() {
 	updateCalque(seqNum, {"features":[]});// nothing to add but set calque seq above calque panox
 }
 
- async function pxImportBox() {
+ async function panoramaxInBox() {
 ////	actionMode = "panox";
 	const bbxStr = bboxStr(map.getBounds());
 	const dataJson = await px_getFeaturesBbox(bbxStr);
@@ -2163,7 +2228,20 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test;
+b_test.onclick = test2;
+
+function test2() {
+try {
+////var currentFeatureUrl = currentFeature.links[1].href;
+/// var jsontxt = JSON.stringify(currentFeature, null, 2)
+	console.log(currentFeatureImgUrl);	
+///	window.open(currentFeatureUrl);  
+	window.open(currentFeatureImgUrl);  
+}
+catch(err){
+alert(err);
+}
+}
 
 function test1() {
 ///	console.log("collection", calques[seqNum].layerJson);
