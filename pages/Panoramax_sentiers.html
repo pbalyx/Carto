@@ -81,6 +81,7 @@
 				<li><a href = "#sequence">Séquences</a></li>
 				<li><a href = "#intersections">Intersections</a></li>				
 				<li><a href = "#travers">Vues en travers</a></li>				
+				<li><a href = "#precision">Précision</a></li>				
 			</ul>
 		</li>	
 		<li><a href = "#conclure">Pour conclure</a></li>
@@ -153,13 +154,14 @@
 	</div>
 	
 	</p>
+	
 	<p>
-	On peut espérer que d'autres implémentations paraitront dans l'avenir.
+	<br>On peut espérer que d'autres implémentations paraitront dans l'avenir.
 	</p>
 	<p>
 	Pour mon usage, j'ai ajouté une visualisation simplifiée de Panoramax dans la page web que j'utilise pour préparer mes sorties. Cette page me permet de jongler entre différents fonds de carte et calques superposés (voir ci-dessous). Elle est au stade expérimental et le restera sans doute mais ellle donnera peut être des idées à d'autres développeurs.  <a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html" target="blank">Elle peut être testée ici</a> 
 	</p>
-	<div style="position: relative; left:5%; display: flex; flex-direction: row">
+	<br><div style="position: relative; left:5%; display: flex; flex-direction: row">
 		<div style= "width: 40%">
 		<img src="./images/carto_tools_1.jpg" style= "width: 100%">
 		<br><span><i>Fond OpenTopoMap, photo visible</i></span>
@@ -185,7 +187,7 @@
 	<p>
 	J'ai commencé sur OpenStreetMap par la cartographie des réseaux de sentiers. Ces réseaux permettaient au randonneur de construire un itinéraire personnalisé. Ils sont malheureusement de plus en plus abandonnés et remplacés par des boucles prédéfinies.<br>
 	Pour les photos sur Panoramax, j'ai gardé le principe du réseau : une séquence = un sentier entre deux intersections.<br>
-	Ce découpage en séquences courtes a aussi l'avantage de faciliter les mises à jour lorsqu'une portion de sentier est dégradée ou devient interdite pour une raison quelconque.
+	Ce découpage en séquences courtes a aussi l'avantage de faciliter les mises à jour. Lorsqu'une portion de sentier est dégradée ou devient interdite pour une raison quelconque il suffit du supprimer la séquence sans toucher au reste.
 	</p>		
 
 	<h3 id ="sequence">Séquences</h3>
@@ -243,6 +245,11 @@
 		</li>
 
 	</ul>	
+	<h3 id ="precision">Précision</h3>
+	<p>
+	Pour tous les points de prise de vue, la précision de la localisation est correcte à quelques mètres près, précision bien suffisante pour les sentiers.<br>
+	Je dois préciser cependant que dans mes sorties, j'enregistre systématiquement en parallèle une trace gpx avec Osmand (ou n'importe quelle appli de rando). La position gps est donc interrogée à intervalles réguliers ce qui améliore peut-être la localisation.
+	</p>
 
 	
 	<h2 id="conclure">Pour conclure</h2>
