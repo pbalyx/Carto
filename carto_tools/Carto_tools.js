@@ -20,7 +20,7 @@ const subV = "_f";
 //		_b : ok à nettoyer
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
-//		-f feature json et image dans nouvvelle fenetre
+//		-f feature json et image dans nouvelle fenetre
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
