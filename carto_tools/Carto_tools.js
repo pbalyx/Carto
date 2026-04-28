@@ -1,6 +1,6 @@
 ///
-const version ="0.5.9";
-const subV = "_f"; 
+const version ="0.6.0";
+const subV = ""; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -20,7 +20,7 @@ const subV = "_f";
 //		_b : ok à nettoyer
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
-//		-f feature json et image dans nouvelle fenetre
+// 0.6.0 : panoramax ok	
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
@@ -271,6 +271,7 @@ function CalqueObj (_name) {
 				this.layerJson.features.push(_addedJson.features[i]);
 			}
 		}
+///console.log(this.layerJson.features);
 		this.updateLayer();	
 		fill_features_table();
 	}
@@ -1662,9 +1663,6 @@ bImgHD.onclick = () => {
 
 bInfo.onclick = () => {
 	window.open(currentFeatureUrl);  
-/*	show_hideInfo(true);	
-	updateInfoMode(false);
-	updatePanoxInfo(currentFeature);*/
 ///	console.dir(currentFeature);
 }
 
@@ -1743,10 +1741,10 @@ async function manageItem(_feature, checkSeq) {
 	}
 
 	showImage(_feature);
-	if (!nextLink || !prevLink) {		
-//// todo : azimuth bug		panoramaxAround(200); // show other points around
+	if (!nextLink || !prevLink) {
+		panoramaxAround(400);		
 	}
-	currentFeature = _feature; //to display info
+	currentFeature = _feature; 
 	currentFeatureUrl = _feature.links[1].href;
 	currentFeatureImgUrl = _feature.assets.hd.href;
 	updatePanoxInfo(_feature);
@@ -1798,7 +1796,9 @@ function panoramaxClear() {
 	const dataJson = await px_getFeaturesAround(coordsStr(), boxSize);
 ///	console.log(dataJson);
 	updateCalque(panoxNum, dataJson);
-	updateCalque(seqNum, {"features":[]});// nothing to add but set calque seq above calque panox
+	// set calque seq above calque panox
+	map.removeLayer(calques[seqNum].layer);
+	map.addLayer(calques[seqNum].layer);
 }
 
  async function panoramaxInBox() {
@@ -2228,14 +2228,14 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test2;
+b_test.onclick = test;
+
+function test() {
+	alert("no test");
+}
 
 function test2() {
 try {
-////var currentFeatureUrl = currentFeature.links[1].href;
-/// var jsontxt = JSON.stringify(currentFeature, null, 2)
-	console.log(currentFeatureImgUrl);	
-///	window.open(currentFeatureUrl);  
 	window.open(currentFeatureImgUrl);  
 }
 catch(err){
@@ -2243,12 +2243,7 @@ alert(err);
 }
 }
 
-function test1() {
-///	console.log("collection", calques[seqNum].layerJson);
-	prevNextMode = !prevNextMode;
-}
-
-async function test() {
+async function test_delay() {
 //var colId = "3ce69743-1145-4d7f-996e-927da309eaca";  // RN102 : 
 //var colId = "55c51472-14d5-4a10-ae30-41e1a07bd886"; //vinobre 
 var colId = "5b99d0f3-474b-41dd-a23a-de0ee4aa013c"; //bayssac 
