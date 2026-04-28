@@ -21,7 +21,7 @@ const subV = "";
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
-
+//		_a : referer
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
 window.onload = (event) => {
