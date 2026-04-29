@@ -1,6 +1,6 @@
 ///
 const version ="0.6.0";
-const subV = "_a"; 
+const subV = "_b"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -21,7 +21,7 @@ const subV = "_a";
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
-//		_a : referer
+//		_a : referer -b test : Remove referrer meta tag from Carto_tools.html
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
 window.onload = (event) => {
