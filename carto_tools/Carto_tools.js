@@ -1,6 +1,6 @@
 ///
-const version ="0.6.0";
-const subV = "_b"; 
+const version ="0.6.1";
+const subV = ""; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -21,7 +21,8 @@ const subV = "_b";
 // 0.5.8 : supprimé panoramax de stephaneP calque Panox en cours
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
-//		_a : referer -b test : Remove referrer meta tag from Carto_tools.html
+// 0.6.1 : intégré panox dans script
+
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
 window.onload = (event) => {
@@ -560,8 +561,8 @@ function updateLayerMenu() {
 }
 
 //----------- file ---------------
-
 // read file in handleFileSelect
+
 b_networkImport.onclick =  ()=>{
 	if (actionMode != "import") { actionMode = "import" } else {actionMode = "none"};
 	show_hideOsm();
@@ -717,7 +718,7 @@ var curPt2Mark = new L.CircleMarker(curPt2_latlng,
 ).addTo(map);
 var curPtMov2 = moveableMarker(map, curPt2Mark)	//même marker mais déplaçable
 
-function coordsStr() {
+function curPtCoordsStr() {
 	var latLngStr;
 	if (cb_LatLng.checked) {
 		latLngStr = curPt_latlng.lat.toFixed(5)+ ', ' + curPt_latlng.lng.toFixed(5);
@@ -729,11 +730,11 @@ function coordsStr() {
 
 function update3DCoords(){
 	updateLonLat();
-	getPointElev(coordsStr());
+	getPointElev(curPtCoordsStr());
 }
 
 function updateLonLat() {
-	editLonLat.value = coordsStr();
+	editLonLat.value = curPtCoordsStr();
 
 }
 
@@ -916,12 +917,12 @@ function copyCurrent(ev) {
 	switch (ev.target.id) {
 		case "b_cur1":
 			curPt1_latlng = curPt_latlng;
-			editPt1.value = coordsStr();
+			editPt1.value = curPtCoordsStr();
 			curPt1Mark.setLatLng(curPt1_latlng);
 		break;
 		case "b_cur2":
 			curPt2_latlng = curPt_latlng;
-			editPt2.value = coordsStr();
+			editPt2.value = curPtCoordsStr();
 			curPt2Mark.setLatLng(curPt2_latlng);
 		break;	
 	}
@@ -1177,6 +1178,9 @@ function show_hideOsm(){
 // region Overpass
 
 var baseUrl = 'https://overpass-api.de/api/interpreter';
+////var baseUrl = 'https://overpass.openstreetmap.fr/api/interpreter';
+////var baseUrl = 'https://api-overpass.pikamap.fr/api/interpreter';
+
 var queryType = ""; // type enum ?? (around, meta, import)
 var queryOk = true;
 var osmDiv = document.getElementById('osmDiv');
@@ -1622,11 +1626,36 @@ var next_apiUrl, prev_apiUrl;
 var currentFeature;
 var currentFeatureUrl;
 var currentFeatureImgUrl;
-// if prevNextMode new feature and image is fetched using prev and next url in current feature
-// else new feature is got by its index in already loaded collection
-// prevNextMode is set if feature is not found in current collection
+var azimuthPtr = L.polyline([], {color: 'blue'});
+
+// if prevNextMode new feature is fetched using prev and next url in current feature
+// else new feature is got simply by its index in already loaded collection (faster)
+// prevNextMode is set if feature is not found in the loaded part of the current collection
 var prevNextMode = false;
 	
+//------- menu and utils ---------
+	
+async function panoramaxAround(boxSize) {
+	const bbStr = bboxAround(curPtCoordsStr(), boxSize);
+	const dataJson = await px_getFeaturesBbox(bbStr);
+
+	updateCalque(panoxNum, dataJson);
+	// set calque seq above calque panox
+	map.removeLayer(calques[seqNum].layer);
+	map.addLayer(calques[seqNum].layer);
+}
+
+async function panoramaxInBox() {
+	const bbxStr = bboxStr(map.getBounds());
+	const dataJson = await px_getFeaturesBbox(bbxStr);
+	updateCalque(panoxNum, dataJson);
+}
+
+function panoramaxClear() {
+	calques[panoxNum].clearLayer();
+	calques[seqNum].clearLayer();
+}
+
 bClosePhoto.onclick = hidePhoto;
 	function hidePhoto(){
 		photoDiv.style.display = "none";			
@@ -1653,10 +1682,6 @@ img.addEventListener('load', (event) => {
 			checkBottom();
 		});
 
-function panox_click(e) {
-	manageItem(e.target.feature, true);
-}
-
 bImgHD.onclick = () => {
 	window.open(currentFeatureImgUrl);  
 }
@@ -1677,6 +1702,49 @@ function updatePanoxInfo(_feature) {
 		"<br>geovisio:rank: " + _feature.properties["geovisio:rank_in_collection"];
 	elementInfo_div.innerHTML += 
 		"<br>provider[0].name: " + _feature.providers[0].name;
+}
+
+function bboxAround(lonLatStr, dist) {
+var bboxStr = "";
+var strSplit, lon, lat;
+	strSplit = lonLatStr.split(',');
+	lon = parseFloat(strSplit[0]);
+	lat = parseFloat(strSplit[1]); 
+var distDeg = parseFloat(dist) * 180 / 40000000; //halfdist
+bboxStr += (lon - distDeg * Math.cos(lat)).toFixed(7);
+bboxStr += ',' + (lat - distDeg).toFixed(7);
+bboxStr += ',' + (lon + distDeg * Math.cos(lat)).toFixed(7);
+bboxStr += ',' + (lat + distDeg).toFixed(7);
+return bboxStr;
+}
+
+function bboxStr(bboxJson) {
+  var tmpStr;
+  tmpStr = bboxJson._southWest.lng.toFixed(6);
+  tmpStr += ',' + bboxJson._southWest.lat.toFixed(6);
+  tmpStr += ',' + bboxJson._northEast.lng.toFixed(6);
+  tmpStr += ',' + bboxJson._northEast.lat.toFixed(6);
+  
+  return tmpStr
+}
+
+function buildPolyLine(coords, azim, dist) {
+var distDeg = parseFloat(dist) * 360 / 40000000; 
+var azimRad = 3.14 / 180 * azim;
+var delta = 0.16;
+var pt2Lon = coords[0] + distDeg / Math.cos(parseFloat(coords[1])) * Math.sin(azimRad - delta);
+var pt2Lat = coords[1] + distDeg * Math.cos(azimRad - delta);
+var pt3Lon = coords[0] + distDeg / Math.cos(parseFloat(coords[1])) * Math.sin(azimRad + delta);
+var pt3Lat = coords[1] + distDeg * Math.cos(azimRad + delta);
+var polyL = [[pt2Lat, pt2Lon], [coords[1], coords[0]],[pt3Lat, pt3Lon]];
+///console.log(polyL);
+return polyL;
+}
+
+//-------- core -----------
+
+function panox_click(e) {
+	manageItem(e.target.feature, true);
 }
 
 bPrevPoint.onclick = () => {
@@ -1713,18 +1781,14 @@ async function managePrevNext(prevNextUrl) {
 
 // check what to do with new feature	
 async function manageItem(_feature, checkSeq) {
-
     const imgIndex = await updateCollection(_feature, checkSeq);	
-	if (imgIndex < 0) {
+	if (imgIndex < 0) {  //feature is not in loaded part of the collection
 		prevNextMode = true;
-////		alert("imgIndex < 0; prevNextMode");
 	}
 	else {
 		prevNextMode = false;
 	}
 	currentImageIndex = imgIndex;
-	
-///	console.log("imgIndex", imgIndex,"  collection count", calques[seqNum].layerJson.features.length);
 	const nextLink = _feature.links.find(obj => obj?.rel === "next");
 	if (nextLink) {
 		next_apiUrl = nextLink.href; 
@@ -1745,68 +1809,10 @@ async function manageItem(_feature, checkSeq) {
 		panoramaxAround(400);		
 	}
 	currentFeature = _feature; 
-	currentFeatureUrl = _feature.links[1].href;
+	currentFeatureUrl = _feature.links.find(obj => obj?.rel === "self").href;
 	currentFeatureImgUrl = _feature.assets.hd.href;
 	updatePanoxInfo(_feature);
 	showSelectedPoint(_feature);	
-}
-
-function showImage(_feature) {
-		photoDiv.style.display = "block";	
-		img.src = _feature.assets.sd.href;
-///	console.log("img", _feature.assets.sd);
-}
-
-var azimuthPtr = L.polyline([], {color: 'blue'});
-
-// set a larger marker on selected feature
-// set azimuth if present in feature
-// set map current_point on this feature (useful to search around)
-function showSelectedPoint(_feature) {
-	// set marker on selected point in the sequence
-///	console.log (calques[seqNum].layer._layers);
-	calques[seqNum].layer.eachLayer(function (subLayer) { 	
-		if (subLayer.feature && subLayer.feature.id == _feature.id) {
-			subLayer.setStyle(styleSelected);
-		} else {
-			subLayer.setStyle(styles[seqNum]);		
-		}
-	});	
-	// build azimuth pointer
-	const azimuth = _feature.properties["view:azimuth"];
-	const ptLngLat = _feature.geometry.coordinates;
-	if (azimuth) {
-		const longueur = 50 * Math.pow(2, 17 - map.getZoom());
-		const polyL = buildPolyLine(_feature.geometry.coordinates, azimuth, longueur);
-		azimuthPtr.setLatLngs(polyL).addTo(calques[seqNum].layer);;
-	}
-	curPt_latlng.lat = ptLngLat[1];
-	curPt_latlng.lng = ptLngLat[0];
-	
-}
-
-function panoramaxClear() {
-	calques[panoxNum].clearLayer();
-	calques[seqNum].clearLayer();
-
-}
-
- async function panoramaxAround(boxSize) {
-/////	actionMode = "panox";
-	const dataJson = await px_getFeaturesAround(coordsStr(), boxSize);
-///	console.log(dataJson);
-	updateCalque(panoxNum, dataJson);
-	// set calque seq above calque panox
-	map.removeLayer(calques[seqNum].layer);
-	map.addLayer(calques[seqNum].layer);
-}
-
- async function panoramaxInBox() {
-////	actionMode = "panox";
-	const bbxStr = bboxStr(map.getBounds());
-	const dataJson = await px_getFeaturesBbox(bbxStr);
-///	console.log(dataJson);
-	updateCalque(panoxNum, dataJson);
 }
 
 async function updateCollection(_feature, checkSeq){
@@ -1838,6 +1844,64 @@ async function updateCollection(_feature, checkSeq){
 	}	
 ///	console.log(imgIndex);
 	return imgIndex;
+}
+
+
+function showSelectedPoint(_feature) {
+// 	set a larger marker on selected feature
+// 	set map current_point on this feature (useful to search around)
+	calques[seqNum].layer.eachLayer(function (subLayer) { 	
+		if (subLayer.feature && subLayer.feature.id == _feature.id) {
+			subLayer.setStyle(styleSelected);
+		} else {
+			subLayer.setStyle(styles[seqNum]);		
+		}
+	});	
+// 	set azimuth if present in feature
+// 	build azimuth pointer
+	const azimuth = _feature.properties["view:azimuth"];
+	const ptLngLat = _feature.geometry.coordinates;
+	if (azimuth) {
+		const longueur = 50 * Math.pow(2, 17 - map.getZoom());
+		const polyL = buildPolyLine(_feature.geometry.coordinates, azimuth, longueur);
+		azimuthPtr.setLatLngs(polyL).addTo(calques[seqNum].layer);;
+	}
+	curPt_latlng.lat = ptLngLat[1];
+	curPt_latlng.lng = ptLngLat[0];
+	
+}
+
+function showImage(_feature) {
+		photoDiv.style.display = "block";	
+		img.src = _feature.assets.sd.href;
+///	console.log("img", _feature.assets.sd);
+}
+
+
+//------- panoramax api calls -----
+
+async function px_getFeaturesBbox(bboxString) {
+	const apiUrl = 
+////		`https://api.panoramax.xyz/api/search?bbox=${bboxString}&sortby=-ts&limit=1000`;
+		`https://api.panoramax.xyz/api/search?bbox=${bboxString}&limit=1000`;
+	try {
+		const res = await fetch(apiUrl);
+		const data = await res.json();
+		return data;
+	} catch (e) {
+		console.error("[Panoramax] erreur", e);
+	}
+}
+
+async function px_getFeaturesInCollection(_collection_id) {
+		const apiUrl = `https://api.panoramax.xyz/api/search?collections=${_collection_id}&sortby=datetime&limit=1000`;	
+	try {
+		const res = await fetch(apiUrl);
+		const data = await res.json();
+		return data;
+	} catch (e) {
+		  console.error("[Panoramax] erreur", e);
+	}
 }
 
 // endregion
