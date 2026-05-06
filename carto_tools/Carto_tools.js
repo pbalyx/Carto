@@ -1,6 +1,6 @@
 ///
 const version ="0.6.1";
-const subV = ""; 
+const subV = "_a"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -22,6 +22,7 @@ const subV = "";
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
+	// _a essai paramètres + supprimé panox
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
@@ -31,7 +32,19 @@ window.onload = (event) => {
 	console.log("version : ", version + subV);
 	init_map();
 	init_features_table();
+	
+	const params = new URLSearchParams(window.location.search);
+	if (params.toString() !== "") {
+		decodeParams(params);
+	}
+console.log(initialCenter, initialZoom);
+	map.setView(initialCenter, initialZoom);
 };
+
+function decodeParams(_params) {
+	if (_params.has("nom")) { initialZoom = _params.get("zoom")};
+	if (_params.has("center")) { initialCenter = JSON.parse(_params.get("center"))};
+}
 
 function init_map() {
 
@@ -328,14 +341,17 @@ const calques = [calque1, calque2, calque3, calquePanox, calqueSeq];
 
 // region map
 
-//var mapCenter = [44.65, 4.251];//Jaujac
-var mapCenter = [44.622, 4.40];// 4.40582, 44.63658
+//var initialCenter = [44.65, 4.251];//Jaujac
+var initialCenter = [44.622, 4.40];// Aubenas
+//var initialCenter = [44.60758, 4.44063];// Jastres
+//var initialCenter = [44.56, 4.4194];// Vogüé
+var initialZoom = 15;
 
 var map = L.map('map', {
-//	center: mapCenter,
+//	center: initialCenter,
 	layers: [
 		OTMLayer 
-	]}).setView(mapCenter, 13); //setView to overwrite setBounds after loading
+	]}).setView(initialCenter, initialZoom); //setView to overwrite setBounds after loading
 
 L.control.scale({maxWidth: 200, imperial: false}).addTo(map);
 var zoom_div = document.getElementById("zoom_div");
