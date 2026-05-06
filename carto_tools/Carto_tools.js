@@ -1,6 +1,6 @@
 ///
 const version ="0.6.1";
-const subV = "_a"; 
+const subV = "_b"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -22,7 +22,7 @@ const subV = "_a";
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
-	// _a essai paramètres + supprimé panox
+	// _b essai paramètres + supprimé panox + corrections
 
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
@@ -37,18 +37,19 @@ window.onload = (event) => {
 	if (params.toString() !== "") {
 		decodeParams(params);
 	}
-console.log(initialCenter, initialZoom);
-	map.setView(initialCenter, initialZoom);
+///console.log(initialCenter, initialZoom);
+	init_map();
 };
 
 function decodeParams(_params) {
-	if (_params.has("nom")) { initialZoom = _params.get("zoom")};
+	if (_params.has("zoom")) { initialZoom = _params.get("zoom")};
 	if (_params.has("center")) { initialCenter = JSON.parse(_params.get("center"))};
 }
 
 function init_map() {
-
-
+	map.setView(initialCenter, initialZoom);
+	curPt_latlng = L.latLng(map.getCenter());
+	curPtMark.setLatLng(curPt_latlng);
 }
 
 // region Map Tiles
@@ -345,13 +346,14 @@ const calques = [calque1, calque2, calque3, calquePanox, calqueSeq];
 var initialCenter = [44.622, 4.40];// Aubenas
 //var initialCenter = [44.60758, 4.44063];// Jastres
 //var initialCenter = [44.56, 4.4194];// Vogüé
-var initialZoom = 15;
+var initialZoom = 13;
 
 var map = L.map('map', {
 //	center: initialCenter,
 	layers: [
 		OTMLayer 
-	]}).setView(initialCenter, initialZoom); //setView to overwrite setBounds after loading
+////	]}).setView(initialCenter, initialZoom); 
+	]}); 
 
 L.control.scale({maxWidth: 200, imperial: false}).addTo(map);
 var zoom_div = document.getElementById("zoom_div");
@@ -586,6 +588,7 @@ b_networkImport.onclick =  ()=>{
 
 b_panoramaxAround.onclick =  ()=>{ 
 	panoramaxAround(1000);
+	updateInfoMode(false); // set infoDiv on panoramax
 }
 
 b_panoramaxInBox.onclick = panoramaxInBox;
@@ -666,7 +669,8 @@ b_save_gpx.onclick = ()=> {
 
 // region point courant
 
-var curPt_latlng = L.latLng(map.getCenter());
+///var curPt_latlng = L.latLng(map.getCenter());
+var curPt_latlng = L.latLng([0,0]);
 var curPt1_latlng = L.latLng([0,0]);
 var curPt2_latlng = L.latLng([0,0]);
 var curPtDiv = document.getElementById('curPtDiv');
