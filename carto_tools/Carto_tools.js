@@ -22,8 +22,7 @@ const subV = "_b";
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
-	// _b essai paramètres + supprimé panox + corrections
-
+	// _c bouton panox
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
 window.onload = (event) => {
@@ -1708,9 +1707,13 @@ bImgHD.onclick = () => {
 
 bInfo.onclick = () => {
 	window.open(currentFeatureUrl);  
-///	console.dir(currentFeature);
 }
 
+bPanox.onclick = () => {
+var pxUrl = 'https://api.panoramax.xyz/fr/index?focus=pic&pic='
+	pxUrl += currentFeature.id;
+	window.open(pxUrl);  
+}
 function updatePanoxInfo(_feature) {
 	elementInfo_div.innerHTML = "id: " + _feature.id;
 	elementInfo_div.innerHTML += 
@@ -1902,7 +1905,6 @@ function showImage(_feature) {
 
 async function px_getFeaturesBbox(bboxString) {
 	const apiUrl = 
-////		`https://api.panoramax.xyz/api/search?bbox=${bboxString}&sortby=-ts&limit=1000`;
 		`https://api.panoramax.xyz/api/search?bbox=${bboxString}&limit=1000`;
 	try {
 		const res = await fetch(apiUrl);
