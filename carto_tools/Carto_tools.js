@@ -1932,7 +1932,7 @@ async function px_getFeaturesBbox(bboxString) {
 }
 
 async function px_getFeaturesInCollection(_collection_id) {
-	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&sortby=datetime&limit=1000`;	
+	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&limit=1000`;	
 	
 	try {
 		const res = await fetch(apiUrl);
