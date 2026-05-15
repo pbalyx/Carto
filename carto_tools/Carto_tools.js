@@ -1,6 +1,6 @@
 ///
 const version ="0.6.1";
-const subV = "_b"; 
+const subV = "_d"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -22,7 +22,7 @@ const subV = "_b";
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
-	// _c bouton panox
+	// _d bouton panox + choix instance
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
 window.onload = (event) => {
@@ -43,6 +43,17 @@ window.onload = (event) => {
 function decodeParams(_params) {
 	if (_params.has("zoom")) { initialZoom = _params.get("zoom")};
 	if (_params.has("center")) { initialCenter = JSON.parse(_params.get("center"))};
+	if (_params.has("source")) { 
+		var _url = JSON.parse(_params.get("source"))
+		switch (_url) {
+			case "osm":
+			panoxUrl = osmUrl;
+			break;
+			case "ign":
+			panoxUrl = ignUrl;
+			break;			
+		}
+	};
 }
 
 function init_map() {
@@ -1196,9 +1207,9 @@ function show_hideOsm(){
 	
 // region Overpass
 
-var baseUrl = 'https://overpass-api.de/api/interpreter';
-////var baseUrl = 'https://overpass.openstreetmap.fr/api/interpreter';
-////var baseUrl = 'https://api-overpass.pikamap.fr/api/interpreter';
+var overpassUrl = 'https://overpass-api.de/api/interpreter';
+////var overpassUrl = 'https://overpass.openstreetmap.fr/api/interpreter';
+////var overpassUrl = 'https://api-overpass.pikamap.fr/api/interpreter';
 
 var queryType = ""; // type enum ?? (around, meta, import)
 var queryOk = true;
@@ -1296,7 +1307,7 @@ function callOverpass(type, params) {
 	}
 	var _query = buildQuery(type, params);
 	if (!queryOk) {
-//		console.log("baseUrl: ",baseUrl);
+//		console.log("overpassUrl: ",overpassUrl);
 //		console.log("_query: ",_query);
 		_status.innerHTML = "Erreur";
 		_status.style.backgroundColor = "OrangeRed";
@@ -1304,7 +1315,7 @@ function callOverpass(type, params) {
 	} else {
 		_status.innerHTML = "Attente";
 		_status.style.backgroundColor = "Orange";
-		fetch(baseUrl + _query)
+		fetch(overpassUrl + _query)
 		.then(
 			function(response) {
 				if (response.status == 200) {
@@ -1903,9 +1914,14 @@ function showImage(_feature) {
 
 //------- panoramax api calls -----
 
+const metaCatalogUrl = "https://api.panoramax.xyz/api"
+const osmUrl = "https://panoramax.openstreetmap.fr/api"
+const ignUrl = "https://https://panoramax.ign.fr/api"
+
+var panoxUrl = metaCatalogUrl;
+
 async function px_getFeaturesBbox(bboxString) {
-	const apiUrl = 
-		`https://api.panoramax.xyz/api/search?bbox=${bboxString}&limit=1000`;
+	const apiUrl = `${panoxUrl}/search?bbox=${bboxString}&limit=1000`;
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
@@ -1916,7 +1932,8 @@ async function px_getFeaturesBbox(bboxString) {
 }
 
 async function px_getFeaturesInCollection(_collection_id) {
-		const apiUrl = `https://api.panoramax.xyz/api/search?collections=${_collection_id}&sortby=datetime&limit=1000`;	
+	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&sortby=datetime&limit=1000`;	
+	
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
