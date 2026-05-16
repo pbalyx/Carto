@@ -1,6 +1,6 @@
 ///
 const version ="0.6.1";
-const subV = "_d"; 
+const subV = "_e"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -22,7 +22,7 @@ const subV = "_d";
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
-	// _d bouton panox + choix instance
+	// _e bouton panox + choix instance ok
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 
 window.onload = (event) => {
@@ -1916,7 +1916,7 @@ function showImage(_feature) {
 
 const metaCatalogUrl = "https://api.panoramax.xyz/api"
 const osmUrl = "https://panoramax.openstreetmap.fr/api"
-const ignUrl = "https://https://panoramax.ign.fr/api"
+const ignUrl = "https://panoramax.ign.fr/api"
 
 var panoxUrl = metaCatalogUrl;
 
@@ -1932,7 +1932,7 @@ async function px_getFeaturesBbox(bboxString) {
 }
 
 async function px_getFeaturesInCollection(_collection_id) {
-	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&limit=1000`;	
+	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&sortby=ts&limit=1000`;	
 	
 	try {
 		const res = await fetch(apiUrl);
