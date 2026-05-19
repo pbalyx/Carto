@@ -1,6 +1,6 @@
 ///
-const version ="0.6.1";
-const subV = "_e"; 
+const version ="0.6.2";
+const subV = ""; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -22,8 +22,10 @@ const subV = "_e";
 // 0.5.9 : panoramax en cours calques panox en 3 et 4 
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
-	// _e bouton panox + choix instance ok
+// 0.6.2 : panoramax ok
+	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
+// Leaflet version = "1.6.0"
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
