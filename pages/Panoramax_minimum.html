@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8" />
+
+    <title>Panoramax minimaliste</title>
+</head>
+
+<style>
+	body
+	{
+<!--		font-family: Arial;-->
+		font-family: Times New Roman;
+		background-color: #ddffff; /*	color: #205090;*/
+		font-size: 1.25em;
+		margin-left: 5%;
+		margin-right: 10%;
+	}
+	h1
+	{
+		background-color: #00ffff;
+		border-style: outset;
+		padding-bottom: 10px;
+		padding-top: 6px;
+		font-weight: normal;
+		font-size: 2em;
+		text-align: center;
+	}
+	h2
+	{
+		background-color: #88ffff;
+		font-size: 1.5em;
+		font-weight:normal;   
+		margin-top: 1.0em;   
+		margin-bottom: 0.01em;
+	}
+
+	h3
+	{
+		background-color: #88ffff;
+		font-style: italic;
+		text-indent: 3%;
+		font-size: 1.3em;
+		font-weight:normal;   
+		margin-top: 1.0em;   
+		margin-bottom: 0em;
+	}
+	
+	p{
+		margin-bottom: 0.2em;
+		margin-top: 0.5em;   
+	
+	}
+	
+	ul {
+		margin-top: 0.1em;
+		margin-bottom: 0.5em;
+	}
+
+	li {
+		margin-bottom: 0.1em;
+	}
+
+	#gototop {
+		position: fixed;
+		top: 50px;
+		right: 20px;
+		width: 50px;
+		text-align: center;
+		background-color: #00ffff;
+		border-style: outset;
+	}
+
+</style>
+
+
+<body>
+	<h1>Une visionneuse minimaliste pour Panoramax<br><small>Panoramax des sentiers</small></h1>
+	<div id="gototop"><a href = "#">Top</a></div>
+	<ol>
+		<li><a href = "#why">Les raisons</a></li>	
+		<li><a href = "#visionneuse">La visionneuse</a></li>
+			<ul>
+				<li><a href = "#search">Recherche d'éléments</a></li>
+				<li><a href = "#select">Sélection d'un élément</a></li>
+				<li><a href = "#photo">Détails de la photo</a></li>
+			</ul>
+		<li><a href = "#l_api">L'essentiel sur l'api</a></li>	
+			<ul>
+				<li><a href = "#javascript">L'api en javascript</a></li>
+				<li><a href = "#bbox">Rechercher des éléments dans une zone</a></li>
+				<li><a href = "#sequence">Récupérer les éléments d'une séquence</a></li>
+				<li><a href = "#feature">Utilisation d'un élément</a></li>				
+			</ul>
+		<li><a href = "#details">Annexe - quelques détails</a></li>f
+			<ul>
+				<li><a href = "#uuid">Identifiants UUID</a></li>
+				<li><a href = "#parcourir">Parcourir la séquence</a></li>
+				<li><a href = "#code">Détails sur la page</a></li>
+			</ul>
+	</ol>
+	
+	<h2 id="why">Les raisons</h2>
+	<p>
+	J'ai commencé à utiliser Panoramax pour prendre des photos de sentiers avec l'application Baba sur un simple téléphone - voir la page d'explications et de conseils
+	<a href= "https://pbalyx.github.io/Carto/pages/Panoramax_sentiers.html" target="blank"> Panoramax des sentiers</a>.
+	</p>
+	<p>
+	Cependant, le fond de carte de la visionneuse de base de Panoramax n'est pas du tout adapté pour l'exploration des sentiers. Voir par exemple
+	<a href= "https://api.panoramax.xyz/?focus=map&map=14.0/44.56/4.4194" target="blank"> dans cette zone</a> 	</p>
+	<p>
+	J'ai donc essayé de trouver une façon de repérer les photos sur des fonds de carte correspondant plus à cette utilisation en créant une visionneuse simplifiée.<br>
+	J'ai inséré cette visionneuse dans Carto_tools, une page HTML basée sur Leaflet qui contenait déjà tous les outils pour jongler avec les cartes et afficher des photos. Voir <a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html?zoom=15&center=%5B44.56%2C4.4194%5D" 
+	target="blank">un exemple dans la même zone</a> en cliquant sur <i>Panoramax</i> -> <i>Chercher sur carte</i> 
+	</p>
+
+<h2 id="visionneuse">La visionneuse</h2>
+<p>
+	Cette visualisation a été conçue au départ pour l'utilisation <i>Panoramax des Sentiers</i>.  Elle est donc adaptée avant tout pour : 
+	<ul>
+		<li>de multiples séquences courtes (quelques dizaines de photos) dans une zone</li>
+		<li>des photos "à plat" prises avec un téléphone. Les photos 360° sont aplaties (mais accessibles via Panoramax)</li>
+	</ul>	
+</p>	
+<p>
+	Par défaut les photos sont recherchées sur le métacatalogue qui regroupe toutes les instances publiques de Panoramax. On peut restreindre la recherche aux instances OpenStreetMap ou IGN en appelant la page avec un paramètre ?source= "osm" ou "ign".
+
+</p>
+			
+<h3 id ="search">Recherche d'éléments</h3>
+<p>
+	Dans une zone donnée, on peut commencer à chercher les photos existantes de deux façons :
+	<ul>
+		<li><i>Chercher sur carte</i> retrouve les éléments sur toute la carte actuelle. La limite est fixée à 1000 pour ne pas trop surcharger. Pour les zooms faibles  la recherche ne donne donc pas forcément tous les éléments, surtout s'il y a des routes. Voir en annexe.</li>
+		<li><i>Chercher autour</i>. C'est la meilleure façon de voir les sentiers dans une petite zone. Une fois le point courant positionné par un clic, la recherche donne les éléments trouvés dans un carré de 1000 m de coté autour de ce point.</li>			
+	</ul>
+</p>	
+<h3 id ="select">Sélection d'un élément</h3>
+<p>
+		Le clic sur un élément déclenche plusieurs actions :
+	<ul>
+		<li>La photo est affichée</li>
+		<li>Si la séquence n'était pas complète, les points manquants sont chargés (sauf pour les séquences trop longues)</li>	
+		<li>Les points de la séquence sont affichés en bleu</li>			
+		<li>Le point sélectionné est mis en valeur.</li>
+		<li> Si l'information sur l'azimuth de prise de vue est présente, elle est indiquée par deux traits</li>
+	</ul>
+</p>
+<h3 id ="photo">Détails de la photo</h3>
+<p>
+	<ul>
+		<li>La photo peut être déplacée à partir du bandeau. Au chargement elle est redimensionnée automatiquement pour aller jusqu'au bas de la page ce qui permet de l'agrandir ou de la diminuer.	</li>
+		<li>On peut parcourir la séquence avec les flèches avant arrière sur ce bandeau.</li>
+		<li>Lorsqu'on arrive au début ou à la fin de la séquence, la flèche correspondante est désactivée. De nouveaux points sont recherchés automatiquement dans un carré de 400 m de côté pour enchaîner vers les sentiers voisins.</li>
+		<li>Un bouton <i>--> Panoramax</i> ouvre la visionneuse du métacatalogue, positionnée sur la même photo (pratique pour voir les photos 360°).</li>
+		<li>Le bouton <i>Image hd</i> affiche la photo dans une nouvelle fenêtre.</li>
+		<li>Pour ceux qui veulent tout savoir, un bouton <i>Info (json)</i> affiche l'objet json complet de l'élémént, donnant accès à tous les détails</li>
+		<li>Un cadre simplifié donnant les infos principales est accessible par le menu <i>Affiche->Info</i></li>		
+	</ul>
+</p>
+
+
+	<h2 id="l_api">L'essentiel sur l'api</h2>
+	
+<p>
+	Il n'est pas facile de s'y retrouver dans la documentation de l'api de Panoramax mais, comme souvent, quand on a extrait ce qu'on voulait, l'utilisation est très simple.<br>
+	Pour faciliter le travail de ceux qui voudraient suivre mon exemple, j'ai réuni ci-dessous les quelques points essentiels.
+</p>
+
+		<h3 id = "javascript">L'api en javascript</h3>
+<p>
+	La recherche des photos se fait au moyen de l'api à l'adresse 
+	<i>https://api.panoramax.xyz/api/</i> pour le métacatalogue (ou <i>https://panoramax.openstreetmap.fr/api</i> et <i>https://panoramax.ign.fr/api</i> pour les instances OSM ou IGN).
+
+</p>
+<p>
+	En Javascript cette recherche tient en quelques lignes pour définir une fonction asynchrone <br>
+	<pre style ="  margin: 0.5em 0";>
+	async function px_xxx() {
+		const apiUrl = 
+		const res = await fetch(apiUrl);
+		const data = await res.json();
+		return data;
+	}</pre>
+	
+	qui retourne un objet JSON.
+</p>
+	
+		<h3 id ="bbox">Rechercher des éléments dans une zone</h3>
+<p>
+	Pour récupérer les éléments contenus dans une zone rectangulaire (bbox) la syntaxe est:
+	<pre>	apiUrl = "https://api.panoramax.xyz/api/search?bbox=${bboxString}&limit=${limit}"</pre>
+	avec les paramètres
+	<ul>
+		<li><i>bboxString</i>: rectangle de recherche - format: <i>SW_lng,SW_lat,NE_lng,NE_lat</i></li>
+		<li><i>limit</i>: nombre maximum d'éléments renvoyés. Valeur maximum admise 10 000</li>
+	</ul>
+</p>
+<p>
+	La réponse est un objet JSON contenant 
+		<ul>
+			<li><i>features</i>: tableau (<i>array</i>) des éléments trouvés	</li>
+			<li><i>links</i>: tableau vide	</li>							
+		</ul>
+
+	<div style="position: relative; left:5%"">
+		<img src="./images/search_red.jpg" style= "width: 45%">
+	</div>
+</p>
+		En développant le tableau on voit que chaque élémént (<i>feature</i>) est un objet JSON contenant entre autres un identifiant et l'identifiant de la séquence (<i>collection</i>) à laquelle il appartient. Les identifiants sont sous forme d'UUID (voir Annexe).
+<p>
+
+	<div style="position: relative; left:5%"">
+		<img src="./images/search.jpg" style= "width: 80%">
+	</div>
+</p>
+		<h3 id ="sequence">Récupérer les éléments d'une séquence</h3>
+<p>
+	A partir de l'identifiant d'une <i>collection</i>, on peut récupérer les élements qui en font partie . La syntaxe est:
+	<pre>apiUrl = "https://api.panoramax.xyz/api/search?collections=${collectionId}&sortby=ts&limit=${limit}</pre>
+	cette fonction renvoie aussi un objet contenant un tableau dans lequel tous les éléments ont le même identifiant de collection
+</p>
+	<div style="position: relative; left:5%"">
+		<img src="./images/collection.jpg" style= "width: 80%">
+	</div>
+		<h3 id ="feature">Utilisation d'un élément</h3>
+<p>
+	L'objet JSON correspondant à un élément (<i>feature</i>) peut être lu directement à partir des tableaux de features.
+</p>
+<p>
+		
+	<div style="position: relative; left:5%"">
+		<img src="./images/feature_json.jpg" style= "width: 80%">
+	</div>
+</p> 
+<p>
+	Les paires clef - valeur à retenir pour cette utilisation sont :
+	<ul>
+		<li><i>geometry</i>: coordonnées du point de prise de vue. Ces coordonnées se retrouvent aussi dupliquées dans <i>bbox</i> puis que l'élément est un pont isolé</li>
+		<li><i>links</i>: tableau de liens caractérisés par une clé <i>rel</i> dont les valeurs utiles sont :
+			<ul>
+				<li><i>self</i>: lien vers l'élément lui-même	</li>
+				<li><i>next</i>: lien vers l'élément suivant dans la séquence	</li>			<li><i>prev</i>: lien vers l'élément précédent dans la séquence	</li>
+			</ul>
+			Pour le premier ou le dernier point de la séquence, les liens <i>prev</i> ou <i>next</i> sont absents.
+		</li>							
+		<li><i>assets</i>: objet donnant accès aux trois liens directs vers le stockage des photos 
+			<ul>
+				<li><i>hd</i>: image haute définition	</li>
+				<li><i>sd</i>: image définition standard	</li>			
+				<li><i>thumb</i>: vignette	</li>
+			</ul>		
+		</li>
+		<li><i>properties</i>: regroupe toutes les métadonnées avec pas mal de redondances. On peut retenir :</li>
+			<ul>
+				<li><i>exif</i>: métadonnées exif	</li>
+				<li><i>created</i>: date de prise de vue	</li>			
+				<li><i>view:azimuth</i>: orientation de la prise de vue en degrés	</li>
+			</ul>
+	</ul>
+
+</p>
+	Cet ensemble constitue la base des éléments à connaitre pour récupérer et afficher les photos
+<p>
+
+</p>
+		
+<h2 id="details">Annexe - quelques détails</h2>
+<h3 id ="uuid">Identifiants UUID</h3>
+<p>
+	Ne cherchez pas de logique quelconque pour les identifiants (de <i>feature</i> ou de <i>collection</i>) utilisés par Panoramax. Les UUID (Universally_unique_identifier) sont simplement des nombres binaires sur 128 bits créés au hasard et représentés par un codage standard. Voir le détail sur 
+	<a href= "https://fr.wikipedia.org/wiki/Universally_unique_identifier" target="blank">Wikipedia</a>.
+</p>
+
+<h3 id ="parcourir">Parcourir la séquence</h3>
+<p>
+	Losqu'une photo est affichée, pour passer à la suivante ou  la précédente, il semblerait logique d'utiliser les liens <i>next</i> ou <i>prev</i> mais ces liens rappellent l'api pour recharger l'élément ce qui ralentit l'affichage.
+</p>
+<p>	
+	Pour les séquences "normales" pour cette application (ne dépassant pas les 1000 éléments), au premier clic sur un des éléments, tous les autres éléments sont chargés dans un tableau sous forme d'objets json. Il est donc plus rapide de passer à l'élément suivant ou précédent dans le tableau et d'accéder directement au stockage de la photo par le lien <i>assets.sd</i>.
+</p>
+<p>
+	Cependant, certaines séquences, sur des routes en particulier, peuvent avoir plusieurs milliers d'éléments. <br>
+	Le chargement de la collection se faisant à partir du premier élément, il peut arriver que les 1000 premiers éléments soient en dehors de la zone d'intérêt. Dans ce cas les éléments ne sont pas chargés et la séquence n'est pas affichée en bleu mais on peut quand même se déplacer dans la séquence. Le code utilise alors les liens <i>next</i> et <i>prev</i>.
+</p>
+
+<h3 id ="code">Détails sur la page</h3>
+
+<p> 
+	La page est basée sur Leaflet Version 1.6.0.
+</p>
+<p>
+	Le code source est accessible depuis le navigateur.
+</p>
+<p>
+	Le script JS peut être téléchargé <a href="../carto_tools/Carto_tools.js" download = "js" >ici</a>.
+</p>
+
+
+	<p>17/05/2026</p>
+<p>
+
+</p>
+
+</body>
+</html>
