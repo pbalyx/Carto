@@ -1,6 +1,6 @@
 ///
 const version ="0.7.0";
-const subV = "_d_gh"; 
+const subV = "_e_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -1673,6 +1673,9 @@ function display_resultImport(osm_data) {
 
 const panoxNum = 3;
 const seqNum = 4;
+var photoDiv = document.getElementById('photoDiv');
+var photoHeader = document.getElementById('photoHeader');
+
 var img = document.getElementById("image");
 var currentCollectionId;
 var currentCollectionCount = 0;
