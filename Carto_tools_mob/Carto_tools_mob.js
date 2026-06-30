@@ -1,6 +1,6 @@
 ///
 const version ="0.7.0";
-const subV = "_b"; 
+const subV = "_c_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -462,111 +462,6 @@ map.on("zoomend", function(ev) {
 	zoom_div.innerHTML = 'zoom: ' + map.getZoom();
 });
 
-function dragElement_old(header, elem) {
-		header.onmousedown = dragMouseDown;
-	  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, posTop = 0;
-	 function dragMouseDown(e) {
-		e = e || window.event;
-		e.preventDefault();
-
-		// get the mouse cursor position at startup:
-		pos3 = e.clientX;
-		pos4 = e.clientY;
-		document.onmouseup = closeDragElement;
-		// call a function whenever the cursor moves:
-		document.onmousemove = elementDrag;
-	  }
-	 function elementDrag(e) {
-		e = e || window.event;
-		e.preventDefault();
-		// calculate the new cursor position:
-		pos1 = pos3 - e.clientX;
-		pos2 = pos4 - e.clientY;
-		pos3 = e.clientX;
-		pos4 = e.clientY;
-		// set the elem's new position:
-		posTop = elem.offsetTop - pos2;
-		if (posTop < 0) { posTop = 0}  // prevent header to go beyond top
-		elem.style.top = (posTop) + "px";
-		elem.style.left = (elem.offsetLeft - pos1) + "px";
-	  }
-	 function closeDragElement() {
-		// stop moving when mouse button is released:
-		document.onmouseup = null;
-		document.onmousemove = null;
-	  }
-
-}
-
-function dragElement_1(header, elem) {
-	header.onmousedown = dragMouseDown;
-	header.addEventListener('touchstart', dragTouchStart, { passive: false });
-
-	var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, posTop = 0;
-
-	// ---- SOURIS ----
-	function dragMouseDown(e) {
-		e = e || window.event;
-		e.preventDefault();
-
-		pos3 = e.clientX;
-		pos4 = e.clientY;
-		document.onmouseup = closeDragElement;
-		document.onmousemove = elementDrag;
-	}
-
-	function elementDrag(e) {
-		e = e || window.event;
-		e.preventDefault();
-		pos1 = pos3 - e.clientX;
-		pos2 = pos4 - e.clientY;
-		pos3 = e.clientX;
-		pos4 = e.clientY;
-		moveElement(pos1, pos2);
-	}
-
-	function closeDragElement() {
-		document.onmouseup = null;
-		document.onmousemove = null;
-	}
-
-	// ---- TACTILE ----
-	function dragTouchStart(e) {
-		e.preventDefault();
-		var touch = e.touches[0];
-
-		pos3 = touch.clientX;
-		pos4 = touch.clientY;
-
-		document.addEventListener('touchend', closeDragTouch, { passive: false });
-		document.addEventListener('touchmove', elementTouchDrag, { passive: false });
-	}
-
-	function elementTouchDrag(e) {
-		e.preventDefault();
-		var touch = e.touches[0];
-
-		pos1 = pos3 - touch.clientX;
-		pos2 = pos4 - touch.clientY;
-		pos3 = touch.clientX;
-		pos4 = touch.clientY;
-		moveElement(pos1, pos2);
-	}
-
-	function closeDragTouch() {
-		document.removeEventListener('touchend', closeDragTouch);
-		document.removeEventListener('touchmove', elementTouchDrag);
-	}
-
-	// ---- Fonction commune de déplacement ----
-	function moveElement(deltaX, deltaY) {
-		posTop = elem.offsetTop - deltaY;
-		if (posTop < 0) { posTop = 0; } // empêche le header de dépasser le haut
-		elem.style.top = posTop + "px";
-		elem.style.left = (elem.offsetLeft - deltaX) + "px";
-	}
-}
-
 function dragElement(header, elem) {
 	header.onmousedown = dragMouseDown;
 	header.addEventListener('touchstart', dragTouchStart, { passive: false });
@@ -839,6 +734,7 @@ cb_LatLng.addEventListener('change', (event) => {
 	update3DCoords();
 });
 
+dragElement(curPtHeader, curPtDiv );
 
 var coordsMode = false;
 
@@ -913,11 +809,6 @@ function update3DCoords(){
 function updateLonLat() {
 	editLonLat.value = curPtCoordsStr();
 
-}
-
-curPtHeader.onmouseover = dragcurPtDiv;
-function dragcurPtDiv(){
-	dragElement(curPtHeader, curPtDiv );
 }
 
 b_copyCoords.onclick = copyCoords;	
@@ -1083,10 +974,8 @@ function show_hideDist(vis){
 	distMode = vis;
 }
 
-distDiv.onmouseover = dragdistDiv;
-function dragdistDiv(){
-	dragElement(distHeader, distDiv );
-}
+dragElement(distHeader, distDiv );
+
 
 b_cur1.onclick = copyCurrent;
 b_cur2.onclick = copyCurrent;
@@ -1192,10 +1081,8 @@ var statusVisible = false;
 		statusVisible = vis;
 	}
 
-statusHeader.onmouseover = dragstatusDiv;
-function dragstatusDiv(){
-	dragElement(statusHeader, statusDiv );
-}
+dragElement(statusHeader, statusDiv );
+
 
 //endregion
 
@@ -1232,11 +1119,7 @@ var infoVisible = false;
 		infoVisible = vis;
 	}
 
-draginfoDiv();
-infoHeader.onmouseover = draginfoDiv;
-function draginfoDiv(){
-	dragElement(infoHeader, infoDiv );
-}
+dragElement(infoHeader, infoDiv );
 
 function updateInfoMode(_calqueMode) {
 	calqueMode = _calqueMode;
@@ -1520,10 +1403,8 @@ b_request.onclick = () =>{queryAround()}
 b_back_to_list.onclick = close_tags;
 b_call_osm.onclick = show_in_OSM;
 
-osmHeader.onmouseover = dragosmDiv;
-function dragosmDiv(){
-	dragElement(osmHeader, osmDiv );
-}
+dragElement(osmHeader, osmDiv );
+
 var osmMark = new L.CircleMarker(osm_latlng, {
 	radius: 20,
 	fillColor: "white",
@@ -1727,10 +1608,8 @@ function show_in_OSM() {
 
 var import_div = document.getElementById("import_div"); 
 
-importHeader.onmouseover = dragImportDiv;
-function dragImportDiv(){
-	dragElement(importHeader, importDiv );
-}
+dragElement(importHeader, importDiv );
+
 
 var osm_geojson = {"features":[]};
 
@@ -1839,10 +1718,8 @@ bClosePhoto.onclick = hidePhoto;
 		photoDiv.style.display = "none";			
 	}
 	
-photoHeader.onmouseover = dragPhotoDiv;
-function dragPhotoDiv(){
-	dragElement(photoHeader, photoDiv );
-}
+dragElement(photoHeader, photoDiv );
+
 
 function checkBottom() {
 // console.log(photoDiv.offsetTop, photoDiv.offsetHeight, window.innerHeight);
