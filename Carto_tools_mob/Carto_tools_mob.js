@@ -1,6 +1,6 @@
 ///
 const version ="0.7.0";
-const subV = "_c_gh"; 
+const subV = "_d_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -539,10 +539,8 @@ function dragElement(header, elem) {
 }
 	
 function moveableMarker(map, marker) {
-
 // drag circleMarker from
 // https://stackoverflow.com/questions/43410600/leaflet-v1-03-make-circlemarker-draggable
-
   function trackCursor(evt) {
     marker.setLatLng(evt.latlng)
   }
