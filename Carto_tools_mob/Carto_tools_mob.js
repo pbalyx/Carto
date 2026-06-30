@@ -1,6 +1,6 @@
 ///
-const version ="0.6.2";
-const subV = ""; 
+const version ="0.7.0";
+const subV = "_a"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -462,7 +462,7 @@ map.on("zoomend", function(ev) {
 	zoom_div.innerHTML = 'zoom: ' + map.getZoom();
 });
 
-function dragElement(header, elem) {
+function dragElement_old(header, elem) {
 		header.onmousedown = dragMouseDown;
 	  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, posTop = 0;
 	 function dragMouseDown(e) {
@@ -496,6 +496,75 @@ function dragElement(header, elem) {
 		document.onmousemove = null;
 	  }
 
+}
+
+function dragElement(header, elem) {
+	header.onmousedown = dragMouseDown;
+	header.addEventListener('touchstart', dragTouchStart, { passive: false });
+
+	var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, posTop = 0;
+
+	// ---- SOURIS ----
+	function dragMouseDown(e) {
+		e = e || window.event;
+		e.preventDefault();
+
+		pos3 = e.clientX;
+		pos4 = e.clientY;
+		document.onmouseup = closeDragElement;
+		document.onmousemove = elementDrag;
+	}
+
+	function elementDrag(e) {
+		e = e || window.event;
+		e.preventDefault();
+		pos1 = pos3 - e.clientX;
+		pos2 = pos4 - e.clientY;
+		pos3 = e.clientX;
+		pos4 = e.clientY;
+		moveElement(pos1, pos2);
+	}
+
+	function closeDragElement() {
+		document.onmouseup = null;
+		document.onmousemove = null;
+	}
+
+	// ---- TACTILE ----
+	function dragTouchStart(e) {
+		e.preventDefault();
+		var touch = e.touches[0];
+
+		pos3 = touch.clientX;
+		pos4 = touch.clientY;
+
+		document.addEventListener('touchend', closeDragTouch, { passive: false });
+		document.addEventListener('touchmove', elementTouchDrag, { passive: false });
+	}
+
+	function elementTouchDrag(e) {
+		e.preventDefault();
+		var touch = e.touches[0];
+
+		pos1 = pos3 - touch.clientX;
+		pos2 = pos4 - touch.clientY;
+		pos3 = touch.clientX;
+		pos4 = touch.clientY;
+		moveElement(pos1, pos2);
+	}
+
+	function closeDragTouch() {
+		document.removeEventListener('touchend', closeDragTouch);
+		document.removeEventListener('touchmove', elementTouchDrag);
+	}
+
+	// ---- Fonction commune de déplacement ----
+	function moveElement(deltaX, deltaY) {
+		posTop = elem.offsetTop - deltaY;
+		if (posTop < 0) { posTop = 0; } // empêche le header de dépasser le haut
+		elem.style.top = posTop + "px";
+		elem.style.left = (elem.offsetLeft - deltaX) + "px";
+	}
 }
 	
 function moveableMarker(map, marker) {
@@ -1087,6 +1156,7 @@ var infoVisible = false;
 		infoVisible = vis;
 	}
 
+draginfoDiv();
 infoHeader.onmouseover = draginfoDiv;
 function draginfoDiv(){
 	dragElement(infoHeader, infoDiv );
