@@ -29,7 +29,7 @@ const subV = "";
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
-	document.title = 'Carto_tools  V_' + version + subV;
+	document.title = 'Carto_tools_mob  V_' + version + subV;
 	console.log("version : ", version + subV);
 	init_map();
 	init_features_table();
