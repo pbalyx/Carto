@@ -37,16 +37,6 @@
 		will-change: auto !important;
 	}
 
-/*	.leaflet-tooltip {
-		padding: 0px 4px 0px 4px ;
-		background-color: aquamarine;
-		font-size: 12px;
-		font-weight: bold;
-		line-height: 12px;
-		border: 1px solid blue;
-
-	}*/
-
 	#zoom_div {
 		position: absolute;
 		bottom:25px;
@@ -123,7 +113,6 @@
 		background-color: Gray;
 		z-index:2;
 		cursor: move;
-		font-size: 1.0em; 
 	}
 	
 	.b_header {
@@ -159,6 +148,7 @@
 		background-color: AliceBlue;
 		border: 1px solid blue;	
 		z-index: 900;
+		font-size: 1.0em; 
 	}
 	
 	.bPrevNextPoint {
@@ -232,8 +222,8 @@
 	}
 
 	#infoDiv {
-	/*	left: 20px;*/
-		width: 400px;
+		left: 10dvw;
+		width: 40dvw;
 		resize: both;
 		overflow:hidden;
 		padding-bottom: 8px;
@@ -280,14 +270,17 @@
     }
 		
 	@media (hover: none) and (pointer: coarse) {   /* mobile display*/
-		.header {
+		.overlayDiv {
 			font-size:0.8em;
 		}
 		#menubar {
 			font-size:0.8em;
 		}
 		#photoDiv {
-			top: 60%;
+			top: 10%;
+		}
+		#infoDiv {
+			width: 80dvw;
 		}
 
 	}
@@ -496,7 +489,7 @@
 		</div>		
 	</div>
 	
-	<div id="photoDiv">		
+	<div id="photoDiv" class = "overlayDiv">		
 		<div id= "photoHeader" class= "header">
 			Photo&nbsp 
 				<span id="photoName"></span>
