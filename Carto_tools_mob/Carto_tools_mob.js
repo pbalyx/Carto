@@ -1,6 +1,6 @@
 ///
 const version ="0.7.0";
-const subV = "_h_gh"; 
+const subV = "_i_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -27,7 +27,8 @@ const subV = "_h_gh";
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
 
-var isMobile = false;
+var isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+////var isMobile = window.matchMedia('(hover: hover)').matches;
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
@@ -42,6 +43,11 @@ window.onload = (event) => {
 	}
 ///console.log(initialCenter, initialZoom);
 	init_map();
+	statusDiv.innerHTML = "isMobile: ";
+	statusDiv.innerHTML += isMobile ?  "true" : "false";
+///	console.log(isMobile);
+///		photoDiv.style.top = "70%";
+	
 };
 
 function decodeParams(_params) {
@@ -64,6 +70,7 @@ function init_map() {
 	map.setView(initialCenter, initialZoom);
 	curPt_latlng = L.latLng(map.getCenter());
 	curPtMark.setLatLng(curPt_latlng);
+	
 }
 
 // region Map Tiles
