@@ -1,6 +1,6 @@
 ///
 const version ="0.7.0";
-const subV = "_f_gh"; 
+const subV = "_g_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 

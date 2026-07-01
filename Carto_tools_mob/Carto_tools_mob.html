@@ -158,6 +158,7 @@
 		top: 18px;
 		background-color: AliceBlue;
 		border: 1px solid blue;	
+		z-index: 900;
 	}
 	
 	.bPrevNextPoint {
@@ -273,7 +274,7 @@
 		top: 30%;
 		background-color: white;
 		border: 1px solid blue;
-/*		z-index: 900; */
+		z-index: 850; 
 		resize: both;
 		overflow: hidden;
     }
@@ -355,7 +356,6 @@
 		</div>
 		<div id="map" class="map"></div>
 		<div id="zoom_div">z:</div>
-	</div>
 	
 	<div id="statusDiv" style ="display: none" class = "overlayDiv" >		
 		<div id= "statusHeader" class= "header" >
@@ -497,6 +497,7 @@
 		<img  id="image" alt="pas de photo ?" style="max-width:100%">
 	</div>
 	
+	</div>
 
 	
 	<script src='../lib/osmtogeojson.js'></script> 
