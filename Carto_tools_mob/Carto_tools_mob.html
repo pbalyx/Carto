@@ -37,7 +37,7 @@
 		will-change: auto !important;
 	}
 
-	.leaflet-tooltip {
+/*	.leaflet-tooltip {
 		padding: 0px 4px 0px 4px ;
 		background-color: aquamarine;
 		font-size: 12px;
@@ -45,16 +45,7 @@
 		line-height: 12px;
 		border: 1px solid blue;
 
-	}
-	.curPt_tooltip {
-		padding: 1px 4px 0px 4px ;
-		font-weight: 600;
-		font-size: 1.1em;
-		line-height: 1.2em;
-		background-color: Aquamarine;
-		border: 1px solid Blue;
-	}
-
+	}*/
 
 	#zoom_div {
 		position: absolute;
@@ -146,7 +137,7 @@
 	.b_close {
 		background-color: white;
 		color:red;
-		font-size: 13px;
+		font-size: 1em;
 		font-weight: bold;
 		position: absolute;
 		right:0; top:0;
@@ -284,7 +275,10 @@
 	@media (hover: none) and (pointer: coarse) {
 /*	@media (hover: hover){*/
 		.b_menu {
-			font-size:0.6em;
+			font-size:0.7em;
+		}
+		.bPrevNextPoint {
+			font-size:1.2em;
 		}
 		#photoDiv {
 			top: 70%;
@@ -502,9 +496,10 @@
 				<span id="photoName"></span>
 			<button id= "bPrevPoint" class= "bPrevNextPoint"  disabled><b>&lt</b></button>
 			<button id= "bNextPoint" class= "bPrevNextPoint"  disabled><b>&gt</b></button>	
-			<button id= "bImgHD" class= "bPrevNextPoint" ><b>Image hd</b></button>	
-			<button id= "bInfo" class= "bPrevNextPoint" ><b>json</b></button>	
-			<button id= "bPanox" class= "bPrevNextPoint" ><b> -> Panoramax</b></button>	
+			&nbsp&nbsp&nbsp&nbsp
+			<button id= "bImgHD" class= "b_header" ><b>Image hd</b></button>	
+			<button id= "bInfo" class= "b_header" ><b>json</b></button>	
+			<button id= "bPanox" class= "b_header" ><b> -> Panoramax</b></button>	
 			<button id="bClosePhoto" class = "b_close">X</button>
 		</div>
 		<img  id="image" alt="pas de photo ?" style="max-width:100%">
