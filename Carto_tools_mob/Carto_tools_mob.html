@@ -65,6 +65,7 @@
 		padding-right:10px;*/
 		background-color: #808080;
 		z-index: 1000; /*leaflet va jusqu'à 800!*/
+		font-size: 1.0em; 
 	}
 	
 	.input_file {
@@ -88,8 +89,8 @@
 		color: black;
 		padding: 10px;
 		border: none;*/
-		font-size: 0.85em; 
 		cursor: pointer;
+		font-size: 0.8em; 
 	}
 	.d_sub {
 		display: none;
@@ -105,10 +106,14 @@
 		background-color: MediumSpringGreen;
 /*		background-color: #D4FF2A;*/
 		display: block;
+		font-size: 0.8em; 
 	}
 	.d_sub button:hover, label:hover {
 /*		background-color: #FF7F00;*/
 		background-color: orange;
+	}
+	#input_fileX {
+		font-size: 1em; 
 	}
 	
 	.header {
@@ -118,10 +123,12 @@
 		background-color: Gray;
 		z-index:2;
 		cursor: move;
+		font-size: 1.0em; 
 	}
 	
 	.b_header {
 		background-color: MediumSpringGreen;
+		font-size: 0.8em; 
 	}
 	.b_header:hover {
 		background-color: orange;	
@@ -272,16 +279,15 @@
 		overflow: hidden;
     }
 		
-	@media (hover: none) and (pointer: coarse) {
-/*	@media (hover: hover){*/
-		.b_menu {
-			font-size:0.7em;
+	@media (hover: none) and (pointer: coarse) {   /* mobile display*/
+		.header {
+			font-size:0.8em;
 		}
-		.bPrevNextPoint {
-			font-size:1.2em;
+		#menubar {
+			font-size:0.8em;
 		}
 		#photoDiv {
-			top: 70%;
+			top: 60%;
 		}
 
 	}

@@ -1,6 +1,6 @@
 ///
-const version ="0.7.0";
-const subV = "_j_"; 
+const version ="0.7.1";
+const subV = "_a_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -28,7 +28,6 @@ const subV = "_j_";
 // Leaflet version = "1.6.0"
 
 var isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-////var isMobile = window.matchMedia('(hover: hover)').matches;
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
