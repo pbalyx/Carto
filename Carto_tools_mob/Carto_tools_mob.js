@@ -1,6 +1,6 @@
 ///
 const version ="0.7.0";
-const subV = "_g_gh"; 
+const subV = "_h_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -26,6 +26,8 @@ const subV = "_g_gh";
 	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
+
+var isMobile = false;
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
