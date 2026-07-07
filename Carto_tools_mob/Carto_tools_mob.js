@@ -1,6 +1,6 @@
 ///
 const version ="0.7.1";
-const subV = "_c_gh"; 
+const subV = "_h_gh"; 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -23,6 +23,7 @@ const subV = "_c_gh";
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
 // 0.6.2 : panoramax ok
+// 0.7.1 : version mobile
 	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
