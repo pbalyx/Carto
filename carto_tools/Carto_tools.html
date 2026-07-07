@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8"> 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"> 	
-<!--	<meta name="referrer" content="strict-origin-when-cross-origin"> -->
     <title>Carto_tools</title>
 	<link rel="stylesheet" type="text/css" href="../lib/leaflet_src/leaflet.css">	 
 	<script src="../lib/leaflet_src/leaflet-src.js" ></script>   <!-- version 1.6.0 -->
@@ -12,16 +11,17 @@
 	html {
 		overscroll-behavior: none !important;	
 	}
-	#main {
-		position: fixed;
-		top: 3px;
-		left: 3px;
-		width: 99%;
-		height: 99%; /* Ajuster la hauteur du cadre principal selon vos besoins */
-		display: flex;
-		flex-direction: column;
-		border: 1px solid blue;
-	} 
+#main {
+  position: fixed;
+  top: 3px;
+  left: 3px;
+  width: calc(99% - 2px);   /* compense la bordure si pas de border-box */
+  height: 99dvh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid blue;
+  box-sizing: border-box;   /* simplifie : plus besoin du calc() ci-dessus si tu gardes width: 99% */
+}
 	.map {
 		flex: 1; /* Fait en sorte que la carte prenne tout l'espace disponible en hauteur */
  	}
@@ -37,25 +37,6 @@
 		will-change: auto !important;
 	}
 
-	.leaflet-tooltip {
-		padding: 0px 4px 0px 4px ;
-		background-color: aquamarine;
-		font-size: 12px;
-		font-weight: bold;
-		line-height: 12px;
-		border: 1px solid blue;
-
-	}
-	.curPt_tooltip {
-		padding: 1px 4px 0px 4px ;
-		font-weight: 600;
-		font-size: 1.1em;
-		line-height: 1.2em;
-		background-color: Aquamarine;
-		border: 1px solid Blue;
-	}
-
-
 	#zoom_div {
 		position: absolute;
 		bottom:25px;
@@ -69,10 +50,12 @@
 		position:absolute;
 		left: 50px;
 		top :12px;
+		max-width: 70%;
 		padding: 2px;
 		padding-right:10px;*/
 		background-color: #808080;
 		z-index: 1000; /*leaflet va jusqu'à 800!*/
+		font-size: 1.0em; 
 	}
 	
 	.input_file {
@@ -87,36 +70,32 @@
 		display: block;
 	}
 	.d_menu:hover .b_menu {
-/*		background-color: #FFAA2A;*/
 		background-color: orange;
 	}
 	
 	.b_menu {
-/*		background-color: #FFD455;
-		color: black;
-		padding: 10px;
-		font-size: 10px; 
-		border: none;*/
 		cursor: pointer;
+		font-size: 0.8em; 
 	}
 	.d_sub {
 		display: none;
 		position: absolute;
 		background-color: white;
 		min-width: 140px;
-	/*	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
 		z-index: 900;
 	}
 			
 	.d_sub button, label {
 		color: black;
 		background-color: MediumSpringGreen;
-/*		background-color: #D4FF2A;*/
 		display: block;
+		font-size: 0.8em; 
 	}
 	.d_sub button:hover, label:hover {
-/*		background-color: #FF7F00;*/
 		background-color: orange;
+	}
+	#input_fileX {
+		font-size: 1em; 
 	}
 	
 	.header {
@@ -130,6 +109,7 @@
 	
 	.b_header {
 		background-color: MediumSpringGreen;
+		font-size: 0.8em; 
 	}
 	.b_header:hover {
 		background-color: orange;	
@@ -145,7 +125,7 @@
 	.b_close {
 		background-color: white;
 		color:red;
-		font-size: 13px;
+		font-size: 1em;
 		font-weight: bold;
 		position: absolute;
 		right:0; top:0;
@@ -155,15 +135,20 @@
 	
 	.overlayDiv {
 		position: absolute; 
-		top: 18px;
+		top: 75px;
+		left: 20px;
 		background-color: AliceBlue;
 		border: 1px solid blue;	
+		z-index: 900;
+		font-size: 1.0em; 
 	}
 	
 	.bPrevNextPoint {
 		background-color: LightBlue;	
-		height:24px;
 		color:Maroon;
+		position:absolute;
+		font-size: 1.8em; 		
+		bottom: 2px;
 	}
 	
 	.bPrevNextPoint:disabled { 
@@ -172,8 +157,6 @@
 	}
 	
 	#statusDiv {
-		left: 20px;
-		top: 140px;
 		width: 150px;
 		overflow:hidden;
 		resize: both;
@@ -181,18 +164,12 @@
     }
 
 	#curPtDiv {
-		left: 20px;
-		top: 150px;
 		width: 300px;
 		resize: both;
 		overflow:hidden;
-/*		padding-left: 12px;	
-		padding-right: 12px;	*/
     }
 	
 	#distDiv {
-		left: 20px;
-		top: 250px;
 		width: 300px;
 		resize: both;
 		overflow:hidden;
@@ -201,7 +178,6 @@
 	
 	
 	#osmDiv {
-		left: 25%;
 		width: 566px;
 		resize: both;
 		overflow:hidden;
@@ -231,8 +207,8 @@
 	}
 
 	#infoDiv {
-		left: 650px;
-		width: 560px;
+		left: 10dvw;
+		width: 40dvw;
 		resize: both;
 		overflow:hidden;
 		padding-bottom: 8px;
@@ -262,39 +238,38 @@
 	table:hover {
 		cursor: pointer;
 	}
-/*
-@media screen and (max-width: 650px) {
-	#main {
-		height: 88vh;
-		width: 98%;
-	}
-	#info {
-		font-size: 0.8em;
-	}
-	#help_div {
-		font-size: 0.8em;
-		top: 60px;
-		left: 52px;
-		width: 84vw;
-	}
-
-}
-*/
 
 	#photoDiv {
 		position: absolute; 
 		display: none; 
 		width: 30%;
+		max-width: 95%;
 		height: auto;
 		left: 10px;
 		top: 30%;
 		background-color: white;
 		border: 1px solid blue;
-/*		z-index: 900; */
+		z-index: 850; 
 		resize: both;
 		overflow: hidden;
     }
 		
+	@media (hover: none) and (pointer: coarse) {   /* mobile display*/
+		.overlayDiv {
+			font-size:0.8em;
+		}
+		#menubar {
+			font-size:0.8em;
+		}
+		#photoDiv {
+			top: 10%;
+		}
+		#infoDiv {
+			width: 80dvw;
+		}
+
+	}
+
 
 	</style>
 
@@ -372,7 +347,6 @@
 		</div>
 		<div id="map" class="map"></div>
 		<div id="zoom_div">z:</div>
-	</div>
 	
 	<div id="statusDiv" style ="display: none" class = "overlayDiv" >		
 		<div id= "statusHeader" class= "header" >
@@ -500,20 +474,22 @@
 		</div>		
 	</div>
 	
-	<div id="photoDiv">		
+	<div id="photoDiv" class = "overlayDiv">		
 		<div id= "photoHeader" class= "header">
 			Photo&nbsp 
 				<span id="photoName"></span>
-			<button id= "bPrevPoint" class= "bPrevNextPoint"  disabled><b>&lt</b></button>
-			<button id= "bNextPoint" class= "bPrevNextPoint"  disabled><b>&gt</b></button>	
-			<button id= "bImgHD" class= "bPrevNextPoint" ><b>Image hd</b></button>	
-			<button id= "bInfo" class= "bPrevNextPoint" ><b>json</b></button>	
-			<button id= "bPanox" class= "bPrevNextPoint" ><b> -> Panoramax</b></button>	
+			&nbsp&nbsp&nbsp&nbsp
+			<button id= "bImgHD" class= "b_header" ><b>Image hd</b></button>	
+			<button id= "bInfo" class= "b_header" ><b>json</b></button>	
+			<button id= "bPanox" class= "b_header" ><b> -> Panoramax</b></button>	
 			<button id="bClosePhoto" class = "b_close">X</button>
 		</div>
 		<img  id="image" alt="pas de photo ?" style="max-width:100%">
+			<button id= "bPrevPoint" class= "bPrevNextPoint" style= "right: 3em" disabled><b>&lt</b></button>
+			<button id= "bNextPoint" class= "bPrevNextPoint" style= "right: 1em" disabled><b>&gt</b></button>	
 	</div>
-	
+	w
+	</div>
 
 	
 	<script src='../lib/osmtogeojson.js'></script> 
