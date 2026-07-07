@@ -153,8 +153,10 @@
 	
 	.bPrevNextPoint {
 		background-color: LightBlue;	
-		height:24px;
 		color:Maroon;
+		position:absolute;
+		font-size: 1.8em; 		
+		bottom: 2px;
 	}
 	
 	.bPrevNextPoint:disabled { 
@@ -493,8 +495,6 @@
 		<div id= "photoHeader" class= "header">
 			Photo&nbsp 
 				<span id="photoName"></span>
-			<button id= "bPrevPoint" class= "bPrevNextPoint"  disabled><b>&lt</b></button>
-			<button id= "bNextPoint" class= "bPrevNextPoint"  disabled><b>&gt</b></button>	
 			&nbsp&nbsp&nbsp&nbsp
 			<button id= "bImgHD" class= "b_header" ><b>Image hd</b></button>	
 			<button id= "bInfo" class= "b_header" ><b>json</b></button>	
@@ -502,6 +502,8 @@
 			<button id="bClosePhoto" class = "b_close">X</button>
 		</div>
 		<img  id="image" alt="pas de photo ?" style="max-width:100%">
+			<button id= "bPrevPoint" class= "bPrevNextPoint" style= "right: 3em" disabled><b>&lt</b></button>
+			<button id= "bNextPoint" class= "bPrevNextPoint" style= "right: 1em" disabled><b>&gt</b></button>	
 	</div>
 	
 	</div>
