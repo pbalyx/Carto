@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8" />
+
+    <title>Panoramax panoramique</title>
+</head>
+
+<style>
+	body
+	{
+<!--		font-family: Arial;-->
+		font-family: Times New Roman;
+		background-color: #ddffff; /*	color: #205090;*/
+		font-size: 1.25em;
+		margin-left: 5%;
+		margin-right: 10%;
+	}
+	h1
+	{
+		background-color: #00ffff;
+		border-style: outset;
+		padding-bottom: 10px;
+		padding-top: 6px;
+		font-weight: normal;
+		font-size: 2em;
+		text-align: center;
+	}
+	h2
+	{
+		font-size: 1.5em;
+		font-weight:normal;   
+		margin-top: 1.0em;   
+		margin-bottom: 0.01em;
+	}
+
+	h3
+	{
+		font-style: italic;
+		text-indent: 5%;
+		font-size: 1.3em;
+		font-weight:normal;   
+		margin-top: 0.5em;   
+		margin-bottom: 0em;
+	}
+	
+	p{
+		margin-bottom: 0.2em;
+		margin-top: 0.5em;   
+	
+	}
+
+	#gototop {
+		position: fixed;
+		top: 50px;
+		right: 20px;
+		width: 50px;
+		text-align: center;
+		background-color: #00ffff;
+		border-style: outset;
+	}
+
+</style>
+
+
+<body>
+	<h1>Ajouter des panoramas<br><small>Panoramax des sentiers</small></h1>
+	<div id="gototop"><a href = "#">Top</a></div>
+	<p>10/07/2026</p>
+	<ol>
+		<li><a href = "#pourquoi">Pourquoi ?</a></li>	
+		<li><a href = "#outils">Les outils</a></li>	
+			<ul>
+				<li><a href = "#pilot">Exif Pilot</a></li>
+				<li><a href = "#photo_sphere">Photo Sphere Viewer</a></li>				
+			</ul>
+		<li><a href = "#prisevue">Prise de vue</a></li>	
+		<li><a href = "#reglagesenvoi">Réglages et envoi</a></li>
+			<ul>
+				<li><a href = "#reglage">Réglage des paramètres du panorama</a></li>
+				<li><a href = "#localisation">Ajout ou modification de la localisation</a></li>
+				<li><a href = "#orientation">Orientation</a></li>				
+				<li><a href = "#envoidirect">Envoi direct sur Panoramax</a></li>	
+				<li><a href = "#envoibaba">Inclusion dans une séquence avec <i>baba</i></a></li>				
+				
+			</ul>
+	</ol>
+
+	<h2 id="pourquoi">Pourquoi ?</h2>
+	
+	<p>Toujours dans l'optique de photographier les sentiers sans matériel spécial et sans connaissances poussées en informatique pour espérer augmenter le nombre de contributions sur Panoramax, après <a href= "https://pbalyx.github.io/Carto/pages/Panoramax_sentiers.html" target="blank">l'utilisation de <i>baba</i> pour les prises de vues</a> et une proposition <a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html" target="blank">de visualisation mieux adaptée</a> aux séquences irrégulières et aux photos isolées, voici maintenant une méthode simple pour ajouter des prises de vues panoramiques prises avec un simple téléphone. </p>
+	<p>Les deux seuls outils supplémentaires à utiliser sont la page web du playground de  <a href= "https://photo-sphere-viewer.js.org/playground.html" target="blank">Photo Sphere Viewer</a> pour voir un aperçu de ce que la photo donnera dans Panoramax et une mini appli windows, <a href= "https://www.colorpilot.com/exif.html" target="blank">Exif Pilot</a>, pour écrire et modifier les données exif dans l'image.
+	</p>
+
+	<h2 id="outils">Les outils</h2>
+		<h3 id ="pilot">Exif Pilot</h3>
+	<p><a href= "https://www.colorpilot.com/exif.html" target="blank">Exif Pilot</a> est un tout petit programme Windows ( &lt 5 Mb ) qui permet de voir et d'éditer toutes les métadonnées d'un fichier image. <br>
+	Je ne sais pas s'il existe un équivalent Linux ou Mac mais une fois qu'on a compris les bases, d'autres éditeurs Exifs peuvent faire le travail.</p>
+		<h3 id ="photo_sphere">Photo Sphere Viewer</h3>
+	<p>La page <a href= "https://photo-sphere-viewer.js.org/playground.html" target="blank">Playground</a> de Photo Sphere Viewer est une simple page web dans laquelle on peut charger une photo quelconque pour voir le résultat en visualisation 3D. C'est une aide très utile pour voir l'effet des modifications effectuées dans Exif Pilot.</p>
+	<p>On pourrait même en principe modifier en temps réel les données dans <i>Pano data/Provide manual data</i> mais si on essaie de rentrer à la main une largeur de panneau, au premier chiffre tapé on entre dans une boucle infinie ou très longue car la page essaie de traiter un panneau de 1, 2, 3... pixels (le premier chiffre tapé) et n'y arrive pas.</p>
+	
+	<h2 id="prisevue">Prise de vue</h2>
+	<p>Selon le logiciel de l'appareil, un panorama complet couvre un peu plus de 360° ou un angle plus faible. Quelques essais préliminaires permettront de préciser ce point.
+	</p>
+	<p>
+	Pour les panoramas incomplets, une solution pour calibrer l'angle est de prendre un panorama avec des sommets connus. En repérant leur distance en pixels sur la photo et les azimuths de ces sommets, sur <a href= "https://cartes.gouv.fr/explorer-les-cartes/" target="blank">cartes.gouv.fr</a> par exemple (<i>afficher plus/mesurer un angle</i> ), on aura un étalonnage en pixels par degré et donc l'anle complet couvert par le panorama.
+	</p>
+	<p>
+	Dans tous les cas, il faut se souvenir que la photo s'ouvrira par défaut sur le point central du panorama et donc effectuer un balayage de part et d'autre de cette direction.<br>
+	Pour les panoramas 360°, le raccord 360° - 0° n'est jamais parfait même si le balayage est bien horizontal et la photo coupée au bon endroit. On peut se débrouiller pour placer ce raccord dans une zone moins intéressante.
+	</p>
+	
+	<h2 id="reglagesenvoi">Réglages et envoi</h2>
+		<h3 id ="reglage">Réglage des paramètres du panorama</h3>	
+<br>
+	<div style="position: relative; left:10%; display: flex; flex-direction: row">
+		<div style= "width: 80%">
+		<img src="./images/ExifPilot_1.jpg" style= "width: 100%">
+		<br><span><i>Exif Pilot - menu principal</i></span>
+		</div>
+	</div>
+<br>	
+		
+	<p>Dans Exif Pilot, lorsqu'on sélectionne une photo <b>(1)</b>, toutes les métadonnées sont affichées dans le panneau de droite <b>(2)</b>. Les données du panorama sont dans le volet XMP sous la rubrique GooglePhotoSpere. Selon l'appareil de prise de vue, cette rubrique peut être déjà présente et remplie ou complètement absente.<br>
+	Pour la remplir ou la modifier il faut ouvrir l'éditeur par le bouton en bas du panneau <b>(3)</b> et sélectionner l'onglet Photosphere <b>(4)</b>.
+	</p>
+<br>
+	<div style="position: relative; left:10%; display: flex; flex-direction: row">
+		<div style= "width: 80%">
+		<img src="./images/ExifPilot_2.jpg" style= "width: 100%">	
+		<br><span><i>Onglet Photosphere ouvert</i></span>
+		</div>
+	</div>
+<br>	
+		
+	<p>
+	Le panorama pris en tournant sur place devrait normalement se projeter sur un cylindre mais Panoramax n'accepte que la projection sphérique. Il faut donc commencer par choisir cette projection - (projection type: <i>equirectangular</i>).	
+	</p>
+	<p>
+	Dans cette projection, l'image (<i>CroppedArea</i>) est plaquée sur une sphère (<i>FullPano</i>) de 360° en horizontal et 180° en vertical.
+	Les six paramètres numériques sont :
+	<ul>
+		<li>W : <i>FullPanoWidthPixels</i>: largeur totale du panneau sphérique</li>
+		<li>H : <i>FullPanoHeightPixels</i>: hauteur totale du panneau sphérique.<br>
+			Ce paramètre n'est en fait pas sauvegardé dans les métadonnées. Il doit être toujours égal à W/2 compte tenu du rapport hauteur largeur en degrés (180/360).</li>
+		<li>w : <i>CroppedAreaImageWidthPixels</i>: largeur de l'image.</li>
+		<li>h : <i>CroppedAreaImageHeightPixels</i>: hauteur de l'image</li>
+		<li>L : <i>CroppedAreaLeftPixels</i>, décalage latéral de l'image à partir de la gauche</li>
+		<li>T : <i>CroppedAreaTopPixels</i>, décalage vertical de l'image à partir du zenith.</li>
+	</ul>
+	Pour remplir ces valeurs : 
+	<ul>
+		<li>Commencer par w et h qui sont la largeur et la hauteur de la photo en pixels.</li>
+		<li>Fixer ensuite la largeur du panneau :
+			<ul>
+				<li>Pour un panorama 360° la largeur de l'image est la largeur totale du panneau (W = w)</li>
+				<li>Pour un angle de vue <i>alpha</i> plus faible il faut prendre 
+						W = w * 360 / <i>alpha</i></li>			
+			</ul>
+		<li>H est déduit de H = W / 2</li>
+		<li>pour obtenir une image centrée, on termine par les deux décalages: <br>
+			<ul>
+				<li>horizontal: L = (W - w) / 2 </li>
+				<li>vertical: T = (H - h) / 2</li>		
+			</ul>	
+	</ul> 	 
+	</p>
+		<h3 id ="localisation">Ajout ou modification de la localisation</h3>
+	<p>
+	Pour modifier la localisation, ou pour insérer des coordonnées pour les fichiers qui n'en ont pas, il faut aller dans l'onglet <i>Exif Gps</i> de l'éditeur <b>(1)</b>.<br>
+	Pour chaque coordonnée, un clic sur l'icône monde <b>(2)</b> donne accès à l'éditeur de la ligne <b>(3)</b> avec le choix du format d'entrée (degrés/minutes/secondes ou degrés décimaux) Exif Pilot fait automatiquement la conversion dans le bon format exif.
+	</p>
+<br>
+	<div style="position: relative; left:10%; display: flex; flex-direction: row">
+		<div style= "width: 80%">
+		<img src="./images/ExifPilot_3.jpg" style= "width: 100%">
+		<br><span><i>Edition des coordonnées</i></span>
+		</div>
+	</div>
+<br>			
+	<p>
+	Exif Pilot donne un moyen simple de vérifier cette localisation. En cliquant sur l'icône monde en dessous de la vignette <b>(4)</b>, une fenêtre web s'ouvre avec le point localisé sur la photo satellite de Google Maps.
+	</p>
+		<h3 id ="orientation">Orientation</h3>
+	<p>
+	En comparant la photo à des repères sur la carte, on peut facilement estimer l'azimuth correspondant au centre de l'image. Cet azimuth sera la direction indiquée par Panoramax à l'ouverture de la photo.
+	</p>
+	<br>
+	<div style="position: relative; left:10%; display: flex; flex-direction: row">
+		<div style= "width: 80%">
+		<img src="./images/ExifPilot_4.jpg" style= "width: 100%">	
+		<br><span><i>Orientation de la prise de vue</i></span>
+		</div>
+	</div>
+	<br>
+	<p>
+	Pour insérer cette valeur dans l'éditeur, il faut aller dans l'onglet <i>Add New Tags</i>, retrouver dans la catégorie <i>Exif/Gps</i> la clef <i>Exif/Gps/ImgDirection</i> et rentrer la valeur en degrés sans se préoccuper de la présentation sous forme de fraction, on ne va pas chercher le dixième de degré.
+	</p>
+
+		<h3 id ="envoidirect">Envoi direct sur Panoramax</h3>
+	<p>
+		Une fois les réglages terminés, on peut envoyer directement la photo au moyen de l'interface web de Panoramax. L'inconvénient est que, s'il s'agit d'une photo isolée, elle sera difficile à retrouver, les photos hors séquences n'apparaissent que comme des petits points peu visibles et seulement à partir du zoom 16.
+	</p>		
+		<h3 id ="envoibaba">Inclusion dans une séquence avec <i>baba</i></h3>
+	<p>
+		La photo peut avoir été prise au cours de l'enregistrement d'une séquence avec <i>baba</i>. <i>Baba</i> n'a pas de possibilité de panorama pour l'instant mais on peut très bien, en parallèle, utiliser l'appareil photo de base.<br>
+		Dans ce cas, après avoir récupéré la photo sur l'ordinateur et édité les paramètres, il faut renvoyer la photo dans un répertoire quelconque du téléphone puis, en rouvrant la séquence avec <i>baba</i>, aller chercher cette photo et la charger dans la séquence. Avec l'horodatage l'ordre chronologique sera respecté.<br>
+		Attention, il faut faire tout ça avant d'envoyer la séquence.Une fois stockée sur Panoramax on ne peut plus la modifier.
+	</p>
+	<br><br>
+	
+</body>
+</html>
