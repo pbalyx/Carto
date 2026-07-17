@@ -33,7 +33,7 @@ var isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
-	document.title = 'Carto_tools_loc  V_' + version + subV;
+	document.title = 'Carto_tools  V_' + version + subV;
 	console.log("version : ", version + subV);
 	init_features_table();
 
