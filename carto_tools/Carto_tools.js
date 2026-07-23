@@ -1,5 +1,5 @@
 //
-const version ="0.7.3";
+const version ="0.7.4";
 const subV = ""; // 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
@@ -25,6 +25,7 @@ const subV = ""; //
 // 0.6.2 : panoramax ok
 // 0.7.2 : version mobile
 // 0.7.3 : mapView in localStorage
+// 0.7.4 : image
 	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
@@ -1702,6 +1703,15 @@ const panoxNum = 3;
 const seqNum = 4;
 var photoDiv = document.getElementById('photoDiv');
 var photoHeader = document.getElementById('photoHeader');
+const resizeHandleW = document.getElementById('resizeHandleW');
+const resizeHandleH = document.getElementById('resizeHandleH');
+
+let isResizingW = false;
+let isResizingH = false;
+let startX = 0;
+let startWidth = 0;
+let startY = 0;
+let startHeight = 0;
 
 var img = document.getElementById("image");
 var currentCollectionId;
@@ -1717,6 +1727,61 @@ var azimuthPtr = L.polyline([], {color: 'blue'});
 // else new feature is got simply by its index in already loaded collection (faster)
 // prevNextMode is set if feature is not found in the loaded part of the current collection
 var prevNextMode = false;
+//------- utils ------------------
+
+resizeHandleW.addEventListener('mousedown', (e) => {
+  isResizingW = true;
+  startX = e.clientX;
+  startWidth = photoDiv.offsetWidth;
+
+  // Empêche la sélection de texte pendant le drag
+  document.body.style.userSelect = 'none';
+  e.preventDefault();
+});
+
+resizeHandleH.addEventListener('mousedown', (e) => {
+  isResizingH = true;
+  startY = e.clientY;
+  startHeight = photoDiv.offsetHeight;
+  // Empêche la sélection de texte pendant le drag
+  document.body.style.userSelect = 'none';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (isResizingW) {
+	  const diff = e.clientX - startX;
+	  const newWidth = startWidth + diff;
+	  // Optionnel : bornes min/max
+	  const minWidth = 100;
+	  const maxWidth = window.innerWidth - photoDiv.offsetLeft - 20;
+	  if (newWidth >= minWidth && newWidth <= maxWidth) {
+		photoDiv.style.width = newWidth + 'px';
+	  }
+  }
+  if (isResizingH) {
+	  const diffY = e.clientY - startY;
+	  const newHeight = startHeight + diffY;
+	  // Optionnel : bornes min/max
+	  const minHeight = 100;
+	  const maxHeight = window.innerHeight - photoDiv.offsetTop - 20;
+	  if (newHeight >= minHeight && newHeight <= maxHeight) { 
+		photoDiv.style.height = newHeight + 'px';
+	  }
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  if (isResizingW) {
+    isResizingW = false;
+    document.body.style.userSelect = '';
+  }
+  if (isResizingH) {
+    isResizingH = false;
+    document.body.style.userSelect = '';
+  }
+});
+
 	
 //------- menu and utils ---------
 	
@@ -1748,23 +1813,6 @@ bClosePhoto.onclick = hidePhoto;
 	
 dragElement(photoHeader, photoDiv );
 
-
-function checkBottom() {
-// console.log(photoDiv.offsetTop, photoDiv.offsetHeight, window.innerHeight);
-	var currentHeight = photoDiv.offsetHeight;
-	var bottomSpace = window.innerHeight - (photoDiv.offsetTop + currentHeight) -20;
-	var ratio = (currentHeight + bottomSpace) / currentHeight;
-	var newWidth = Math.floor(photoDiv.offsetWidth * ratio);
-	var newWidthTxt = newWidth+'px';
-	photoDiv.style.width = newWidthTxt;			
-	photoDiv.style.height = "auto";			
- }
-
-img.addEventListener('load', (event) => {
- //           console.log('img has been loaded!');
-			checkBottom();
-		});
-
 bImgHD.onclick = () => {
 	window.open(currentFeatureImgUrl);  
 }
@@ -1778,6 +1826,7 @@ var pxUrl = 'https://api.panoramax.xyz/fr/index?focus=pic&pic='
 	pxUrl += currentFeature.id;
 	window.open(pxUrl);  
 }
+
 function updatePanoxInfo(_feature) {
 	elementInfo_div.innerHTML = "id: " + _feature.id;
 	elementInfo_div.innerHTML += 
@@ -1892,6 +1941,7 @@ async function manageItem(_feature, checkSeq) {
 	}
 
 	showImage(_feature);
+	
 	if (!nextLink || !prevLink) {
 		panoramaxAround(400);		
 	}
@@ -1959,7 +2009,7 @@ function showSelectedPoint(_feature) {
 }
 
 function showImage(_feature) {
-		photoDiv.style.display = "block";	
+		photoDiv.style.display = "flex";	
 		img.src = _feature.assets.sd.href;
 ///	console.log("img", _feature.assets.sd);
 }
