@@ -1,6 +1,6 @@
-///
-const version ="0.7.1";
-const subV = "_h_gh"; 
+//
+const version ="0.7.4";
+const subV = ""; // 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -23,7 +23,9 @@ const subV = "_h_gh";
 // 0.6.0 : panoramax ok	
 // 0.6.1 : intégré panox dans script
 // 0.6.2 : panoramax ok
-// 0.7.1 : version mobile
+// 0.7.2 : version mobile
+// 0.7.3 : mapView in localStorage
+// 0.7.4 : image
 	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
@@ -32,27 +34,38 @@ var isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
-	document.title = 'Carto_tools_mob  V_' + version + subV;
+	document.title = 'Carto_tools  V_' + version + subV;
 	console.log("version : ", version + subV);
-	init_map();
 	init_features_table();
+
+// params test 
+// https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html?zoom=15&center=[44.56,4.4194]	
+
+	mapCenter = defaultCenter;
+	mapZoom = defaultZoom;
+	
+	const saved = localStorage.getItem('lastMapView');
+	if (saved) {
+		const { lat, lng, zoom } = JSON.parse(saved);
+		mapCenter = [lat, lng];
+		mapZoom = zoom;
+	}
 	
 	const params = new URLSearchParams(window.location.search);
 	if (params.toString() !== "") {
 		decodeParams(params);
 	}
-///console.log(initialCenter, initialZoom);
-	init_map();
-	statusDiv.innerHTML = "isMobile: ";
-	statusDiv.innerHTML += isMobile ?  "true" : "false";
-///	console.log(isMobile);
-///		photoDiv.style.top = "70%";
 	
+/// console.log(mapCenter, mapZoom);
+	init_map();
+///	console.log("isMobile: ",isMobile ?  "true" : "false");
+///	statusDiv.innerHTML = "isMobile: ";
+///	statusDiv.innerHTML += isMobile ?  "true" : "false";	
 };
 
 function decodeParams(_params) {
-	if (_params.has("zoom")) { initialZoom = _params.get("zoom")};
-	if (_params.has("center")) { initialCenter = JSON.parse(_params.get("center"))};
+	if (_params.has("zoom")) { mapZoom = _params.get("zoom")};
+	if (_params.has("center")) { mapCenter = JSON.parse(_params.get("center"))};
 	if (_params.has("source")) { 
 		var _url = JSON.parse(_params.get("source"))
 		switch (_url) {
@@ -67,10 +80,10 @@ function decodeParams(_params) {
 }
 
 function init_map() {
-	map.setView(initialCenter, initialZoom);
+	map.setView(mapCenter, mapZoom); 
 	curPt_latlng = L.latLng(map.getCenter());
 	curPtMark.setLatLng(curPt_latlng);
-	
+///	console.log("map.getCenter()",map.getCenter());
 }
 
 // region Map Tiles
@@ -83,7 +96,7 @@ function init_map() {
 	}); 
 
 //region OSM/ 	
-///var OSMLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+////var OSMLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 var OSMLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 19,
 		attribution: '&copy <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
@@ -185,7 +198,6 @@ function layer_onEachFeatureDo(feature, layer) {
 				popupStr += '<br /> desc: '+ feature.properties.desc ;
 			}
 		}
-///		console.log(popupStr);
 		layer.bindPopup(popupStr);
 		layer.on('click', onCalqueClickNormal);
 	}
@@ -336,7 +348,6 @@ function CalqueObj (_name) {
 function updateCalque(_num, _addedJson) {
 	var calque = calques[_num];
 	var isNew = (calque.layerJson.features.length == 0);
-/// console.log(_num, isNew, calque.layerJson.features.length);
 	try {
 	calque.addFeatures(_addedJson);
 	if (isNew) {
@@ -363,17 +374,19 @@ const calques = [calque1, calque2, calque3, calquePanox, calqueSeq];
 
 // region map
 
-//var initialCenter = [44.65, 4.251];//Jaujac
-var initialCenter = [44.622, 4.40];// Aubenas
-//var initialCenter = [44.60758, 4.44063];// Jastres
-//var initialCenter = [44.56, 4.4194];// Vogüé
-var initialZoom = 13;
+const defaultCenter = [44.622, 4.40];// Aubenas
+const defaultZoom = 13;
+
+var mapCenter;
+var mapZoom;
+
+//const defaultCenter = [44.65, 4.251];//Jaujac
+//const defaultCenter = [44.60758, 4.44063];// Jastres
+//const defaultCenter = [44.56, 4.4194];// Vogüé
 
 var map = L.map('map', {
-//	center: initialCenter,
 	layers: [
 		OTMLayer 
-////	]}).setView(initialCenter, initialZoom); 
 	]}); 
 
 L.control.scale({maxWidth: 200, imperial: false}).addTo(map);
@@ -435,6 +448,7 @@ map.on("moveend", function () {
 */
 	}
 	map_moving = false;
+	saveView();
 });
 
 function overlaysVis_remove(name) {
@@ -470,6 +484,16 @@ map.on("zoomend", function(ev) {
 	updateLocPtAccRadius();
 	zoom_div.innerHTML = 'zoom: ' + map.getZoom();
 });
+
+function saveView() {
+  const _center = map.getCenter();
+  const _zoom = map.getZoom();
+  localStorage.setItem('lastMapView', JSON.stringify({
+    lat: _center.lat,
+    lng: _center.lng,
+    zoom: _zoom
+  }));
+}
 
 function dragElement(header, elem) {
 	header.onmousedown = dragMouseDown;
@@ -574,7 +598,6 @@ var calqueMode = true;
 b_calque.onclick = ()=>{
 alert("A faire");
 }
-/// var sub_layer = document.getElementById("sub_layer");
 b_layer_1.onclick = setLayer;
 b_layer_2.onclick = setLayer;
 b_layer_3.onclick = setLayer;
@@ -661,7 +684,6 @@ b_undo.onclick = () => {
 b_center_file.onclick = centerCalque;
 b_panoramaxCenter.onclick = centerCalque;
 function centerCalque(ev) {
-///  console.log(ev.target);
 	var _index = calqueIndex;
 	if (ev.target.id == "b_panoramaxCenter") {
 		_index = 3;
@@ -728,7 +750,6 @@ b_save_gpx.onclick = ()=> {
 
 // region point courant
 
-///var curPt_latlng = L.latLng(map.getCenter());
 var curPt_latlng = L.latLng([0,0]);
 var curPt1_latlng = L.latLng([0,0]);
 var curPt2_latlng = L.latLng([0,0]);
@@ -939,7 +960,7 @@ var	ptStrs ;
 		latPrm = 'lat=' + ptStrs[1].trim();
 	}
 	URLFull = URLbase + lonPrm + '&' +latPrm + '&zonly=true';  
-///	URLFull = URLbase + lonPrm + '&' +latPrm ;  
+////	URLFull = URLbase + lonPrm + '&' +latPrm ;  
 	curPtElev.style.backgroundColor = "Red";
 	var httpRequest = new XMLHttpRequest();
 	httpRequest.open('GET', URLFull);
@@ -1396,7 +1417,6 @@ function display_result(_type, _data) {
 
 // region OSM around
 
-///var currentOsmCenter = [4.43902, 44.63892 ]; // Mont Champ
 var searchRadius = 32;
 var osm_latlng = L.latLng([0,0]);
 
@@ -1441,7 +1461,7 @@ function display_resultAround(response_data) {
 
 function setOsmSearchRadius() {
 	var zoomDiff = 17.0 - map.getZoom(); // 17.5 donne 10m
-	///	  var r = Math.pow(2,zoomDiff)* R_pixels * 0.95;  // R_pixels ??
+	////	  var r = Math.pow(2,zoomDiff)* R_pixels * 0.95;  // R_pixels ??
 	var r = Math.pow(2,zoomDiff)* osmMark._radius * 0.95;
 	searchRadius = Math.round(r)
 }
@@ -1658,7 +1678,6 @@ function display_resultImport(osm_data) {
 ///		console.log(geojson_tmp1);
 	}
 	catch(err) {
-///			trucDiv.innerHTML += err;
 		console.log( err); 
 	}
 }
@@ -1684,6 +1703,15 @@ const panoxNum = 3;
 const seqNum = 4;
 var photoDiv = document.getElementById('photoDiv');
 var photoHeader = document.getElementById('photoHeader');
+const resizeHandleW = document.getElementById('resizeHandleW');
+const resizeHandleH = document.getElementById('resizeHandleH');
+
+let isResizingW = false;
+let isResizingH = false;
+let startX = 0;
+let startWidth = 0;
+let startY = 0;
+let startHeight = 0;
 
 var img = document.getElementById("image");
 var currentCollectionId;
@@ -1699,6 +1727,61 @@ var azimuthPtr = L.polyline([], {color: 'blue'});
 // else new feature is got simply by its index in already loaded collection (faster)
 // prevNextMode is set if feature is not found in the loaded part of the current collection
 var prevNextMode = false;
+//------- utils ------------------
+
+resizeHandleW.addEventListener('mousedown', (e) => {
+  isResizingW = true;
+  startX = e.clientX;
+  startWidth = photoDiv.offsetWidth;
+
+  // Empêche la sélection de texte pendant le drag
+  document.body.style.userSelect = 'none';
+  e.preventDefault();
+});
+
+resizeHandleH.addEventListener('mousedown', (e) => {
+  isResizingH = true;
+  startY = e.clientY;
+  startHeight = photoDiv.offsetHeight;
+  // Empêche la sélection de texte pendant le drag
+  document.body.style.userSelect = 'none';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (isResizingW) {
+	  const diff = e.clientX - startX;
+	  const newWidth = startWidth + diff;
+	  // Optionnel : bornes min/max
+	  const minWidth = 100;
+	  const maxWidth = window.innerWidth - photoDiv.offsetLeft - 20;
+	  if (newWidth >= minWidth && newWidth <= maxWidth) {
+		photoDiv.style.width = newWidth + 'px';
+	  }
+  }
+  if (isResizingH) {
+	  const diffY = e.clientY - startY;
+	  const newHeight = startHeight + diffY;
+	  // Optionnel : bornes min/max
+	  const minHeight = 100;
+	  const maxHeight = window.innerHeight - photoDiv.offsetTop - 20;
+	  if (newHeight >= minHeight && newHeight <= maxHeight) { 
+		photoDiv.style.height = newHeight + 'px';
+	  }
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  if (isResizingW) {
+    isResizingW = false;
+    document.body.style.userSelect = '';
+  }
+  if (isResizingH) {
+    isResizingH = false;
+    document.body.style.userSelect = '';
+  }
+});
+
 	
 //------- menu and utils ---------
 	
@@ -1730,23 +1813,6 @@ bClosePhoto.onclick = hidePhoto;
 	
 dragElement(photoHeader, photoDiv );
 
-
-function checkBottom() {
-// console.log(photoDiv.offsetTop, photoDiv.offsetHeight, window.innerHeight);
-	var currentHeight = photoDiv.offsetHeight;
-	var bottomSpace = window.innerHeight - (photoDiv.offsetTop + currentHeight) -20;
-	var ratio = (currentHeight + bottomSpace) / currentHeight;
-	var newWidth = Math.floor(photoDiv.offsetWidth * ratio);
-	var newWidthTxt = newWidth+'px';
-	photoDiv.style.width = newWidthTxt;			
-	photoDiv.style.height = "auto";			
- }
-
-img.addEventListener('load', (event) => {
- //           console.log('img has been loaded!');
-			checkBottom();
-		});
-
 bImgHD.onclick = () => {
 	window.open(currentFeatureImgUrl);  
 }
@@ -1760,6 +1826,7 @@ var pxUrl = 'https://api.panoramax.xyz/fr/index?focus=pic&pic='
 	pxUrl += currentFeature.id;
 	window.open(pxUrl);  
 }
+
 function updatePanoxInfo(_feature) {
 	elementInfo_div.innerHTML = "id: " + _feature.id;
 	elementInfo_div.innerHTML += 
@@ -1874,6 +1941,7 @@ async function manageItem(_feature, checkSeq) {
 	}
 
 	showImage(_feature);
+	
 	if (!nextLink || !prevLink) {
 		panoramaxAround(400);		
 	}
@@ -1941,7 +2009,7 @@ function showSelectedPoint(_feature) {
 }
 
 function showImage(_feature) {
-		photoDiv.style.display = "block";	
+		photoDiv.style.display = "flex";	
 		img.src = _feature.assets.sd.href;
 ///	console.log("img", _feature.assets.sd);
 }
@@ -2045,7 +2113,7 @@ function toJsonTxt(gpxText) {
 			strTmp += propEnd;
 		}
 		console.log(strTmp);
-		///geometry
+		//geometry
 		strTmp += geomStart;
 		var trkpts = Array.from(trkXml.getElementsByTagName("trkpt"));
 		for (var i = 0; i < trkpts.length; i++) {
@@ -2215,7 +2283,7 @@ var timeStr = formattedTime(date);
 
 }
 
-function geoFindMe(option) {  /// option : loc, center, wpt, trkpt
+function geoFindMe(option) {  // option : loc, center, wpt, trkpt
 
   function success(position) {
 	decodePosition(position, option);
