@@ -1,6 +1,6 @@
 //
-const version ="0.7.4";
-const subV = ""; // 
+const version ="0.7.5";
+const subV = "_d"; // 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -34,7 +34,7 @@ var isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
-	document.title = 'Carto_tools  V_' + version + subV;
+	document.title = 'Carto_tools_mob  V_' + version + subV;
 	console.log("version : ", version + subV);
 	init_features_table();
 
@@ -1713,7 +1713,7 @@ let startWidth = 0;
 let startY = 0;
 let startHeight = 0;
 
-var img = document.getElementById("image");
+var image = document.getElementById("image");
 var currentCollectionId;
 var currentCollectionCount = 0;
 var currentImageIndex = 0;
@@ -2010,9 +2010,20 @@ function showSelectedPoint(_feature) {
 
 function showImage(_feature) {
 		photoDiv.style.display = "flex";	
-		img.src = _feature.assets.sd.href;
-///	console.log("img", _feature.assets.sd);
+		image.src = _feature.assets.sd.href;
+///	console.log("image", _feature.assets.sd);
 }
+
+// Après chargement de l'image
+image.addEventListener('load', centrerImage);
+
+function centrerImage() {
+  const scrollableWidth = image.offsetWidth - imageDiv.offsetWidth;
+  if (scrollableWidth > 0) {
+    imageDiv.scrollLeft = scrollableWidth / 2;
+  }
+}
+
 
 
 //------- panoramax api calls -----
