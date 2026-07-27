@@ -1,6 +1,6 @@
 //
 const version ="0.7.5";
-const subV = "_d"; // 
+const subV = "_e"; // 
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -34,7 +34,7 @@ var isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 window.onload = (event) => {
 	b_version.innerHTML = 'V: ' + version + subV; 
-	document.title = 'Carto_tools_mob  V_' + version + subV;
+	document.title = 'Carto_tools  V_' + version + subV;
 	console.log("version : ", version + subV);
 	init_features_table();
 
