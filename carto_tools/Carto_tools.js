@@ -1,6 +1,6 @@
 //
 const version ="0.7.6";
-const subV = ""; // 
+const subV = "_c"; // 
 
 // region init 
 
@@ -1805,6 +1805,7 @@ async function panoramaxInBox() {
 	const bbxStr = bboxStr(map.getBounds());
 	const dataJson = await px_getFeaturesBbox(bbxStr);
 	updateCalque(panoxNum, dataJson);
+	updateInfoMode(false); // set infoDiv on panoramax
 }
 
 function panoramaxClear() {
@@ -1834,16 +1835,18 @@ var pxUrl = 'https://api.panoramax.xyz/fr/index?focus=pic&pic='
 }
 
 function updatePanoxInfo(_feature) {
-	elementInfo_div.innerHTML = "id: " + _feature.id;
+	elementInfo_div.innerHTML = "image id: " + _feature.id;
 	elementInfo_div.innerHTML += 
 		"<br>date: " + _feature.properties.datetime.substring(0,10) + 
 		",  time: " + _feature.properties.datetime.substring(11,19);
 	elementInfo_div.innerHTML += 
-		"<br>assets: " + _feature.assets.hd.href.substring(0,35) + "...";
+		"<br>azimuth: " + _feature.properties["view:azimuth"];
 	elementInfo_div.innerHTML += 
-		"<br>geovisio:rank: " + _feature.properties["geovisio:rank_in_collection"];
+		"<br>index in sequence: " + _feature.properties["geovisio:rank_in_collection"];
 	elementInfo_div.innerHTML += 
-		"<br>provider[0].name: " + _feature.providers[0].name;
+		"<br>instance: " + _feature.assets.hd.href.substring(0,35) + "...";
+	elementInfo_div.innerHTML += 
+		"<br>provider.name: " + _feature.providers[0].name;
 }
 
 function bboxAround(lonLatStr, dist) {
@@ -2019,11 +2022,12 @@ function showImage(_feature) {
 	photoDiv.style.display = "flex";	
 	const exif = _feature.properties.exif;
 	const is360 = (exif['Xmp.GPano.ProjectionType'] == 'equirectangular');
-	console.log("is360", is360 );
+///	console.log("is360", is360 );
+	bWaiting.style.display = "block";
 	if (!is360) {
 		imageDiv.style.display = "flex";
 		Y360Div.style.display = "none";;
-		image.src = _feature.assets.hd.href;
+		image.src = _feature.assets.sd.href;
 	} else {
 		imageDiv.style.display = "none";
 		Y360Div.style.display = "flex";;
@@ -2045,6 +2049,7 @@ function centrerImage() {
   if (scrollableWidth > 0) {
     imageDiv.scrollLeft = scrollableWidth / 2;
   }
+	bWaiting.style.display = "none";
 }
 
 
