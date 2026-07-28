@@ -7,6 +7,8 @@
 	<link rel="stylesheet" type="text/css" href="../lib/leaflet_src/leaflet.css">	 
 	<script src="../lib/leaflet_src/leaflet-src.js" ></script>   <!-- version 1.6.0 -->
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css" />
+
 	<style>
 
 
@@ -148,6 +150,7 @@
 		position:absolute;
 		font-size: 1.8em; 		
 		bottom: 2px;
+		z-index: 900;
 	}
 	
 	.bPrevNextPoint:disabled { 
@@ -276,6 +279,10 @@
 	#imageDiv {
 		flex: 1; 
 		overflow-x: scroll; 
+	}
+	
+	#Y360Div {
+		flex: 1; 
 	}
 	
 	#image {
@@ -525,6 +532,8 @@
 		<div id="imageDiv">
 		<img  id="image" alt="pas de photo ?">
 		</div>
+		<div id="Y360Div" style= "display: none">
+		</div>
 			<button id= "bPrevPoint" class= "bPrevNextPoint" style= "right: 3em" disabled><b>&lt</b></button>
 			<button id= "bNextPoint" class= "bPrevNextPoint" style= "right: 1em" disabled><b>&gt</b></button>	
 		<div id="resizeHandleW"></div>
@@ -532,8 +541,45 @@
 	</div>
 	
 	</div>
-
 	
+	<script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+            "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js"
+        }
+    }
+	</script>
+
+	<script type="module">
+	
+	// docs https://photo-sphere-viewer.js.org/guide/
+	
+	import { Viewer } from '@photo-sphere-viewer/core';
+
+	var _container = document.getElementById('Y360Div');
+	var viewer;
+
+	document.addEventListener('newImage', (e) => {
+		///  console.log('Valeur changée:', e);
+//		try {
+		const detail_ = e.detail;;
+		console.log('detail:', detail_.imageAsset);
+		_container.innerHTML = "";
+		viewer = new Viewer({
+			container: _container,
+			panorama: detail_.imageAsset,
+			navbar: false,
+		});
+/*		}
+		catch(err) {
+			alert("viewer error: " + err)
+		}*/
+
+	});
+	
+	</script>
+
 	<script src='../lib/osmtogeojson.js'></script> 
 	<script src="./Carto_tools.js"> </script>
 

@@ -1,6 +1,9 @@
 //
-const version ="0.7.5";
-const subV = "_e"; // 
+const version ="0.7.6";
+const subV = ""; // 
+
+// region init 
+
 // 0.1.1 : lecture gpx ou json
 // 0.2.1 : essai responsive design
 // 0.3.0 : objets calques 
@@ -26,6 +29,7 @@ const subV = "_e"; //
 // 0.7.2 : version mobile
 // 0.7.3 : mapView in localStorage
 // 0.7.4 : image
+// 0.7.6 : 360°
 	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
@@ -85,6 +89,8 @@ function init_map() {
 	curPtMark.setLatLng(curPt_latlng);
 ///	console.log("map.getCenter()",map.getCenter());
 }
+
+// endregion
 
 // region Map Tiles
 
@@ -1983,6 +1989,7 @@ async function updateCollection(_feature, checkSeq){
 	return imgIndex;
 }
 
+const Y360Div = document.getElementById('Y360Div');
 
 function showSelectedPoint(_feature) {
 // 	set a larger marker on selected feature
@@ -2009,8 +2016,24 @@ function showSelectedPoint(_feature) {
 }
 
 function showImage(_feature) {
-		photoDiv.style.display = "flex";	
-		image.src = _feature.assets.sd.href;
+	photoDiv.style.display = "flex";	
+	const exif = _feature.properties.exif;
+	const is360 = (exif['Xmp.GPano.ProjectionType'] == 'equirectangular');
+	console.log("is360", is360 );
+	if (!is360) {
+		imageDiv.style.display = "flex";
+		Y360Div.style.display = "none";;
+		image.src = _feature.assets.hd.href;
+	} else {
+		imageDiv.style.display = "none";
+		Y360Div.style.display = "flex";;
+		document.dispatchEvent(new CustomEvent('newImage', { 
+			detail: { imageAsset: _feature.assets.hd.href}
+		}));
+	}
+
+//		alert("360 à faire");
+	
 ///	console.log("image", _feature.assets.sd);
 }
 
