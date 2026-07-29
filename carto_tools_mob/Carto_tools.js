@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_a"; // zoom
+const subV = "_b"; // zoom
 
 // region init 
 
@@ -2158,18 +2158,20 @@ if (isMobile) {
       initialPinchDistance = getPinchDistance(e.touches);
       initialScale = currentScale;
     }
-  }, { passive: true });
+  }, { passive: false });
 
-  imageDiv.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2 && initialPinchDistance) {
-      const newDistance = getPinchDistance(e.touches);
-      const ratio = newDistance / initialPinchDistance;
-      currentScale = Math.min(maxScale, Math.max(minScale, initialScale * ratio));
-      
-      image.style.transform = `scale(${currentScale})`;
-      image.style.transformOrigin = 'center center';
-    }
-  }, { passive: true });
+	imageDiv.addEventListener('touchmove', (e) => {
+		if (e.touches.length === 2 && initialPinchDistance) {
+		  const newDistance = getPinchDistance(e.touches);
+		  const ratio = newDistance / initialPinchDistance;
+		  currentScale = Math.min(maxScale, Math.max(minScale, initialScale * ratio));
+		  
+		  image.style.transform = `scale(${currentScale})`;
+		  image.style.transformOrigin = 'center center';
+		}
+		e.preventDefault();
+	}, 
+	{ passive: false });
 
   imageDiv.addEventListener('touchend', (e) => {
     if (e.touches.length < 2) {
@@ -2177,9 +2179,9 @@ if (isMobile) {
     }
   });
 }
-// Zoom molette (desktop uniquement)
 
 if (!isMobile) {
+// Zoom molette (desktop uniquement)
   imageDiv.addEventListener('wheel', (e) => {
     e.preventDefault();
     const delta = e.deltaY < 0 ? 0.2 : -0.2;
