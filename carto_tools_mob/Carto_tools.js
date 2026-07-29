@@ -2153,12 +2153,13 @@ function getPinchDistance(touches) {
 }
 
 if (isMobile) {
-  imageDiv.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      initialPinchDistance = getPinchDistance(e.touches);
-      initialScale = currentScale;
-    }
-  }, { passive: false });
+	imageDiv.addEventListener('touchstart', (e) => {
+		if (e.touches.length === 2) {
+		  initialPinchDistance = getPinchDistance(e.touches);
+		  initialScale = currentScale;
+		}
+	}, 
+	{ passive: false });
 
 	imageDiv.addEventListener('touchmove', (e) => {
 		if (e.touches.length === 2 && initialPinchDistance) {
@@ -2173,23 +2174,23 @@ if (isMobile) {
 	}, 
 	{ passive: false });
 
-  imageDiv.addEventListener('touchend', (e) => {
-    if (e.touches.length < 2) {
-      initialPinchDistance = null;
-    }
-  });
+	imageDiv.addEventListener('touchend', (e) => {
+		if (e.touches.length < 2) {
+		  initialPinchDistance = null;
+		}
+	});
 }
 
 if (!isMobile) {
 // Zoom molette (desktop uniquement)
-  imageDiv.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.2 : -0.2;
-    currentScale = Math.min(maxScale, Math.max(minScale, currentScale + delta));
-    
-    image.style.transform = `scale(${currentScale})`;
-    image.style.transformOrigin = 'center center';
-  });
+	imageDiv.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const delta = e.deltaY < 0 ? 0.2 : -0.2;
+		currentScale = Math.min(maxScale, Math.max(minScale, currentScale + delta));
+
+		image.style.transform = `scale(${currentScale})`;
+		image.style.transformOrigin = 'center center';
+	});
 }
 
 
