@@ -243,7 +243,7 @@
 
 	#photoDiv {
 		position: absolute; 
-		width: 50%;
+		width: 45%;
 		height: 60%;
 		left: 10px;
 		top: 30%;
@@ -278,7 +278,7 @@
 
 	#imageDiv {
 		flex: 1; 
-		overflow-x: scroll; 
+		overflow-x: scroll;	
 	}
 	
 	#Y360Div {
@@ -534,8 +534,11 @@
 		</div>
 		<div id="Y360Div" style= "display: none">
 		</div>
-			<button id= "bPrevPoint" class= "bPrevNextPoint" style= "right: 3em" disabled><b>&lt</b></button>
-			<button id= "bNextPoint" class= "bPrevNextPoint" style= "right: 1em" disabled><b>&gt</b></button>	
+		<button id= "bWaiting" class= "bPrevNextPoint" 
+			style= "right: 5em; color: black; background-color: red; display: none " 
+			disabled><b>!</b></button>
+		<button id= "bPrevPoint" class= "bPrevNextPoint" style= "right: 3em" disabled><b>&lt</b></button>
+		<button id= "bNextPoint" class= "bPrevNextPoint" style= "right: 1em" disabled><b>&gt</b></button>	
 		<div id="resizeHandleW"></div>
 		<div id="resizeHandleH"></div>
 	</div>
@@ -561,20 +564,25 @@
 	var viewer;
 
 	document.addEventListener('newImage', (e) => {
-		///  console.log('Valeur changée:', e);
-//		try {
+		try {
+	bWaiting.style.display = "block";
 		const detail_ = e.detail;;
-		console.log('detail:', detail_.imageAsset);
+///		console.log('detail:', detail_.imageAsset);
 		_container.innerHTML = "";
 		viewer = new Viewer({
 			container: _container,
 			panorama: detail_.imageAsset,
 			navbar: false,
 		});
-/*		}
+		viewer.addEventListener('ready', () => {
+///			console.log(`viewer is ready`);
+			bWaiting.style.display = "none";
+		}, { once: true });
+
+		}
 		catch(err) {
 			alert("viewer error: " + err)
-		}*/
+		}
 
 	});
 	

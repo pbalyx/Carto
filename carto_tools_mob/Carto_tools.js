@@ -1,6 +1,6 @@
 //
-const version ="0.7.6";
-const subV = ""; // 
+const version ="0.7.7";
+const subV = ""; // pan/zoom
 
 // region init 
 
@@ -1714,7 +1714,7 @@ const resizeHandleH = document.getElementById('resizeHandleH');
 
 let isResizingW = false;
 let isResizingH = false;
-let startX = 0;
+let startResizeX = 0;
 let startWidth = 0;
 let startY = 0;
 let startHeight = 0;
@@ -1737,7 +1737,7 @@ var prevNextMode = false;
 
 resizeHandleW.addEventListener('mousedown', (e) => {
   isResizingW = true;
-  startX = e.clientX;
+  startResizeX = e.clientX;
   startWidth = photoDiv.offsetWidth;
 
   // Empêche la sélection de texte pendant le drag
@@ -1756,7 +1756,7 @@ resizeHandleH.addEventListener('mousedown', (e) => {
 
 document.addEventListener('mousemove', (e) => {
   if (isResizingW) {
-	  const diff = e.clientX - startX;
+	  const diff = e.clientX - startResizeX;
 	  const newWidth = startWidth + diff;
 	  // Optionnel : bornes min/max
 	  const minWidth = 100;
@@ -1805,6 +1805,7 @@ async function panoramaxInBox() {
 	const bbxStr = bboxStr(map.getBounds());
 	const dataJson = await px_getFeaturesBbox(bbxStr);
 	updateCalque(panoxNum, dataJson);
+	updateInfoMode(false); // set infoDiv on panoramax
 }
 
 function panoramaxClear() {
@@ -1834,16 +1835,18 @@ var pxUrl = 'https://api.panoramax.xyz/fr/index?focus=pic&pic='
 }
 
 function updatePanoxInfo(_feature) {
-	elementInfo_div.innerHTML = "id: " + _feature.id;
+	elementInfo_div.innerHTML = "image id: " + _feature.id;
 	elementInfo_div.innerHTML += 
 		"<br>date: " + _feature.properties.datetime.substring(0,10) + 
 		",  time: " + _feature.properties.datetime.substring(11,19);
 	elementInfo_div.innerHTML += 
-		"<br>assets: " + _feature.assets.hd.href.substring(0,35) + "...";
+		"<br>azimuth: " + _feature.properties["view:azimuth"];
 	elementInfo_div.innerHTML += 
-		"<br>geovisio:rank: " + _feature.properties["geovisio:rank_in_collection"];
+		"<br>index in sequence: " + _feature.properties["geovisio:rank_in_collection"];
 	elementInfo_div.innerHTML += 
-		"<br>provider[0].name: " + _feature.providers[0].name;
+		"<br>instance: " + _feature.assets.hd.href.substring(0,35) + "...";
+	elementInfo_div.innerHTML += 
+		"<br>provider.name: " + _feature.providers[0].name;
 }
 
 function bboxAround(lonLatStr, dist) {
@@ -2019,11 +2022,12 @@ function showImage(_feature) {
 	photoDiv.style.display = "flex";	
 	const exif = _feature.properties.exif;
 	const is360 = (exif['Xmp.GPano.ProjectionType'] == 'equirectangular');
-	console.log("is360", is360 );
+///	console.log("is360", is360 );
+	bWaiting.style.display = "block";
 	if (!is360) {
 		imageDiv.style.display = "flex";
 		Y360Div.style.display = "none";;
-		image.src = _feature.assets.hd.href;
+		image.src = _feature.assets.sd.href;
 	} else {
 		imageDiv.style.display = "none";
 		Y360Div.style.display = "flex";;
@@ -2041,13 +2045,102 @@ function showImage(_feature) {
 image.addEventListener('load', centrerImage);
 
 function centrerImage() {
-  const scrollableWidth = image.offsetWidth - imageDiv.offsetWidth;
-  if (scrollableWidth > 0) {
-    imageDiv.scrollLeft = scrollableWidth / 2;
-  }
+    const marginNeeded = (imageDiv.offsetWidth - image.offsetWidth) / 2;
+	if (marginNeeded > 0) {
+		// image plus étroite : on centre avec une marge calculée
+		image.style.margin = `0 ${marginNeeded}px`;
+	} else {
+		// image plus large : on retire toute marge et on centre le scroll
+		image.style.margin = '0';
+		imageDiv.scrollLeft = -marginNeeded;
+	}
+	bWaiting.style.display = "none";
 }
 
+// region pan/zoom
 
+//-----------pan
+let isDragging = false;
+let startX = 0;
+let scrollStart = 0;
+
+function dragStart(clientX) {
+  isDragging = true;
+  startX = clientX;
+  scrollStart = imageDiv.scrollLeft;
+}
+
+function dragMove(clientX) {
+  if (!isDragging) return;
+  const diff = clientX - startX;
+  imageDiv.scrollLeft = scrollStart - diff;
+}
+
+function dragEnd() {
+  isDragging = false;
+}
+
+if (isMobile) {
+  image.addEventListener('touchstart', (e) => {
+    dragStart(e.touches[0].clientX);
+  }, { passive: true });
+
+  image.addEventListener('touchmove', (e) => {
+    dragMove(e.touches[0].clientX);
+  }, { passive: true });
+
+  image.addEventListener('touchend', dragEnd);
+
+} else {
+  image.addEventListener('mousedown', (e) => {
+    dragStart(e.clientX);
+    image.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    dragMove(e.clientX);
+  });
+
+  document.addEventListener('mouseup', () => {
+    dragEnd();
+    image.style.cursor = 'grab';
+  });
+}
+
+if (isMobile) {
+  image.addEventListener('touchstart', (e) => {
+    dragStart(e.touches[0].clientX);
+  }, { passive: true });
+
+  image.addEventListener('touchmove', (e) => {
+    dragMove(e.touches[0].clientX);
+  }, { passive: true });
+
+  image.addEventListener('touchend', dragEnd);
+
+} else {
+  image.addEventListener('mousedown', (e) => {
+    dragStart(e.clientX);
+    image.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    dragMove(e.clientX);
+  });
+
+  document.addEventListener('mouseup', () => {
+    dragEnd();
+    image.style.cursor = 'grab';
+  });
+}
+
+//--------------- zoom
+
+
+
+// endregion
 
 //------- panoramax api calls -----
 
