@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = ""; // pan/zoom
+const subV = "_a"; // zoom
 
 // region init 
 
@@ -2138,6 +2138,57 @@ if (isMobile) {
 
 //--------------- zoom
 
+// Zoom au pincement (pinch-to-zoom) sur mobile
+
+let currentScale = 1;
+const minScale = 0.95;
+const maxScale = 4;
+let initialPinchDistance = null;
+let initialScale = 1;
+
+function getPinchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+if (isMobile) {
+  imageDiv.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      initialPinchDistance = getPinchDistance(e.touches);
+      initialScale = currentScale;
+    }
+  }, { passive: true });
+
+  imageDiv.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && initialPinchDistance) {
+      const newDistance = getPinchDistance(e.touches);
+      const ratio = newDistance / initialPinchDistance;
+      currentScale = Math.min(maxScale, Math.max(minScale, initialScale * ratio));
+      
+      image.style.transform = `scale(${currentScale})`;
+      image.style.transformOrigin = 'center center';
+    }
+  }, { passive: true });
+
+  imageDiv.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) {
+      initialPinchDistance = null;
+    }
+  });
+}
+// Zoom molette (desktop uniquement)
+
+if (!isMobile) {
+  imageDiv.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.2 : -0.2;
+    currentScale = Math.min(maxScale, Math.max(minScale, currentScale + delta));
+    
+    image.style.transform = `scale(${currentScale})`;
+    image.style.transformOrigin = 'center center';
+  });
+}
 
 
 // endregion
