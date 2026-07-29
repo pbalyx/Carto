@@ -1,6 +1,6 @@
 //
 const version ="0.7.6";
-const subV = "_c"; // 
+const subV = ""; // 
 
 // region init 
 
@@ -29,7 +29,7 @@ const subV = "_c"; //
 // 0.7.2 : version mobile
 // 0.7.3 : mapView in localStorage
 // 0.7.4 : image
-// 0.7.6 : 360°
+// 0.7.6 : 360° image centrée
 	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
@@ -1714,7 +1714,7 @@ const resizeHandleH = document.getElementById('resizeHandleH');
 
 let isResizingW = false;
 let isResizingH = false;
-let startX = 0;
+let startResizeX = 0;
 let startWidth = 0;
 let startY = 0;
 let startHeight = 0;
@@ -1737,7 +1737,7 @@ var prevNextMode = false;
 
 resizeHandleW.addEventListener('mousedown', (e) => {
   isResizingW = true;
-  startX = e.clientX;
+  startResizeX = e.clientX;
   startWidth = photoDiv.offsetWidth;
 
   // Empêche la sélection de texte pendant le drag
@@ -1756,7 +1756,7 @@ resizeHandleH.addEventListener('mousedown', (e) => {
 
 document.addEventListener('mousemove', (e) => {
   if (isResizingW) {
-	  const diff = e.clientX - startX;
+	  const diff = e.clientX - startResizeX;
 	  const newWidth = startWidth + diff;
 	  // Optionnel : bornes min/max
 	  const minWidth = 100;
@@ -2045,10 +2045,15 @@ function showImage(_feature) {
 image.addEventListener('load', centrerImage);
 
 function centrerImage() {
-  const scrollableWidth = image.offsetWidth - imageDiv.offsetWidth;
-  if (scrollableWidth > 0) {
-    imageDiv.scrollLeft = scrollableWidth / 2;
-  }
+    const marginNeeded = (imageDiv.offsetWidth - image.offsetWidth) / 2;
+	if (marginNeeded > 0) {
+		// image plus Ã©troite : on centre avec une marge calculÃ©e
+		image.style.margin = `0 ${marginNeeded}px`;
+	} else {
+		// image plus large : on retire toute marge et on centre le scroll
+		image.style.margin = '0';
+		imageDiv.scrollLeft = -marginNeeded;
+	}
 	bWaiting.style.display = "none";
 }
 
