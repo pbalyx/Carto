@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_g"; // zoom pan
+const subV = "_h"; // zoom pan
 
 // region init 
 
@@ -2199,7 +2199,8 @@ if (isMobile) {
       pinchCenterX = center.x;
       pinchCenterY = center.y;
     }
-  }, { passive: true });
+  }, 
+  { passive: false });
 
   imageDiv.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2 && initialPinchDistance) {
@@ -2209,7 +2210,9 @@ if (isMobile) {
       const center = getPinchCenter(e.touches);
       applyZoomAtPoint(initialScale * ratio, center.x, center.y);
     }
-  }, { passive: true });
+	e.preventDefault();
+  }, 
+  { passive: false });
 
   imageDiv.addEventListener('touchend', (e) => {
     if (e.touches.length < 2) {
