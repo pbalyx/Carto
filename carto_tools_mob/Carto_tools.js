@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_h"; // zoom pan
+const subV = "_j"; // zoom pan
 
 // region init 
 
@@ -2135,7 +2135,7 @@ function getBaseHeight() {
   return baseHeight;
 }
 
-function applyZoomAtPoint(newScale, clientX, clientY) {////) {
+function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   newScale = Math.min(maxScale, Math.max(minScale, newScale));
   console.log(newScale);
   if (newScale === currentScale) return;
@@ -2143,8 +2143,8 @@ function applyZoomAtPoint(newScale, clientX, clientY) {////) {
   const rect = imageDiv.getBoundingClientRect();
 
   // Position du curseur relative à imageDiv
-  const pointerX = clientX - rect.left;
-  const pointerY = clientY - rect.top;
+  const pointerX = centerX - rect.left;
+  const pointerY = centerY - rect.top;
 
   // Point visé dans le contenu (image) AVANT zoom
   const contentX = imageDiv.scrollLeft + pointerX;
@@ -2160,6 +2160,9 @@ function applyZoomAtPoint(newScale, clientX, clientY) {////) {
   // Recalcule le scroll pour garder le même point sous le curseur
   imageDiv.scrollLeft = contentX * ratio - pointerX;
   imageDiv.scrollTop = contentY * ratio - pointerY;
+  
+  let textInfo = 'pointerX: '+ pointerX + ', pointerY: ' + pointerY;
+  statusTxt.innerText = textInfo;
 }
 
 if (!isMobile) {
