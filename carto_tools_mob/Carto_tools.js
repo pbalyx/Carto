@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_e"; // zoom pan
+const subV = "_g"; // zoom pan
 
 // region init 
 
@@ -2080,6 +2080,8 @@ function dragMove(clientX, clientY) {
   imageDiv.scrollLeft = scrollStartX - diffX;
   const diffY = clientY - startY;
   imageDiv.scrollTop = scrollStartY - diffY;
+///  statusTxt.textContent = imageDiv.scrollTop;
+///  console.log(imageDiv.scrollTop, scrollStartY, diffY, clientY, startY);
 }
 
 function dragEnd() {
@@ -2121,9 +2123,103 @@ if (isMobile) {
 let currentScale = 1;
 const minScale = 0.95;
 const maxScale = 4;
+///let initialPinchDistance = null;
+///let initialScale = 1;
+////-----------------
+let baseHeight = null;
+
+function getBaseHeight() {
+  if (baseHeight === null) {
+    baseHeight = imageDiv.offsetHeight; // hauteur "naturelle" = 100% du conteneur
+  }
+  return baseHeight;
+}
+
+function applyZoomAtPoint(newScale, clientX, clientY) {////) {
+  newScale = Math.min(maxScale, Math.max(minScale, newScale));
+  console.log(newScale);
+  if (newScale === currentScale) return;
+
+  const rect = imageDiv.getBoundingClientRect();
+
+  // Position du curseur relative à imageDiv
+  const pointerX = clientX - rect.left;
+  const pointerY = clientY - rect.top;
+
+  // Point visé dans le contenu (image) AVANT zoom
+  const contentX = imageDiv.scrollLeft + pointerX;
+  const contentY = imageDiv.scrollTop + pointerY;
+
+  // Ratio entre nouvelle et ancienne échelle
+  const ratio = newScale / currentScale;
+
+  // Applique le zoom (taille réelle, pas transform)
+  currentScale = newScale;
+  image.style.height = (getBaseHeight() * currentScale) + 'px';
+
+  // Recalcule le scroll pour garder le même point sous le curseur
+  imageDiv.scrollLeft = contentX * ratio - pointerX;
+  imageDiv.scrollTop = contentY * ratio - pointerY;
+}
+
+if (!isMobile) {
+  imageDiv.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.2 : -0.2;
+    applyZoomAtPoint(currentScale + delta, e.clientX, e.clientY);
+  });
+}
+
+////------------touch
+
 let initialPinchDistance = null;
 let initialScale = 1;
+let pinchCenterX = 0;
+let pinchCenterY = 0;
 
+function getPinchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function getPinchCenter(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  };
+}
+
+if (isMobile) {
+  imageDiv.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      initialPinchDistance = getPinchDistance(e.touches);
+      initialScale = currentScale;
+      const center = getPinchCenter(e.touches);
+      pinchCenterX = center.x;
+      pinchCenterY = center.y;
+    }
+  }, { passive: true });
+
+  imageDiv.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && initialPinchDistance) {
+      const newDistance = getPinchDistance(e.touches);
+      const ratio = newDistance / initialPinchDistance;
+      // le centre du pinch peut légèrement bouger, on le remet à jour
+      const center = getPinchCenter(e.touches);
+      applyZoomAtPoint(initialScale * ratio, center.x, center.y);
+    }
+  }, { passive: true });
+
+  imageDiv.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) {
+      initialPinchDistance = null;
+    }
+  });
+}
+
+
+/*
 function getPinchDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
   const dy = touches[0].clientY - touches[1].clientY;
@@ -2159,6 +2255,8 @@ if (isMobile) {
 	});
 }
 
+*/
+/*
 if (!isMobile) {
 // Zoom molette (desktop uniquement)
 	imageDiv.addEventListener('wheel', (e) => {
@@ -2170,7 +2268,7 @@ if (!isMobile) {
 		image.style.transformOrigin = 'center center';
 	});
 }
-
+*/
 
 // endregion
 
@@ -2621,7 +2719,7 @@ console.log("col", data);
 
 }
 
-var statusTxt =	document.getElementById("statusTxt");
+////var statusTxt =	document.getElementById("statusTxt");
 
 // region poub
 
