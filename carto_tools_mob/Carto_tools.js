@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_j"; // zoom pan
+const subV = "_k"; // zoom pan
 
 // region init 
 
@@ -2210,8 +2210,9 @@ if (isMobile) {
       const newDistance = getPinchDistance(e.touches);
       const ratio = newDistance / initialPinchDistance;
       // le centre du pinch peut légèrement bouger, on le remet à jour
-      const center = getPinchCenter(e.touches);
-      applyZoomAtPoint(initialScale * ratio, center.x, center.y);
+////      const center = getPinchCenter(e.touches);
+////      applyZoomAtPoint(initialScale * ratio, center.x, center.y);
+      applyZoomAtPoint(initialScale * ratio, pinchCenterX, pinchCenterY);
     }
 	e.preventDefault();
   }, 
