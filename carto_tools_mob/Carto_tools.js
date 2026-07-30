@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_k"; // zoom pan
+const subV = "_L"; // zoom pan
 
 // region init 
 
@@ -2161,7 +2161,7 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   imageDiv.scrollLeft = contentX * ratio - pointerX;
   imageDiv.scrollTop = contentY * ratio - pointerY;
   
-  let textInfo = 'pointerX: '+ pointerX + ', pointerY: ' + pointerY;
+  let textInfo = 'initialPinchDistance: ' +initialPinchDistance + ',  pointerX: '+ pointerX + ', pointerY: ' + pointerY;
   statusTxt.innerText = textInfo;
 }
 
