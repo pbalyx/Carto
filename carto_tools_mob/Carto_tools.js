@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_b"; // zoom
+const subV = "_d"; // zoom pan
 
 // region init 
 
@@ -1707,17 +1707,8 @@ function display_resultImport(osm_data) {
 
 const panoxNum = 3;
 const seqNum = 4;
-var photoDiv = document.getElementById('photoDiv');
-var photoHeader = document.getElementById('photoHeader');
-const resizeHandleW = document.getElementById('resizeHandleW');
-const resizeHandleH = document.getElementById('resizeHandleH');
-
-let isResizingW = false;
-let isResizingH = false;
-let startResizeX = 0;
-let startWidth = 0;
-let startY = 0;
-let startHeight = 0;
+const photoDiv = document.getElementById('photoDiv');
+const photoHeader = document.getElementById('photoHeader');
 
 var image = document.getElementById("image");
 var currentCollectionId;
@@ -1735,6 +1726,15 @@ var azimuthPtr = L.polyline([], {color: 'blue'});
 var prevNextMode = false;
 //------- utils ------------------
 
+const resizeHandleW = document.getElementById('resizeHandleW');
+const resizeHandleH = document.getElementById('resizeHandleH');
+
+let isResizingW = false;
+let isResizingH = false;
+let startResizeX = 0;
+let startWidth = 0;
+let startResizeY = 0;
+let startHeight = 0;
 resizeHandleW.addEventListener('mousedown', (e) => {
   isResizingW = true;
   startResizeX = e.clientX;
@@ -1747,7 +1747,7 @@ resizeHandleW.addEventListener('mousedown', (e) => {
 
 resizeHandleH.addEventListener('mousedown', (e) => {
   isResizingH = true;
-  startY = e.clientY;
+  startResizeY = e.clientY;
   startHeight = photoDiv.offsetHeight;
   // Empêche la sélection de texte pendant le drag
   document.body.style.userSelect = 'none';
@@ -1766,7 +1766,7 @@ document.addEventListener('mousemove', (e) => {
 	  }
   }
   if (isResizingH) {
-	  const diffY = e.clientY - startY;
+	  const diffY = e.clientY - startResizeY;
 	  const newHeight = startHeight + diffY;
 	  // Optionnel : bornes min/max
 	  const minHeight = 100;
@@ -2062,18 +2062,24 @@ function centrerImage() {
 //-----------pan
 let isDragging = false;
 let startX = 0;
-let scrollStart = 0;
+let scrollStartX = 0;
+let startY = 0;
+let scrollStartY = 0;
 
-function dragStart(clientX) {
+function dragStart(clientX, clientY) {
   isDragging = true;
   startX = clientX;
-  scrollStart = imageDiv.scrollLeft;
+  startY = clientY;
+  scrollStartX = imageDiv.scrollLeft;
+  scrollStartY = imageDiv.scrollTop;
 }
 
-function dragMove(clientX) {
+function dragMove(clientX, clientY) {
   if (!isDragging) return;
-  const diff = clientX - startX;
-  imageDiv.scrollLeft = scrollStart - diff;
+  const diffX = clientX - startX;
+  imageDiv.scrollLeft = scrollStartX - diffX;
+  const diffY = clientY - startY;
+  imageDiv.scrollTop = scrollStartY - diffY;
 }
 
 function dragEnd() {
@@ -2093,41 +2099,13 @@ if (isMobile) {
 
 } else {
   image.addEventListener('mousedown', (e) => {
-    dragStart(e.clientX);
+    dragStart(e.clientX, e.clientY);
     image.style.cursor = 'grabbing';
     e.preventDefault();
   });
 
   document.addEventListener('mousemove', (e) => {
-    dragMove(e.clientX);
-  });
-
-  document.addEventListener('mouseup', () => {
-    dragEnd();
-    image.style.cursor = 'grab';
-  });
-}
-
-if (isMobile) {
-  image.addEventListener('touchstart', (e) => {
-    dragStart(e.touches[0].clientX);
-  }, { passive: true });
-
-  image.addEventListener('touchmove', (e) => {
-    dragMove(e.touches[0].clientX);
-  }, { passive: true });
-
-  image.addEventListener('touchend', dragEnd);
-
-} else {
-  image.addEventListener('mousedown', (e) => {
-    dragStart(e.clientX);
-    image.style.cursor = 'grabbing';
-    e.preventDefault();
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    dragMove(e.clientX);
+    dragMove(e.clientX, e.clientY);
   });
 
   document.addEventListener('mouseup', () => {
