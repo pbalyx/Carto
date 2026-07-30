@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_d"; // zoom pan
+const subV = "_e"; // zoom pan
 
 // region init 
 
@@ -2088,11 +2088,11 @@ function dragEnd() {
 
 if (isMobile) {
   image.addEventListener('touchstart', (e) => {
-    dragStart(e.touches[0].clientX);
+    dragStart(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
 
   image.addEventListener('touchmove', (e) => {
-    dragMove(e.touches[0].clientX);
+    dragMove(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
 
   image.addEventListener('touchend', dragEnd);
