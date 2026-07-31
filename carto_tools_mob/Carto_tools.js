@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_c"; // 
+const subV = "_d"; // 
 
 // region init 
 
@@ -2221,7 +2221,6 @@ if (isMobile) {
   imageDiv.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
       initialPinchDistance = getPinchDistance(e.touches);
-/////      initialScale = currentScale;
       const center = getPinchCenter(e.touches);
       pinchCenterX = center.x;
       pinchCenterY = center.y;
@@ -2229,23 +2228,22 @@ if (isMobile) {
   }, 
   { passive: false });
 
-  imageDiv.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2 && initialPinchDistance) {
-		const newDistance = getPinchDistance(e.touches);
-		const ratio = newDistance / initialPinchDistance;
-/*      // le centre du pinch peut légèrement bouger, on le remet à jour
-////      const center = getPinchCenter(e.touches);
-////      applyZoomAtPoint(currentScale * ratio, center.x, center.y);*/
-		if (Math.abs(ratio - 1) > 0.05) {
-			initialPinchDistance = newDistance;
-			applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
-			textInfo += ';<br> dist '+ initialPinchDistance.toFixed(2)  + 'new: ' + newDistance.toFixed(2);
-			statusTxt.innerHTML = textInfo;
+	imageDiv.addEventListener('touchmove', (e) => {
+		if (e.touches.length === 2 && initialPinchDistance) {
+			const newDistance = getPinchDistance(e.touches);
+			const ratio = newDistance / initialPinchDistance;
+	/*      // le centre du pinch peut légèrement bouger, on le remet à jour
+	////      const center = getPinchCenter(e.touches);
+	////      applyZoomAtPoint(currentScale * ratio, center.x, center.y);*/
+			if (Math.abs(ratio - 1) > 0.05) {
+				initialPinchDistance = newDistance;
+				applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
+				textInfo += '<br>ok ' + ratio.toFixed(2);
+				statusTxt.innerHTML = textInfo;
+			}
 		}
-    }
-	e.preventDefault();
-  }, 
-  { passive: false });
+	}, 
+	{ passive: false });
 
   imageDiv.addEventListener('touchend', (e) => {
     if (e.touches.length < 2) {
