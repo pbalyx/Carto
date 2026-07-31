@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_f"; // 
+const subV = "_g"; // 
 
 // region init 
 
@@ -1751,6 +1751,7 @@ function startResizeW() {
 function startResizeH() {
 	isResizingH = true;
 	startHeight = photoDiv.offsetHeight;
+	resizeHandleH.style.backgroundColor = "red";
 	// Empêche la sélection de texte pendant le drag
 	document.body.style.userSelect = 'none';
 }
@@ -1800,15 +1801,46 @@ document.addEventListener('mousemove', (e) => {
 });
 
 document.addEventListener('mouseup', () => {
-  if (isResizingW) {
-    isResizingW = false;
+ /* if (isResizingW) {
     document.body.style.userSelect = '';
   }
   if (isResizingH) {
-    isResizingH = false;
+  }*/
+	isResizingW = false;
+	isResizingH = false;
+	resizeHandleH.style.backgroundColor = "transparent";
     document.body.style.userSelect = '';
-  }
+ 
 });
+
+if (isMobile) {
+	resizeHandleH.addEventListener('touchstart', (e) => {
+		startResizeY = e.touches[0].clientY;
+		startResizeH();
+		e.preventDefault();
+	});
+	resizeHandleW.addEventListener('touchstart', (e) => {
+		startResizeX = e.touches[0].clientX;
+		startResizeW();
+		e.preventDefault();
+	});
+	
+	document.addEventListener('touchmove', (e) => {
+		if (isResizingH) {
+			const diff = e.touches[0].clientY - startResizeY;
+			resizeHW(diff);	  
+		}
+		if (isResizingW) {
+			const diff = e.touches[0].clientX - startResizeX;
+			resizeHW(diff);	  
+		}
+	});
+	
+	document.addEventListener('touchend', (e) => {
+		isResizingW = false;
+		isResizingH = false;
+	});
+}
 
 // endregion
 	
@@ -2117,19 +2149,7 @@ function dragEnd() {
 }
 
 if (isMobile) {
-
-/*  image.addEventListener('touchstart', (e) => {
-    dragStart(e.touches[0].clientX, e.touches[0].clientY);
-  }, 
-  { passive: true });
-
-  image.addEventListener('touchmove', (e) => {
-    dragMove(e.touches[0].clientX, e.touches[0].clientY);
-  }, 
-  { passive: true });
-
-  image.addEventListener('touchend', dragEnd);
-*/
+	// groupé avec zoom
 } else {
 
   image.addEventListener('mousedown', (e) => {
