@@ -2692,8 +2692,8 @@ function test1() {
   textInfo += '; contentX ' + contentX_.toFixed(2);
   textInfo += ';<br> scroll Left '+ imageDiv.scrollLeft.toFixed(2) ;
   textInfo += ';<br> width '+ image.width.toFixed(2) ;
-  textInfo += ';<br> currentScale '+ currentScale.toFixed(2) ;
-  statusTxt.innerHTML = textInfo;*/
+  textInfo += ';<br> currentScale '+ currentScale.toFixed(2) ;*/
+  statusTxt.innerHTML = textInfo;
 ///	console.log(textInfo);
 }
 
