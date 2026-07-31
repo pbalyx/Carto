@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_b"; // 
+const subV = "_c"; // 
 
 // region init 
 
@@ -2231,15 +2231,17 @@ if (isMobile) {
 
   imageDiv.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2 && initialPinchDistance) {
-      const newDistance = getPinchDistance(e.touches);
-	  initialPinchDistance = newDistance;
-      const ratio = newDistance / initialPinchDistance;
+		const newDistance = getPinchDistance(e.touches);
+		initialPinchDistance = newDistance;
+		const ratio = newDistance / initialPinchDistance;
 /*      // le centre du pinch peut légèrement bouger, on le remet à jour
 ////      const center = getPinchCenter(e.touches);
 ////      applyZoomAtPoint(currentScale * ratio, center.x, center.y);*/
-      applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
-  textInfo += ';<br> dist '+ initialPinchDistance.toFixed(2)  + 'new: ' + newDistance.toFixed(2);
-  statusTxt.innerHTML = textInfo;
+		if (Math.abs(ratio - 1) > 0.1) {
+			applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
+			textInfo += ';<br> dist '+ initialPinchDistance.toFixed(2)  + 'new: ' + newDistance.toFixed(2);
+			statusTxt.innerHTML = textInfo;
+		}
     }
 	e.preventDefault();
   }, 
@@ -2687,7 +2689,7 @@ var contentX_ = 222;
 var marginNeeded_;
 
 function test1() {
-	textInfo = 'marginNeeded: ' + marginNeeded_;
+	textInfo = '----------';
 /*  textInfo += '---------- <br> pointerX '+ pointerX_.toFixed(2);
   textInfo += '; contentX ' + contentX_.toFixed(2);
   textInfo += ';<br> scroll Left '+ imageDiv.scrollLeft.toFixed(2) ;
