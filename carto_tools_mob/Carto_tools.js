@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_a"; // 
+const subV = "_b"; // 
 
 // region init 
 
@@ -2232,6 +2232,7 @@ if (isMobile) {
   imageDiv.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2 && initialPinchDistance) {
       const newDistance = getPinchDistance(e.touches);
+	  initialPinchDistance = newDistance;
       const ratio = newDistance / initialPinchDistance;
 /*      // le centre du pinch peut légèrement bouger, on le remet à jour
 ////      const center = getPinchCenter(e.touches);
