@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_L"; // 
+const subV = "_m"; // 
 
 // region init 
 
@@ -1783,7 +1783,6 @@ function endResize() {
 	resizeHandleW.style.backgroundColor = "transparent";
 	resizeHandleH.style.backgroundColor = "transparent";
     document.body.style.userSelect = '';
-//////	getBaseHeight(); // pas très propre - à voir
 }
 
 if (!isMobile) {
@@ -1873,7 +1872,12 @@ bClosePhoto.onclick = hidePhoto;
 function hidePhoto(){
 		photoDiv.style.display = "none";			
 	}
+
 	
+b_cb_hd.onclick = () => {
+	cb_hd.checked = !cb_hd.checked;  
+}
+
 bImgHD.onclick = () => {
 	window.open(currentFeatureImgUrl);  
 }
@@ -2179,15 +2183,7 @@ if (isMobile) {
 let currentScale = 1;
 const minScale = 1;
 const maxScale = 8;
-/* let baseHeight = null;
-//////
-function getBaseHeight() {
-  if (baseHeight === null) {
-    baseHeight = imageDiv.offsetHeight; // hauteur "naturelle" = 100% du conteneur
-  }
-  return baseHeight;
-}
-*/
+
 let textInfo ="";
 
 function applyZoomAtPoint(newScale, centerX, centerY) {////) {
@@ -2210,7 +2206,6 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
 
   // Applique le zoom (taille réelle, pas transform)
   currentScale = newScale;
-//////  image.style.height = (getBaseHeight() * currentScale) + 'px';
   image.style.height = (imageDiv.offsetHeight * currentScale) + 'px';
 
   // Recalcule le scroll pour garder le même point sous le curseur
@@ -2229,10 +2224,7 @@ if (!isMobile) {
   });
 }
 
-////------------touch
-
 let initialPinchDistance = null;
-/////let initialScale = 1;
 let pinchCenterX = 0;
 let pinchCenterY = 0;
 let isZooming = false;
@@ -2273,7 +2265,6 @@ if (isMobile) {
 	{ passive: false });
 
 	imageDiv.addEventListener('touchmove', (e) => {
-////		if (e.touches.length === 2 && initialPinchDistance) {
 		if (isZooming && initialPinchDistance) {
 			const newDistance = getPinchDistance(e.touches);
 			const ratio = newDistance / initialPinchDistance;
@@ -2769,7 +2760,6 @@ console.log("col", data);
 
 }
 
-////var statusTxt =	document.getElementById("statusTxt");
 
 // region poub
 
