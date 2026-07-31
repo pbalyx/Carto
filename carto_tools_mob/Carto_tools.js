@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_d"; // 
+const subV = "_e"; // 
 
 // region init 
 
@@ -2101,7 +2101,7 @@ function dragEnd() {
 
 if (isMobile) {
 
-  image.addEventListener('touchstart', (e) => {
+/*  image.addEventListener('touchstart', (e) => {
     dragStart(e.touches[0].clientX, e.touches[0].clientY);
   }, 
   { passive: true });
@@ -2112,7 +2112,7 @@ if (isMobile) {
   { passive: true });
 
   image.addEventListener('touchend', dragEnd);
-
+*/
 } else {
 
   image.addEventListener('mousedown', (e) => {
@@ -2195,6 +2195,7 @@ let initialPinchDistance = null;
 /////let initialScale = 1;
 let pinchCenterX = 0;
 let pinchCenterY = 0;
+let isZooming = false;
 
 function getPinchDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
@@ -2218,18 +2219,22 @@ function getPinchCenter0(touches) {
 }
 
 if (isMobile) {
-  imageDiv.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      initialPinchDistance = getPinchDistance(e.touches);
-      const center = getPinchCenter(e.touches);
-      pinchCenterX = center.x;
-      pinchCenterY = center.y;
-    }
-  }, 
-  { passive: false });
+	imageDiv.addEventListener('touchstart', (e) => {
+		if (e.touches.length === 2) {
+			isZooming = true;
+			initialPinchDistance = getPinchDistance(e.touches);
+			const center = getPinchCenter(e.touches);
+			pinchCenterX = center.x;
+			pinchCenterY = center.y;
+		} else {
+			dragStart(e.touches[0].clientX, e.touches[0].clientY);	
+		}
+	}, 
+	{ passive: false });
 
 	imageDiv.addEventListener('touchmove', (e) => {
-		if (e.touches.length === 2 && initialPinchDistance) {
+////		if (e.touches.length === 2 && initialPinchDistance) {
+		if (isZooming && initialPinchDistance) {
 			const newDistance = getPinchDistance(e.touches);
 			const ratio = newDistance / initialPinchDistance;
 	/*      // le centre du pinch peut légèrement bouger, on le remet à jour
@@ -2238,15 +2243,19 @@ if (isMobile) {
 			if (Math.abs(ratio - 1) > 0.05) {
 				initialPinchDistance = newDistance;
 				applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
-				textInfo += '<br>ok ' + ratio.toFixed(2);
-				statusTxt.innerHTML = textInfo;
+//				textInfo += '<br>ok ' + ratio.toFixed(2);
+//				statusTxt.innerHTML = textInfo;
 			}
-		}
+		} else {
+			dragMove(e.touches[0].clientX, e.touches[0].clientY);		
+		}	
 		e.preventDefault();
 	}, 
 	{ passive: false });
 
   imageDiv.addEventListener('touchend', (e) => {
+	isDragging = false;
+	isZooming = false;
     if (e.touches.length < 2) {
       initialPinchDistance = null;
     }
