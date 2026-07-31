@@ -2232,12 +2232,12 @@ if (isMobile) {
   imageDiv.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2 && initialPinchDistance) {
 		const newDistance = getPinchDistance(e.touches);
-		initialPinchDistance = newDistance;
 		const ratio = newDistance / initialPinchDistance;
 /*      // le centre du pinch peut légèrement bouger, on le remet à jour
 ////      const center = getPinchCenter(e.touches);
 ////      applyZoomAtPoint(currentScale * ratio, center.x, center.y);*/
-		if (Math.abs(ratio - 1) > 0.1) {
+		if (Math.abs(ratio - 1) > 0.05) {
+			initialPinchDistance = newDistance;
 			applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
 			textInfo += ';<br> dist '+ initialPinchDistance.toFixed(2)  + 'new: ' + newDistance.toFixed(2);
 			statusTxt.innerHTML = textInfo;
