@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_n"; // zoom pan
+const subV = "_o"; // zoom pan
 
 // region init 
 
@@ -2161,9 +2161,9 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   imageDiv.scrollLeft = contentX * ratio - pointerX;
   imageDiv.scrollTop = contentY * ratio - pointerY;
   
-  let textInfo = 'rect L '+ rect.left+ '; rect T '+ rect.top;
+  let textInfo = 'rect T '+ rect.top.toFixed(2);
   textInfo += '; contentX ' + contentX;
-  textInfo += '; ratio ' + ratio;
+  textInfo += '; ratio ' + ratio.toFixed(2);
   textInfo += '; scroll Left calculé'+ imageDiv.scrollLeft ;
   //'initialPinchDistance: ' +initialPinchDistance + ',  pointerX: '+ pointerX + ', pointerY: ' + pointerY;
   statusTxt.innerText = textInfo;
@@ -2191,6 +2191,15 @@ function getPinchDistance(touches) {
 }
 
 function getPinchCenter(touches) {
+  const rect = imageDiv.getBoundingClientRect();
+
+  return {
+    x: (rect.right + rect.left) / 2,
+    y: (rect.top + rect.bottom) / 2
+  };
+}
+
+function getPinchCenter0(touches) {
   return {
     x: (touches[0].clientX + touches[1].clientX) / 2,
     y: (touches[0].clientY + touches[1].clientY) / 2
