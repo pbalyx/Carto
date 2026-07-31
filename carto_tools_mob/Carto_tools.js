@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_g"; // 
+const subV = "_h"; // 
 
 // region init 
 
@@ -1744,6 +1744,7 @@ let startHeight = 0;
 function startResizeW() {
 	isResizingW = true;
 	startWidth = photoDiv.offsetWidth;
+	resizeHandleW.style.backgroundColor = "red";
 	// Empêche la sélection de texte pendant le drag
 	document.body.style.userSelect = 'none';
 }
@@ -1752,7 +1753,6 @@ function startResizeH() {
 	isResizingH = true;
 	startHeight = photoDiv.offsetHeight;
 	resizeHandleH.style.backgroundColor = "red";
-	// Empêche la sélection de texte pendant le drag
 	document.body.style.userSelect = 'none';
 }
 
@@ -1775,6 +1775,15 @@ function resizeHW(diff) {
 			photoDiv.style.height = newHeight + 'px';
 		}
 	}
+}
+
+function endResize() {
+	isResizingW = false;
+	isResizingH = false;
+	resizeHandleW.style.backgroundColor = "transparent";
+	resizeHandleH.style.backgroundColor = "transparent";
+    document.body.style.userSelect = '';
+
 }
 
 resizeHandleW.addEventListener('mousedown', (e) => {
@@ -1801,16 +1810,7 @@ document.addEventListener('mousemove', (e) => {
 });
 
 document.addEventListener('mouseup', () => {
- /* if (isResizingW) {
-    document.body.style.userSelect = '';
-  }
-  if (isResizingH) {
-  }*/
-	isResizingW = false;
-	isResizingH = false;
-	resizeHandleH.style.backgroundColor = "transparent";
-    document.body.style.userSelect = '';
- 
+endResize(); 
 });
 
 if (isMobile) {
