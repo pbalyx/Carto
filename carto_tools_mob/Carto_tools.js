@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_o"; // zoom pan
+const subV = "_p"; // zoom pan
 
 // region init 
 
@@ -2047,14 +2047,17 @@ image.addEventListener('load', centrerImage);
 function centrerImage() {
 console.log(initialScale, currentScale)
     const marginNeeded = (imageDiv.offsetWidth - image.offsetWidth) / 2;
-	if (marginNeeded > 0) {
+/*	if (marginNeeded > 0) {
 		// image plus étroite : on centre avec une marge calculée
 		image.style.margin = `0 ${marginNeeded}px`;
-	} else if (currentScale > 1) {
+	} else {
+//	} else if (currentScale <= 1) {
 		// image plus large : on retire toute marge et on centre le scroll
 		image.style.margin = '0';
 		imageDiv.scrollLeft = -marginNeeded;
-	}
+	}*/
+	textInfo = "marginNeeded: " + marginNeeded;
+  statusTxt.innerText = textInfo;
 	bWaiting.style.display = "none";
 }
 
@@ -2135,6 +2138,7 @@ function getBaseHeight() {
   }
   return baseHeight;
 }
+let textInfo ="";
 
 function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   newScale = Math.min(maxScale, Math.max(minScale, newScale));
@@ -2162,9 +2166,10 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   imageDiv.scrollLeft = contentX * ratio - pointerX;
   imageDiv.scrollTop = contentY * ratio - pointerY;
   
-  let textInfo = 'rect T '+ rect.top.toFixed(2);
+  textInfo += '---------- pointerX '+ pointerX.toFixed(2);
   textInfo += '; contentX ' + contentX.toFixed(2);
-  textInfo += '; scroll Left'+ imageDiv.scrollLeft.toFixed(2) ;
+  textInfo += '; scroll Left '+ imageDiv.scrollLeft.toFixed(2) ;
+  textInfo += '; currentScale '+ currentScale.toFixed(2) ;
   //'initialPinchDistance: ' +initialPinchDistance + ',  pointerX: '+ pointerX + ', pointerY: ' + pointerY;
   statusTxt.innerText = textInfo;
 }
