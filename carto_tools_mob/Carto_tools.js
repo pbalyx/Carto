@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_h"; // 
+const subV = "_j"; // 
 
 // region init 
 
@@ -1783,36 +1783,38 @@ function endResize() {
 	resizeHandleW.style.backgroundColor = "transparent";
 	resizeHandleH.style.backgroundColor = "transparent";
     document.body.style.userSelect = '';
-
+	getBaseHeight(); // pas très propre - à voir
 }
 
-resizeHandleW.addEventListener('mousedown', (e) => {
-	startResizeX = e.clientX;
-	startResizeW();  
-	e.preventDefault();
-});
+if (!isMobile) {
 
-resizeHandleH.addEventListener('mousedown', (e) => {
-	startResizeY = e.clientY;
-	startResizeH();
-	e.preventDefault();
-});
+	resizeHandleW.addEventListener('mousedown', (e) => {
+		startResizeX = e.clientX;
+		startResizeW();  
+		e.preventDefault();
+	});
 
-document.addEventListener('mousemove', (e) => {
-	if (isResizingW) {
-		const diff = e.clientX - startResizeX;
-		resizeHW(diff)
-	}
-	if (isResizingH) {
-		const diff = e.clientY - startResizeY;
-		resizeHW(diff)	  
-	}
-});
+	resizeHandleH.addEventListener('mousedown', (e) => {
+		startResizeY = e.clientY;
+		startResizeH();
+		e.preventDefault();
+	});
 
-document.addEventListener('mouseup', () => {
-endResize(); 
-});
+	document.addEventListener('mousemove', (e) => {
+		if (isResizingW) {
+			const diff = e.clientX - startResizeX;
+			resizeHW(diff)
+		}
+		if (isResizingH) {
+			const diff = e.clientY - startResizeY;
+			resizeHW(diff)	  
+		}
+	});
 
+	document.addEventListener('mouseup', () => {
+		endResize(); 
+	});
+}
 if (isMobile) {
 	resizeHandleH.addEventListener('touchstart', (e) => {
 		startResizeY = e.touches[0].clientY;
@@ -1837,8 +1839,7 @@ if (isMobile) {
 	});
 	
 	document.addEventListener('touchend', (e) => {
-		isResizingW = false;
-		isResizingH = false;
+		endResize()
 	});
 }
 
