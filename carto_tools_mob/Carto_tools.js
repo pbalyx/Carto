@@ -2045,11 +2045,12 @@ function showImage(_feature) {
 image.addEventListener('load', centrerImage);
 
 function centrerImage() {
+console.log(initialScale, currentScale)
     const marginNeeded = (imageDiv.offsetWidth - image.offsetWidth) / 2;
 	if (marginNeeded > 0) {
 		// image plus étroite : on centre avec une marge calculée
 		image.style.margin = `0 ${marginNeeded}px`;
-	} else {
+	} else if (currentScale > 1) {
 		// image plus large : on retire toute marge et on centre le scroll
 		image.style.margin = '0';
 		imageDiv.scrollLeft = -marginNeeded;
@@ -2137,7 +2138,7 @@ function getBaseHeight() {
 
 function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   newScale = Math.min(maxScale, Math.max(minScale, newScale));
-  console.log(newScale);
+///  console.log(newScale);
   if (newScale === currentScale) return;
 
   const rect = imageDiv.getBoundingClientRect();
@@ -2162,9 +2163,8 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   imageDiv.scrollTop = contentY * ratio - pointerY;
   
   let textInfo = 'rect T '+ rect.top.toFixed(2);
-  textInfo += '; contentX ' + contentX;
-  textInfo += '; ratio ' + ratio.toFixed(2);
-  textInfo += '; scroll Left calculé'+ imageDiv.scrollLeft ;
+  textInfo += '; contentX ' + contentX.toFixed(2);
+  textInfo += '; scroll Left'+ imageDiv.scrollLeft.toFixed(2) ;
   //'initialPinchDistance: ' +initialPinchDistance + ',  pointerX: '+ pointerX + ', pointerY: ' + pointerY;
   statusTxt.innerText = textInfo;
 }
@@ -2238,57 +2238,6 @@ if (isMobile) {
   });
 }
 
-
-/*
-function getPinchDistance(touches) {
-  const dx = touches[0].clientX - touches[1].clientX;
-  const dy = touches[0].clientY - touches[1].clientY;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-if (isMobile) {
-	imageDiv.addEventListener('touchstart', (e) => {
-		if (e.touches.length === 2) {
-		  initialPinchDistance = getPinchDistance(e.touches);
-		  initialScale = currentScale;
-		}
-	}, 
-	{ passive: false });
-
-	imageDiv.addEventListener('touchmove', (e) => {
-		if (e.touches.length === 2 && initialPinchDistance) {
-		  const newDistance = getPinchDistance(e.touches);
-		  const ratio = newDistance / initialPinchDistance;
-		  currentScale = Math.min(maxScale, Math.max(minScale, initialScale * ratio));
-		  
-		  image.style.transform = `scale(${currentScale})`;
-		  image.style.transformOrigin = 'center center';
-		}
-		e.preventDefault();
-	}, 
-	{ passive: false });
-
-	imageDiv.addEventListener('touchend', (e) => {
-		if (e.touches.length < 2) {
-		  initialPinchDistance = null;
-		}
-	});
-}
-
-*/
-/*
-if (!isMobile) {
-// Zoom molette (desktop uniquement)
-	imageDiv.addEventListener('wheel', (e) => {
-		e.preventDefault();
-		const delta = e.deltaY < 0 ? 0.2 : -0.2;
-		currentScale = Math.min(maxScale, Math.max(minScale, currentScale + delta));
-
-		image.style.transform = `scale(${currentScale})`;
-		image.style.transformOrigin = 'center center';
-	});
-}
-*/
 
 // endregion
 
