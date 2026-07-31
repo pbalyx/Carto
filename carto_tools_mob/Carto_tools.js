@@ -2239,7 +2239,8 @@ if (isMobile) {
 		if (Math.abs(ratio - 1) > 0.05) {
 			initialPinchDistance = newDistance;
 			applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
-			textInfo += '<br>ok '
+			textInfo += '<br>ok ' + ratio.toFixed(2);
+			statusTxt.innerHTML = textInfo;
 		}
 			textInfo += '<br> ++'+ initialPinchDistance.toFixed(2)  + 'new: ' + newDistance.toFixed(2);
 			statusTxt.innerHTML = textInfo;
