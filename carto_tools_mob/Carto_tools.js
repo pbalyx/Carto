@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_e"; // 
+const subV = "_f"; // 
 
 // region init 
 
@@ -1740,49 +1740,66 @@ let startResizeX = 0;
 let startWidth = 0;
 let startResizeY = 0;
 let startHeight = 0;
-resizeHandleW.addEventListener('mousedown', (e) => {
-  isResizingW = true;
-  startResizeX = e.clientX;
-  startWidth = photoDiv.offsetWidth;
 
-  // Empêche la sélection de texte pendant le drag
-  document.body.style.userSelect = 'none';
-  e.preventDefault();
+function startResizeW() {
+	isResizingW = true;
+	startWidth = photoDiv.offsetWidth;
+	// Empêche la sélection de texte pendant le drag
+	document.body.style.userSelect = 'none';
+}
+
+function startResizeH() {
+	isResizingH = true;
+	startHeight = photoDiv.offsetHeight;
+	// Empêche la sélection de texte pendant le drag
+	document.body.style.userSelect = 'none';
+}
+
+function resizeHW(diff) {
+	if (isResizingW) {
+		const newWidth = startWidth + diff;
+		// Optionnel : bornes min/max
+		const minWidth = 100;
+		const maxWidth = window.innerWidth - photoDiv.offsetLeft - 20;
+		if (newWidth >= minWidth && newWidth <= maxWidth) {
+			photoDiv.style.width = newWidth + 'px';
+		}
+	}
+	if (isResizingH) {
+		const newHeight = startHeight + diff;
+		// Optionnel : bornes min/max
+		const minHeight = 100;
+		const maxHeight = window.innerHeight - photoDiv.offsetTop - 20;
+		if (newHeight >= minHeight && newHeight <= maxHeight) { 
+			photoDiv.style.height = newHeight + 'px';
+		}
+	}
+}
+
+resizeHandleW.addEventListener('mousedown', (e) => {
+	startResizeX = e.clientX;
+	startResizeW();  
+	e.preventDefault();
 });
 
 resizeHandleH.addEventListener('mousedown', (e) => {
-  isResizingH = true;
-  startResizeY = e.clientY;
-  startHeight = photoDiv.offsetHeight;
-  // Empêche la sélection de texte pendant le drag
-  document.body.style.userSelect = 'none';
-  e.preventDefault();
+	startResizeY = e.clientY;
+	startResizeH();
+	e.preventDefault();
 });
 
-photoDiv.addEventListener('mousemove', (e) => {
-  if (isResizingW) {
-	  const diff = e.clientX - startResizeX;
-	  const newWidth = startWidth + diff;
-	  // Optionnel : bornes min/max
-	  const minWidth = 100;
-	  const maxWidth = window.innerWidth - photoDiv.offsetLeft - 20;
-	  if (newWidth >= minWidth && newWidth <= maxWidth) {
-		photoDiv.style.width = newWidth + 'px';
-	  }
-  }
-  if (isResizingH) {
-	  const diffY = e.clientY - startResizeY;
-	  const newHeight = startHeight + diffY;
-	  // Optionnel : bornes min/max
-	  const minHeight = 100;
-	  const maxHeight = window.innerHeight - photoDiv.offsetTop - 20;
-	  if (newHeight >= minHeight && newHeight <= maxHeight) { 
-		photoDiv.style.height = newHeight + 'px';
-	  }
-  }
+document.addEventListener('mousemove', (e) => {
+	if (isResizingW) {
+		const diff = e.clientX - startResizeX;
+		resizeHW(diff)
+	}
+	if (isResizingH) {
+		const diff = e.clientY - startResizeY;
+		resizeHW(diff)	  
+	}
 });
 
-photoDiv.addEventListener('mouseup', () => {
+document.addEventListener('mouseup', () => {
   if (isResizingW) {
     isResizingW = false;
     document.body.style.userSelect = '';

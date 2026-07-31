@@ -160,12 +160,13 @@
 	
 	#statusDiv {
 		width: 300px;
-		overflow:hidden;
+		overflow:auto;
 		resize: both;
 		padding-bottom: 8px;
     }
 	
 	#statusTxt {
+		max-height: 300px;
 		overflow:auto;
 	}
 
@@ -526,12 +527,11 @@
 	
 	<div id="photoDiv" >		
 		<div id= "photoHeader" class= "header">
-			Photo&nbsp 
-				<span id="photoName"></span>
-			&nbsp&nbsp&nbsp&nbsp
+			Photo
+			&nbsp&nbsp
 			<input type="checkbox" id= "cb_hd"></input> 
 			<button class= "b_header" >Image hd</button>
-			&nbsp&nbsp&nbsp&nbsp
+			&nbsp&nbsp
 			<button id= "bImgHD" class= "b_header" ><b> -> photo</b></button>	
 			<button id= "bInfo" class= "b_header" ><b> -> json</b></button>	
 			<button id= "bPanox" class= "b_header" ><b> -> Px</b></button>	
