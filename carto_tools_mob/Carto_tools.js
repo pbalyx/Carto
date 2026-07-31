@@ -1,6 +1,6 @@
 //
-const version ="0.7.7";
-const subV = "_q"; // zoom pan
+const version ="0.7.8";
+const subV = ""; // 
 
 // region init 
 
@@ -41,6 +41,7 @@ window.onload = (event) => {
 	document.title = 'Carto_tools  V_' + version + subV;
 	console.log("version : ", version + subV);
 	init_features_table();
+	cb_hd.checked = false;
 
 // params test 
 // https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html?zoom=15&center=[44.56,4.4194]	
@@ -1709,6 +1710,7 @@ const panoxNum = 3;
 const seqNum = 4;
 const photoDiv = document.getElementById('photoDiv');
 const photoHeader = document.getElementById('photoHeader');
+const cb_hd = document.getElementById('cb_hd');
 
 var image = document.getElementById("image");
 var currentCollectionId;
@@ -1724,7 +1726,10 @@ var azimuthPtr = L.polyline([], {color: 'blue'});
 // else new feature is got simply by its index in already loaded collection (faster)
 // prevNextMode is set if feature is not found in the loaded part of the current collection
 var prevNextMode = false;
-//------- utils ------------------
+
+// region resize and drag photoDiv
+
+dragElement(photoHeader, photoDiv );
 
 const resizeHandleW = document.getElementById('resizeHandleW');
 const resizeHandleH = document.getElementById('resizeHandleH');
@@ -1754,7 +1759,7 @@ resizeHandleH.addEventListener('mousedown', (e) => {
   e.preventDefault();
 });
 
-document.addEventListener('mousemove', (e) => {
+photoDiv.addEventListener('mousemove', (e) => {
   if (isResizingW) {
 	  const diff = e.clientX - startResizeX;
 	  const newWidth = startWidth + diff;
@@ -1777,7 +1782,7 @@ document.addEventListener('mousemove', (e) => {
   }
 });
 
-document.addEventListener('mouseup', () => {
+photoDiv.addEventListener('mouseup', () => {
   if (isResizingW) {
     isResizingW = false;
     document.body.style.userSelect = '';
@@ -1788,9 +1793,10 @@ document.addEventListener('mouseup', () => {
   }
 });
 
+// endregion
 	
-//------- menu and utils ---------
-	
+// region  menu and utils 
+
 async function panoramaxAround(boxSize) {
 	const bbStr = bboxAround(curPtCoordsStr(), boxSize);
 	const dataJson = await px_getFeaturesBbox(bbStr);
@@ -1814,12 +1820,10 @@ function panoramaxClear() {
 }
 
 bClosePhoto.onclick = hidePhoto;
-	function hidePhoto(){
+function hidePhoto(){
 		photoDiv.style.display = "none";			
 	}
 	
-dragElement(photoHeader, photoDiv );
-
 bImgHD.onclick = () => {
 	window.open(currentFeatureImgUrl);  
 }
@@ -2018,6 +2022,10 @@ function showSelectedPoint(_feature) {
 	
 }
 
+// endregion
+
+// region image
+
 function showImage(_feature) {
 	photoDiv.style.display = "flex";	
 	const exif = _feature.properties.exif;
@@ -2026,8 +2034,12 @@ function showImage(_feature) {
 	bWaiting.style.display = "block";
 	if (!is360) {
 		imageDiv.style.display = "flex";
-		Y360Div.style.display = "none";;
-		image.src = _feature.assets.sd.href;
+		Y360Div.style.display = "none";
+		if (cb_hd.checked) {
+			image.src = _feature.assets.hd.href;
+		} else {
+			image.src = _feature.assets.sd.href;
+		}
 	} else {
 		imageDiv.style.display = "none";
 		Y360Div.style.display = "flex";;
@@ -2035,32 +2047,28 @@ function showImage(_feature) {
 			detail: { imageAsset: _feature.assets.hd.href}
 		}));
 	}
-
-//		alert("360 à faire");
-	
-///	console.log("image", _feature.assets.sd);
 }
 
 // Après chargement de l'image
 image.addEventListener('load', centrerImage);
 
 function centrerImage() {
-console.log(initialScale, currentScale)
+//console.log(initialScale, currentScale)
     const marginNeeded = (imageDiv.offsetWidth - image.offsetWidth) / 2;
-/*	if (marginNeeded > 0) {
+	if (marginNeeded > 0) {
 		// image plus étroite : on centre avec une marge calculée
 		image.style.margin = `0 ${marginNeeded}px`;
 	} else {
-//	} else if (currentScale <= 1) {
 		// image plus large : on retire toute marge et on centre le scroll
 		image.style.margin = '0';
-		imageDiv.scrollLeft = -marginNeeded;
-	}*/
+		if (currentScale <= 1.2) { // si zoomé on garde la position
+			imageDiv.scrollLeft = -marginNeeded;
+		}
+	}
 	bWaiting.style.display = "none";
 	marginNeeded_ = marginNeeded;
 }
 
-// region pan/zoom
 
 //-----------pan
 let isDragging = false;
@@ -2092,31 +2100,38 @@ function dragEnd() {
 }
 
 if (isMobile) {
+
   image.addEventListener('touchstart', (e) => {
     dragStart(e.touches[0].clientX, e.touches[0].clientY);
-  }, { passive: true });
+  }, 
+  { passive: true });
 
   image.addEventListener('touchmove', (e) => {
     dragMove(e.touches[0].clientX, e.touches[0].clientY);
-  }, { passive: true });
+  }, 
+  { passive: true });
 
   image.addEventListener('touchend', dragEnd);
 
 } else {
+
   image.addEventListener('mousedown', (e) => {
     dragStart(e.clientX, e.clientY);
     image.style.cursor = 'grabbing';
     e.preventDefault();
   });
 
-  document.addEventListener('mousemove', (e) => {
+  image.addEventListener('mousemove', (e) => {
     dragMove(e.clientX, e.clientY);
   });
 
   document.addEventListener('mouseup', () => {
-    dragEnd();
-    image.style.cursor = 'grab';
+	if (isDragging) {
+		dragEnd();
+		image.style.cursor = 'grab';
+	}
   });
+
 }
 
 //--------------- zoom
@@ -2124,11 +2139,8 @@ if (isMobile) {
 // Zoom au pincement (pinch-to-zoom) sur mobile
 
 let currentScale = 1;
-const minScale = 0.95;
-const maxScale = 4;
-///let initialPinchDistance = null;
-///let initialScale = 1;
-////-----------------
+const minScale = 1;
+const maxScale = 8;
 let baseHeight = null;
 
 function getBaseHeight() {
@@ -2171,15 +2183,16 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
 if (!isMobile) {
   imageDiv.addEventListener('wheel', (e) => {
     e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.2 : -0.2;
-    applyZoomAtPoint(currentScale + delta, e.clientX, e.clientY);
+    const delta = e.deltaY < 0 ? 1.2 : 1/1.2;
+//    const delta = e.deltaY < 0 ? 0.2 : -0.2;
+    applyZoomAtPoint(currentScale * delta, e.clientX, e.clientY);
   });
 }
 
 ////------------touch
 
 let initialPinchDistance = null;
-let initialScale = 1;
+/////let initialScale = 1;
 let pinchCenterX = 0;
 let pinchCenterY = 0;
 
@@ -2209,7 +2222,7 @@ if (isMobile) {
   imageDiv.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
       initialPinchDistance = getPinchDistance(e.touches);
-      initialScale = currentScale;
+/////      initialScale = currentScale;
       const center = getPinchCenter(e.touches);
       pinchCenterX = center.x;
       pinchCenterY = center.y;
@@ -2221,10 +2234,10 @@ if (isMobile) {
     if (e.touches.length === 2 && initialPinchDistance) {
       const newDistance = getPinchDistance(e.touches);
       const ratio = newDistance / initialPinchDistance;
-      // le centre du pinch peut légèrement bouger, on le remet à jour
+/*      // le centre du pinch peut légèrement bouger, on le remet à jour
 ////      const center = getPinchCenter(e.touches);
-////      applyZoomAtPoint(initialScale * ratio, center.x, center.y);
-      applyZoomAtPoint(initialScale * ratio, pinchCenterX, pinchCenterY);
+////      applyZoomAtPoint(currentScale * ratio, center.x, center.y);*/
+      applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
     }
 	e.preventDefault();
   }, 
@@ -2240,7 +2253,7 @@ if (isMobile) {
 
 // endregion
 
-//------- panoramax api calls -----
+//region panoramax api calls -----
 
 const metaCatalogUrl = "https://api.panoramax.xyz/api"
 const osmUrl = "https://panoramax.openstreetmap.fr/api"
@@ -2270,6 +2283,8 @@ async function px_getFeaturesInCollection(_collection_id) {
 		  console.error("[Panoramax] erreur", e);
 	}
 }
+
+// endregion
 
 // endregion
 
