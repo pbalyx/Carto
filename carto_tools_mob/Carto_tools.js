@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = "_j"; // 
+const subV = "_k"; // 
 
 // region init 
 
@@ -1783,7 +1783,7 @@ function endResize() {
 	resizeHandleW.style.backgroundColor = "transparent";
 	resizeHandleH.style.backgroundColor = "transparent";
     document.body.style.userSelect = '';
-	getBaseHeight(); // pas très propre - à voir
+//////	getBaseHeight(); // pas très propre - à voir
 }
 
 if (!isMobile) {
@@ -2179,14 +2179,15 @@ if (isMobile) {
 let currentScale = 1;
 const minScale = 1;
 const maxScale = 8;
-let baseHeight = null;
-
+/* let baseHeight = null;
+//////
 function getBaseHeight() {
   if (baseHeight === null) {
     baseHeight = imageDiv.offsetHeight; // hauteur "naturelle" = 100% du conteneur
   }
   return baseHeight;
 }
+*/
 let textInfo ="";
 
 function applyZoomAtPoint(newScale, centerX, centerY) {////) {
@@ -2209,7 +2210,8 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
 
   // Applique le zoom (taille réelle, pas transform)
   currentScale = newScale;
-  image.style.height = (getBaseHeight() * currentScale) + 'px';
+//////  image.style.height = (getBaseHeight() * currentScale) + 'px';
+  image.style.height = (imageDiv.offsetHeight * currentScale) + 'px';
 
   // Recalcule le scroll pour garder le même point sous le curseur
   imageDiv.scrollLeft = contentX * ratio - pointerX;
