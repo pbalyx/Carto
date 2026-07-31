@@ -1,6 +1,6 @@
 //
 const version ="0.7.8";
-const subV = ""; // 
+const subV = "_a"; // 
 
 // region init 
 
@@ -2204,7 +2204,6 @@ function getPinchDistance(touches) {
 
 function getPinchCenter(touches) {
   const rect = imageDiv.getBoundingClientRect();
-
   return {
     x: (rect.right + rect.left) / 2,
     y: (rect.top + rect.bottom) / 2
@@ -2238,6 +2237,8 @@ if (isMobile) {
 ////      const center = getPinchCenter(e.touches);
 ////      applyZoomAtPoint(currentScale * ratio, center.x, center.y);*/
       applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
+  textInfo += ';<br> dist '+ initialPinchDistance.toFixed(2)  + 'new: ' + newDistance.toFixed(2);
+  statusTxt.innerHTML = textInfo;
     }
 	e.preventDefault();
   }, 
@@ -2686,12 +2687,12 @@ var marginNeeded_;
 
 function test1() {
 	textInfo = 'marginNeeded: ' + marginNeeded_;
-  textInfo += '---------- <br> pointerX '+ pointerX_.toFixed(2);
+/*  textInfo += '---------- <br> pointerX '+ pointerX_.toFixed(2);
   textInfo += '; contentX ' + contentX_.toFixed(2);
   textInfo += ';<br> scroll Left '+ imageDiv.scrollLeft.toFixed(2) ;
   textInfo += ';<br> width '+ image.width.toFixed(2) ;
   textInfo += ';<br> currentScale '+ currentScale.toFixed(2) ;
-  statusTxt.innerHTML = textInfo;
+  statusTxt.innerHTML = textInfo;*/
 ///	console.log(textInfo);
 }
 
