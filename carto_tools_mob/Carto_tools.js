@@ -1,6 +1,6 @@
 //
 const version ="0.7.7";
-const subV = "_p"; // zoom pan
+const subV = "_q"; // zoom pan
 
 // region init 
 
@@ -2056,9 +2056,8 @@ console.log(initialScale, currentScale)
 		image.style.margin = '0';
 		imageDiv.scrollLeft = -marginNeeded;
 	}*/
-	textInfo = "marginNeeded: " + marginNeeded;
-  statusTxt.innerText = textInfo;
 	bWaiting.style.display = "none";
+	marginNeeded_ = marginNeeded;
 }
 
 // region pan/zoom
@@ -2165,13 +2164,8 @@ function applyZoomAtPoint(newScale, centerX, centerY) {////) {
   // Recalcule le scroll pour garder le même point sous le curseur
   imageDiv.scrollLeft = contentX * ratio - pointerX;
   imageDiv.scrollTop = contentY * ratio - pointerY;
-  
-  textInfo += '---------- pointerX '+ pointerX.toFixed(2);
-  textInfo += '; contentX ' + contentX.toFixed(2);
-  textInfo += '; scroll Left '+ imageDiv.scrollLeft.toFixed(2) ;
-  textInfo += '; currentScale '+ currentScale.toFixed(2) ;
-  //'initialPinchDistance: ' +initialPinchDistance + ',  pointerX: '+ pointerX + ', pointerY: ' + pointerY;
-  statusTxt.innerText = textInfo;
+  pointerX_ = pointerX;
+  contentX_ = contentX;
 }
 
 if (!isMobile) {
@@ -2665,10 +2659,25 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test;
+b_test.onclick = test1;
 
 function test() {
 	alert("no test");
+}
+
+var pointerX_ = 111;
+var contentX_ = 222;
+var marginNeeded_;
+
+function test1() {
+	textInfo = 'marginNeeded: ' + marginNeeded_;
+  textInfo += '---------- <br> pointerX '+ pointerX_.toFixed(2);
+  textInfo += '; contentX ' + contentX_.toFixed(2);
+  textInfo += ';<br> scroll Left '+ imageDiv.scrollLeft.toFixed(2) ;
+  textInfo += ';<br> width '+ image.width.toFixed(2) ;
+  textInfo += ';<br> currentScale '+ currentScale.toFixed(2) ;
+  statusTxt.innerHTML = textInfo;
+///	console.log(textInfo);
 }
 
 function test2() {
