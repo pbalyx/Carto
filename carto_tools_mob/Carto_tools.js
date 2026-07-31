@@ -2242,6 +2242,7 @@ if (isMobile) {
 				statusTxt.innerHTML = textInfo;
 			}
 		}
+		e.preventDefault();
 	}, 
 	{ passive: false });
 
