@@ -1,5 +1,5 @@
 //
-const version ="0.7.6";
+const version ="0.7.8";
 const subV = ""; // 
 
 // region init 
@@ -29,7 +29,7 @@ const subV = ""; //
 // 0.7.2 : version mobile
 // 0.7.3 : mapView in localStorage
 // 0.7.4 : image
-// 0.7.6 : 360° image centrée
+// 0.7.6 : 360°
 	
 // osmtogeojson :  https://github.com/tyrasd/osmtogeojson
 // Leaflet version = "1.6.0"
@@ -41,6 +41,7 @@ window.onload = (event) => {
 	document.title = 'Carto_tools  V_' + version + subV;
 	console.log("version : ", version + subV);
 	init_features_table();
+	cb_hd.checked = false;
 
 // params test 
 // https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html?zoom=15&center=[44.56,4.4194]	
@@ -1707,17 +1708,9 @@ function display_resultImport(osm_data) {
 
 const panoxNum = 3;
 const seqNum = 4;
-var photoDiv = document.getElementById('photoDiv');
-var photoHeader = document.getElementById('photoHeader');
-const resizeHandleW = document.getElementById('resizeHandleW');
-const resizeHandleH = document.getElementById('resizeHandleH');
-
-let isResizingW = false;
-let isResizingH = false;
-let startResizeX = 0;
-let startWidth = 0;
-let startY = 0;
-let startHeight = 0;
+const photoDiv = document.getElementById('photoDiv');
+const photoHeader = document.getElementById('photoHeader');
+const cb_hd = document.getElementById('cb_hd');
 
 var image = document.getElementById("image");
 var currentCollectionId;
@@ -1733,64 +1726,126 @@ var azimuthPtr = L.polyline([], {color: 'blue'});
 // else new feature is got simply by its index in already loaded collection (faster)
 // prevNextMode is set if feature is not found in the loaded part of the current collection
 var prevNextMode = false;
-//------- utils ------------------
 
-resizeHandleW.addEventListener('mousedown', (e) => {
-  isResizingW = true;
-  startResizeX = e.clientX;
-  startWidth = photoDiv.offsetWidth;
+// region resize and drag photoDiv
 
-  // Empêche la sélection de texte pendant le drag
-  document.body.style.userSelect = 'none';
-  e.preventDefault();
-});
+dragElement(photoHeader, photoDiv );
 
-resizeHandleH.addEventListener('mousedown', (e) => {
-  isResizingH = true;
-  startY = e.clientY;
-  startHeight = photoDiv.offsetHeight;
-  // Empêche la sélection de texte pendant le drag
-  document.body.style.userSelect = 'none';
-  e.preventDefault();
-});
+const resizeHandleW = document.getElementById('resizeHandleW');
+const resizeHandleH = document.getElementById('resizeHandleH');
 
-document.addEventListener('mousemove', (e) => {
-  if (isResizingW) {
-	  const diff = e.clientX - startResizeX;
-	  const newWidth = startWidth + diff;
-	  // Optionnel : bornes min/max
-	  const minWidth = 100;
-	  const maxWidth = window.innerWidth - photoDiv.offsetLeft - 20;
-	  if (newWidth >= minWidth && newWidth <= maxWidth) {
-		photoDiv.style.width = newWidth + 'px';
-	  }
-  }
-  if (isResizingH) {
-	  const diffY = e.clientY - startY;
-	  const newHeight = startHeight + diffY;
-	  // Optionnel : bornes min/max
-	  const minHeight = 100;
-	  const maxHeight = window.innerHeight - photoDiv.offsetTop - 20;
-	  if (newHeight >= minHeight && newHeight <= maxHeight) { 
-		photoDiv.style.height = newHeight + 'px';
-	  }
-  }
-});
+let isResizingW = false;
+let isResizingH = false;
+let startResizeX = 0;
+let startWidth = 0;
+let startResizeY = 0;
+let startHeight = 0;
 
-document.addEventListener('mouseup', () => {
-  if (isResizingW) {
-    isResizingW = false;
+function startResizeW() {
+	isResizingW = true;
+	startWidth = photoDiv.offsetWidth;
+	resizeHandleW.style.backgroundColor = "red";
+	// Empêche la sélection de texte pendant le drag
+	document.body.style.userSelect = 'none';
+}
+
+function startResizeH() {
+	isResizingH = true;
+	startHeight = photoDiv.offsetHeight;
+	resizeHandleH.style.backgroundColor = "red";
+	document.body.style.userSelect = 'none';
+}
+
+function resizeHW(diff) {
+	if (isResizingW) {
+		const newWidth = startWidth + diff;
+		// Optionnel : bornes min/max
+		const minWidth = 100;
+		const maxWidth = window.innerWidth - photoDiv.offsetLeft - 20;
+		if (newWidth >= minWidth && newWidth <= maxWidth) {
+			photoDiv.style.width = newWidth + 'px';
+		}
+	}
+	if (isResizingH) {
+		const newHeight = startHeight + diff;
+		// Optionnel : bornes min/max
+		const minHeight = 100;
+		const maxHeight = window.innerHeight - photoDiv.offsetTop - 20;
+		if (newHeight >= minHeight && newHeight <= maxHeight) { 
+			photoDiv.style.height = newHeight + 'px';
+		}
+	}
+}
+
+function endResize() {
+	isResizingW = false;
+	isResizingH = false;
+	resizeHandleW.style.backgroundColor = "transparent";
+	resizeHandleH.style.backgroundColor = "transparent";
     document.body.style.userSelect = '';
-  }
-  if (isResizingH) {
-    isResizingH = false;
-    document.body.style.userSelect = '';
-  }
-});
+}
 
+if (!isMobile) {
+
+	resizeHandleW.addEventListener('mousedown', (e) => {
+		startResizeX = e.clientX;
+		startResizeW();  
+		e.preventDefault();
+	});
+
+	resizeHandleH.addEventListener('mousedown', (e) => {
+		startResizeY = e.clientY;
+		startResizeH();
+		e.preventDefault();
+	});
+
+	document.addEventListener('mousemove', (e) => {
+		if (isResizingW) {
+			const diff = e.clientX - startResizeX;
+			resizeHW(diff)
+		}
+		if (isResizingH) {
+			const diff = e.clientY - startResizeY;
+			resizeHW(diff)	  
+		}
+	});
+
+	document.addEventListener('mouseup', () => {
+		endResize(); 
+	});
+}
+if (isMobile) {
+	resizeHandleH.addEventListener('touchstart', (e) => {
+		startResizeY = e.touches[0].clientY;
+		startResizeH();
+		e.preventDefault();
+	});
+	resizeHandleW.addEventListener('touchstart', (e) => {
+		startResizeX = e.touches[0].clientX;
+		startResizeW();
+		e.preventDefault();
+	});
 	
-//------- menu and utils ---------
+	document.addEventListener('touchmove', (e) => {
+		if (isResizingH) {
+			const diff = e.touches[0].clientY - startResizeY;
+			resizeHW(diff);	  
+		}
+		if (isResizingW) {
+			const diff = e.touches[0].clientX - startResizeX;
+			resizeHW(diff);	  
+		}
+	});
 	
+	document.addEventListener('touchend', (e) => {
+		endResize()
+	});
+}
+
+// endregion
+	
+// region  menu and utils 
+
 async function panoramaxAround(boxSize) {
 	const bbStr = bboxAround(curPtCoordsStr(), boxSize);
 	const dataJson = await px_getFeaturesBbox(bbStr);
@@ -1814,11 +1869,14 @@ function panoramaxClear() {
 }
 
 bClosePhoto.onclick = hidePhoto;
-	function hidePhoto(){
+function hidePhoto(){
 		photoDiv.style.display = "none";			
 	}
+
 	
-dragElement(photoHeader, photoDiv );
+b_cb_hd.onclick = () => {
+	cb_hd.checked = !cb_hd.checked;  
+}
 
 bImgHD.onclick = () => {
 	window.open(currentFeatureImgUrl);  
@@ -2018,6 +2076,10 @@ function showSelectedPoint(_feature) {
 	
 }
 
+// endregion
+
+// region image
+
 function showImage(_feature) {
 	photoDiv.style.display = "flex";	
 	const exif = _feature.properties.exif;
@@ -2026,8 +2088,12 @@ function showImage(_feature) {
 	bWaiting.style.display = "block";
 	if (!is360) {
 		imageDiv.style.display = "flex";
-		Y360Div.style.display = "none";;
-		image.src = _feature.assets.sd.href;
+		Y360Div.style.display = "none";
+		if (cb_hd.checked) {
+			image.src = _feature.assets.hd.href;
+		} else {
+			image.src = _feature.assets.sd.href;
+		}
 	} else {
 		imageDiv.style.display = "none";
 		Y360Div.style.display = "flex";;
@@ -2035,31 +2101,202 @@ function showImage(_feature) {
 			detail: { imageAsset: _feature.assets.hd.href}
 		}));
 	}
-
-//		alert("360 à faire");
-	
-///	console.log("image", _feature.assets.sd);
 }
 
 // Après chargement de l'image
 image.addEventListener('load', centrerImage);
 
 function centrerImage() {
+//console.log(initialScale, currentScale)
     const marginNeeded = (imageDiv.offsetWidth - image.offsetWidth) / 2;
 	if (marginNeeded > 0) {
-		// image plus Ã©troite : on centre avec une marge calculÃ©e
+		// image plus étroite : on centre avec une marge calculée
 		image.style.margin = `0 ${marginNeeded}px`;
 	} else {
 		// image plus large : on retire toute marge et on centre le scroll
 		image.style.margin = '0';
-		imageDiv.scrollLeft = -marginNeeded;
+		if (currentScale <= 1.2) { // si zoomé on garde la position
+			imageDiv.scrollLeft = -marginNeeded;
+		}
 	}
 	bWaiting.style.display = "none";
+	marginNeeded_ = marginNeeded;
 }
 
 
+//-----------pan
+let isDragging = false;
+let startX = 0;
+let scrollStartX = 0;
+let startY = 0;
+let scrollStartY = 0;
 
-//------- panoramax api calls -----
+function dragStart(clientX, clientY) {
+  isDragging = true;
+  startX = clientX;
+  startY = clientY;
+  scrollStartX = imageDiv.scrollLeft;
+  scrollStartY = imageDiv.scrollTop;
+}
+
+function dragMove(clientX, clientY) {
+  if (!isDragging) return;
+  const diffX = clientX - startX;
+  imageDiv.scrollLeft = scrollStartX - diffX;
+  const diffY = clientY - startY;
+  imageDiv.scrollTop = scrollStartY - diffY;
+///  statusTxt.textContent = imageDiv.scrollTop;
+///  console.log(imageDiv.scrollTop, scrollStartY, diffY, clientY, startY);
+}
+
+function dragEnd() {
+  isDragging = false;
+}
+
+if (isMobile) {
+	// groupé avec zoom
+} else {
+
+  image.addEventListener('mousedown', (e) => {
+    dragStart(e.clientX, e.clientY);
+    image.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  image.addEventListener('mousemove', (e) => {
+    dragMove(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mouseup', () => {
+	if (isDragging) {
+		dragEnd();
+		image.style.cursor = 'grab';
+	}
+  });
+
+}
+
+//--------------- zoom
+
+// Zoom au pincement (pinch-to-zoom) sur mobile
+
+let currentScale = 1;
+const minScale = 1;
+const maxScale = 8;
+
+let textInfo ="";
+
+function applyZoomAtPoint(newScale, centerX, centerY) {////) {
+  newScale = Math.min(maxScale, Math.max(minScale, newScale));
+///  console.log(newScale);
+  if (newScale === currentScale) return;
+
+  const rect = imageDiv.getBoundingClientRect();
+
+  // Position du curseur relative à imageDiv
+  const pointerX = centerX - rect.left;
+  const pointerY = centerY - rect.top;
+
+  // Point visé dans le contenu (image) AVANT zoom
+  const contentX = imageDiv.scrollLeft + pointerX;
+  const contentY = imageDiv.scrollTop + pointerY;
+
+  // Ratio entre nouvelle et ancienne échelle
+  const ratio = newScale / currentScale;
+
+  // Applique le zoom (taille réelle, pas transform)
+  currentScale = newScale;
+  image.style.height = (imageDiv.offsetHeight * currentScale) + 'px';
+
+  // Recalcule le scroll pour garder le même point sous le curseur
+  imageDiv.scrollLeft = contentX * ratio - pointerX;
+  imageDiv.scrollTop = contentY * ratio - pointerY;
+  pointerX_ = pointerX;
+  contentX_ = contentX;
+}
+
+if (!isMobile) {
+  imageDiv.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 1.2 : 1/1.2;
+//    const delta = e.deltaY < 0 ? 0.2 : -0.2;
+    applyZoomAtPoint(currentScale * delta, e.clientX, e.clientY);
+  });
+}
+
+let initialPinchDistance = null;
+let pinchCenterX = 0;
+let pinchCenterY = 0;
+let isZooming = false;
+
+function getPinchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function getPinchCenter(touches) {
+  const rect = imageDiv.getBoundingClientRect();
+  return {
+    x: (rect.right + rect.left) / 2,
+    y: (rect.top + rect.bottom) / 2
+  };
+}
+
+function getPinchCenter0(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  };
+}
+
+if (isMobile) {
+	imageDiv.addEventListener('touchstart', (e) => {
+		if (e.touches.length === 2) {
+			isZooming = true;
+			initialPinchDistance = getPinchDistance(e.touches);
+			const center = getPinchCenter(e.touches);
+			pinchCenterX = center.x;
+			pinchCenterY = center.y;
+		} else {
+			dragStart(e.touches[0].clientX, e.touches[0].clientY);	
+		}
+	}, 
+	{ passive: false });
+
+	imageDiv.addEventListener('touchmove', (e) => {
+		if (isZooming && initialPinchDistance) {
+			const newDistance = getPinchDistance(e.touches);
+			const ratio = newDistance / initialPinchDistance;
+	/*      // le centre du pinch peut légèrement bouger, on le remet à jour
+	////      const center = getPinchCenter(e.touches);
+	////      applyZoomAtPoint(currentScale * ratio, center.x, center.y);*/
+			if (Math.abs(ratio - 1) > 0.05) {
+				initialPinchDistance = newDistance;
+				applyZoomAtPoint(currentScale * ratio, pinchCenterX, pinchCenterY);
+//				textInfo += '<br>ok ' + ratio.toFixed(2);
+//				statusTxt.innerHTML = textInfo;
+			}
+		} else {
+			dragMove(e.touches[0].clientX, e.touches[0].clientY);		
+		}	
+		e.preventDefault();
+	}, 
+	{ passive: false });
+
+  imageDiv.addEventListener('touchend', (e) => {
+	isDragging = false;
+	isZooming = false;
+    if (e.touches.length < 2) {
+      initialPinchDistance = null;
+    }
+  });
+}
+
+
+// endregion
+
+//region panoramax api calls -----
 
 const metaCatalogUrl = "https://api.panoramax.xyz/api"
 const osmUrl = "https://panoramax.openstreetmap.fr/api"
@@ -2089,6 +2326,8 @@ async function px_getFeaturesInCollection(_collection_id) {
 		  console.error("[Panoramax] erreur", e);
 	}
 }
+
+// endregion
 
 // endregion
 
@@ -2478,10 +2717,25 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test;
+b_test.onclick = test1;
 
 function test() {
 	alert("no test");
+}
+
+var pointerX_ = 111;
+var contentX_ = 222;
+var marginNeeded_;
+
+function test1() {
+	textInfo = '----------';
+/*  textInfo += '---------- <br> pointerX '+ pointerX_.toFixed(2);
+  textInfo += '; contentX ' + contentX_.toFixed(2);
+  textInfo += ';<br> scroll Left '+ imageDiv.scrollLeft.toFixed(2) ;
+  textInfo += ';<br> width '+ image.width.toFixed(2) ;
+  textInfo += ';<br> currentScale '+ currentScale.toFixed(2) ;*/
+  statusTxt.innerHTML = textInfo;
+///	console.log(textInfo);
 }
 
 function test2() {
@@ -2506,7 +2760,6 @@ console.log("col", data);
 
 }
 
-var statusTxt =	document.getElementById("statusTxt");
 
 // region poub
 

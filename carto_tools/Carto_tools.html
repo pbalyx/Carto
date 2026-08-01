@@ -159,11 +159,16 @@
 	}
 	
 	#statusDiv {
-		width: 150px;
-		overflow:hidden;
+		width: 300px;
+		overflow:auto;
 		resize: both;
 		padding-bottom: 8px;
     }
+	
+	#statusTxt {
+		max-height: 300px;
+		overflow:auto;
+	}
 
 	#curPtDiv {
 		width: 300px;
@@ -258,8 +263,8 @@
 	#resizeHandleW {
 		position: absolute;
 		top: 0;
-		right: -4px;       /* déborde légèrement pour être facile à attraper */
-		width: 8px;
+		right: -12px;       /* déborde légèrement pour être facile à attraper */
+		width: 12px;
 		height: 100%;
 		cursor: ew-resize;  /* curseur redimensionnement horizontal */
 		z-index: 860;
@@ -267,10 +272,10 @@
 
 	#resizeHandleH {
 		position: absolute;
-		bottom:  -6px;
+		bottom:  -12px;
 		right:0;       
 		width: 100%;
-		height: 6px;
+		height: 12px;
 		cursor: ns-resize;  /* curseur redimensionnement horizontal */
 		z-index: 860;
 	}
@@ -278,7 +283,8 @@
 
 	#imageDiv {
 		flex: 1; 
-		overflow-x: scroll; 
+/*		overflow-x: scroll;	*/
+		overflow: hidden;
 	}
 	
 	#Y360Div {
@@ -301,7 +307,7 @@
 		#photoDiv {
 			top: 10%;
 			width: 90dvw;
-			height: 35dvh;
+			height: 45dvh;
 		}
 		#infoDiv {
 			width: 80dvw;
@@ -521,12 +527,13 @@
 	
 	<div id="photoDiv" >		
 		<div id= "photoHeader" class= "header">
-			Photo&nbsp 
-				<span id="photoName"></span>
-			&nbsp&nbsp&nbsp&nbsp
-			<button id= "bImgHD" class= "b_header" ><b>Image hd</b></button>	
-			<button id= "bInfo" class= "b_header" ><b>json</b></button>	
-			<button id= "bPanox" class= "b_header" ><b> -> Panoramax</b></button>	
+			Photo
+			<input type="checkbox" id= "cb_hd" style="background-color:red"></input> 
+			<button id= "b_cb_hd" class= "b_header" >Image hd</button>
+			&nbsp
+			<button id= "bImgHD" class= "b_header" ><b> > photo</b></button>	
+			<button id= "bInfo" class= "b_header" ><b> > json</b></button>	
+			<button id= "bPanox" class= "b_header" ><b> > Px</b></button>	
 			<button id="bClosePhoto" class = "b_close">X</button>
 		</div>
 		<div id="imageDiv">
