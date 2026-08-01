@@ -92,6 +92,7 @@
 				<li><a href = "#sequence">Séquences</a></li>
 				<li><a href = "#intersections">Intersections</a></li>				
 				<li><a href = "#travers">Vues en travers</a></li>				
+				<li><a href = "#panoramas">Panoramas</a></li>				
 				<li><a href = "#precision">Précision</a></li>				
 			</ul>
 		</li>	
@@ -135,7 +136,7 @@
 	  </li>
 	</ul>
 	<p>
-	<i>Note</i> : Ces points concernent la version que j'ai utilisée (1.19). Ils n'ont pas changé dans la version suivante (1.20) mais celle-ci a introduit de nouvelles icônes et de nouvelles fonctionnalités que je n'ai pas fini d'explorer.
+	<i>Note</i> : Ces points concernent la version que j'ai utilisée (1.19). Ils n'ont pas changé dans les versions suivantes. Celles-ci ont introduit de nouvelles icônes et de nouvelles fonctionnalités que je n'ai pas fini d'explorer.
 	</p>
 	
 	<h2 id="voir">Voir les photos</h2>
@@ -159,18 +160,14 @@
 	<h3 id ="autres_vues">Autres vues</h3>
 	<p>
 	<a href= "https://cartes.app/?style=outdoors&rue=oui&terrain=oui#14.99/44.55693/4.42194" target="blank">Cartes.app</a> a commmencé à intégrer les photos Panoramax mais pour l'instant seules les photos 360° apparaissent sur le fond de carte. Ce filtrage trop rigoureux devrait être relaché dans l'avenir.
+	</p>
+<br>
 	<div style="position: relative; left:30%"">
 		<img src="./images/cartes.jpg" style= "width: 40%">
 		<br><span><i>Dans la même zone, fond Plein air de Cartes.app</i></span>
-	</div>
-	
-	</p>
-	
+	</div>	
 	<p>
-	<br>On peut espérer que d'autres implémentations paraitront dans l'avenir.
-	</p>
-	<p>
-	Pour mon usage, j'ai ajouté une visualisation simplifiée de Panoramax dans la page web que j'utilise pour préparer mes sorties. Cette page me permet de jongler entre différents fonds de carte et calques superposés (voir ci-dessous). Elle est au stade expérimental et le restera sans doute mais ellle donnera peut être des idées à d'autres développeurs.  <a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html" target="blank">Elle peut être testée ici</a> 
+	Pour mon usage, j'avais ajouté une visualisation simplifiée de Panoramax dans la page web carto_tools que j'utilisais pour préparer mes sorties. Cette page permet de jongler entre différents fonds de carte et calques superposés. 
 	</p>
 	<br><div style="position: relative; left:5%; display: flex; flex-direction: row">
 		<div style= "width: 40%">
@@ -183,8 +180,15 @@
 		<br><span><i>Fond MNT Lidar HD + Waymarked Trail, photo cachée</i></span>
 		</div>
 	</div>
+	<p>
+	J'ai depuis étoffé et stabilisé cette visionneuse. Vous pouvez 
+		<a href= "https://pbalyx.github.io/Carto/pages/Panoramax_minimum.html" target="blank">
+	voir la page d'explications</a>  ou 
+	<a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html?zoom=15&center=[44.56%2C4.4194]" 
+	target="blank">la tester directement ici</a>, dans la même zone que ci-dessus. 
+	</p>
 	
-
+Elle donnera peut être des idées à d'autres développeurs. 
 	<p></p>
 
 	<h2 id="trucs">Prendre des photos: trucs, conseils, suggestions </h2>
@@ -244,11 +248,17 @@
 		<li>
 			Pour faciliter le déroulement de la lecture, une bonne méthode est d'encadrer une photo en travers par des photos dans le sens de la marche avant et après. 
 		</li>
-		<li>
-			Pour certains endroits remarquables, panorama d'un sommet, carrefour de plusieurs chemins... on aurait quand même envie d'avoir par ci par là une vraie vue à 360°. La plupart des smartphones peuvent faire une vue panoramique. Reste juste à la transformer pour qu'elle soit comprise par la visionneuse. Des solutions existent mais je n'ai pas encore eu le temps de creuser le problème.
-		</li>
-
 	</ul>	
+
+	<h3 id ="panoramas">Panoramas</h3>
+	<p>
+	Pour certains endroits remarquables, panorama d'un sommet, carrefour de plusieurs chemins... on a quand même envie d'avoir par ci par là une vraie vue à 360°. La plupart des smartphones permettent de prendre une vue panoramique.<br> 
+	Il suffit de rajouter quelques données Exif pour qu'elle soit affichée correctement par la visionneuse. Des outils très simples existent pour cela, on peut même inclure ces panorama dans une séquence <i>baba</i> avec des photos normales. <br>
+	J'ai ajouté les explications détaillées sur les outils et la marche à suivre
+	<a href= "https://pbalyx.github.io/Carto/pages/Panoramax_panoramique.html" target="blank">
+	dans une page séparée</a> car on peut très bien commencer sans cela.
+	</p>
+
 	<h3 id ="precision">Précision</h3>
 	<p>
 	Pour tous les points de prise de vue, la précision de la localisation est correcte à quelques mètres près, précision bien suffisante pour les sentiers.<br>
