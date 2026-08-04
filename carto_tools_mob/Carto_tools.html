@@ -566,26 +566,33 @@
 	// docs https://photo-sphere-viewer.js.org/guide/
 	
 	import { Viewer } from '@photo-sphere-viewer/core';
+	import { events } from '@photo-sphere-viewer/core';
 
 	var _container = document.getElementById('Y360Div');
 	var viewer;
 
 	document.addEventListener('newImage', (e) => {
 		try {
-	bWaiting.style.display = "block";
-		const detail_ = e.detail;;
-///		console.log('detail:', detail_.imageAsset);
-		_container.innerHTML = "";
-		viewer = new Viewer({
-			container: _container,
-			panorama: detail_.imageAsset,
-			navbar: false,
-		});
-		viewer.addEventListener('ready', () => {
-///			console.log(`viewer is ready`);
-			bWaiting.style.display = "none";
-		}, { once: true });
-
+			bWaiting.style.display = "block";
+			const detail_ = e.detail;;
+	///		console.log('detail:', detail_.imageAsset);
+			_container.innerHTML = "";
+			viewer = new Viewer({
+				container: _container,
+				panorama: detail_.imageAsset,
+				navbar: false,
+			});
+			
+			viewer.addEventListener('ready', () => {
+				bWaiting.style.display = "none";
+			}, { once: true });
+			
+			viewer.addEventListener('position-updated', (e) => {		
+				document.dispatchEvent(new CustomEvent('newAngle', { 
+					detail: { angleYaw: e.position.yaw}
+				}));	
+			});
+		
 		}
 		catch(err) {
 			alert("viewer error: " + err)
