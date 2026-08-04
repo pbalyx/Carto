@@ -1721,7 +1721,9 @@ var currentFeature;
 var currentFeatureUrl;
 var currentFeatureImgUrl;
 var azimuthPtr = L.polyline([], {color: 'blue'});
-var curPt_azimuth = 0;
+var azimuthPtrCoords = [0, 0];
+
+////const azimPtrObj = new AzimPtrObj();
 
 // if prevNextMode new feature is fetched using prev and next url in current feature
 // else new feature is got simply by its index in already loaded collection (faster)
@@ -1957,6 +1959,13 @@ return polyL;
 function setAzimPtr(coords, angle) {
 		const longueur = 50 * Math.pow(2, 17 - map.getZoom());
 		const polyL = buildPolyLine(coords, angle, longueur);
+		azimuthPtrCoords = coords;
+		azimuthPtr.setLatLngs(polyL);
+}
+
+function setAzimAngle(newAngle) {
+		const longueur = 50 * Math.pow(2, 17 - map.getZoom());
+		const polyL = buildPolyLine(azimuthPtrCoords, newAngle, longueur);
 		azimuthPtr.setLatLngs(polyL);
 }
 
@@ -2081,19 +2090,11 @@ function showSelectedPoint(_feature) {
 // 	set azimuth if present in feature
 // 	build azimuth pointer
 	const azimuth = _feature.properties["view:azimuth"];
-	console.log("azimuth ", azimuth );
+///	console.log("azimuth ", azimuth );
 	const ptLngLat = _feature.geometry.coordinates;
-	if (azimuth != undefined) {
+	if (azimuth != undefined) {  
 		curPt_azimuth = azimuth;
-/*		const longueur = 50 * Math.pow(2, 17 - map.getZoom());
-		const polyL = buildPolyLine(_feature.geometry.coordinates, azimuth, longueur);
-		azimuthPtr.setLatLngs(polyL);*/
 		setAzimPtr(_feature.geometry.coordinates, curPt_azimuth);
-/*		document.addEventListener('newAngle', (e) => {
-			const angleRad = e.detail.angleYaw;
-			console.log(angleRad * 180 / 3.14); 		
-		});
-*/
 		azimuthPtr.addTo(calques[seqNum].layer)
 	}
 	curPt_latlng.lat = ptLngLat[1];
@@ -2101,13 +2102,10 @@ function showSelectedPoint(_feature) {
 }
 		document.addEventListener('newAngle', (e) => {
 			const angledeg = e.detail.angleYaw * 180/Math.PI;
-			console.log('angles', curPt_azimuth, angledeg, angle); 
 			var angle = curPt_azimuth + angledeg;
 				if (angle > 360) {angle = angle - 360};
-				if (angle < 0) {angle = angle + 360};
-				
-			const ptLngLat =[curPt_latlng.lng, curPt_latlng.lat];
-			setAzimPtr(ptLngLat, angle);
+				if (angle < 0) {angle = angle + 360};				
+			setAzimAngle(angle);
 		});
 
 // endregion
