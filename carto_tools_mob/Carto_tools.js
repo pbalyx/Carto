@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = ""; // 
+const subV = "_a"; // 
 
 // region init 
 
@@ -2113,9 +2113,12 @@ function showSelectedPoint(_feature) {
 // region image
 
 function showImage(_feature) {
+	let is360 = false;
 	photoDiv.style.display = "flex";	
 	const exif = _feature.properties.exif;
-	const is360 = (exif['Xmp.GPano.ProjectionType'] == 'equirectangular');
+	if (exif['Xmp.GPano.ProjectionType'] == 'equirectangular') {is360 = true};
+	const truc = _feature.properties['pers:interior_orientation'];
+	if ( truc.field_of_view == 360) {is360 = true};
 ///	console.log("is360", is360 );
 	bWaiting.style.display = "block";
 	if (!is360) {
