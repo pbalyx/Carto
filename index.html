@@ -61,79 +61,72 @@
 </head>
 <body>
     <h1>Panoramax des sentiers</h1>
-<!--   <h1>A few simple tools for .gpx files</h1> -->
-	<p id="intro">
-	<i> page en chantier </i>
-	</p>
+
 	<p>
+	<i><small> 08/08/2026 </small></i>
+	</p>
+	
+	<p>Un ensemble d'outils, simples à utiliser, sans matériel spécial, pour photographier et caractériser les sentiers de randonnée sur Panoramax .<br>
 	Cliquer sur les titres pour avoir les détails.
 	</p>
+
+	<div id= "babaDiv" class= "tool_div"> 
+		<h2 id= "h2_baba_unfold" class = "unfold"> La prise de vue </h2> 
+		<div id= "baba_detail"  class= "detailDiv" >	
+		<p>	Prendre des séquences de photos et les envoyer sur Panoramax :<br>
+			<a href="https://pbalyx.github.io/Carto/pages/Panoramax_sentiers.html"  
+			target="blank">Contribuer à Panoramax sans matériel spécial</a>
+			<br>
+		</p>
+		<p>
+			<a href="https://pbalyx.github.io/Carto/pages/Panoramax_panoramique.html" 
+			target="blank">Ajouter des panoramas</a><br>
+			Une page d'explications séparée car la technique d'insertion dans Panoramax est un tout petit peu plus compliquée.
+		</p>
+		</div>
+	</div>
+<br>
 	<div id= "visionneuseDiv" class= "tool_div"> 
-		<h2 id= "h2_gpx_find_unfold" class = "unfold">Visionneuse</h2>
-		<div id= "gpx_find_detail" class= "detailDiv" >
+		<h2 id= "h2_visionneuse_unfold" class = "unfold">La visionneuse</h2>
+		<div id= "visionneuse_detail" class= "detailDiv" >
 		<p>
 		Une fois les photos postées dans Panoramax, il faut pouvoir les regarder.
 		</p>			
 		<p>	
 			La visionneuse que j'ai développée est une simple page HTML donc accessible depuis n'importe quel navigateur.
 				<a href="https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html?zoom=15&center=%5B44.56%2C4.4194%5D" 
-				target="blank">carto_tools</a>.
+				target="blank">carto_tools</a>.<br>
+				<i>Note</i> Supprimer les paramètres (après le ?) pour que la carte s'ouvre sur la dernière zone utilisée.
 			</p>
 			<p>	
-			Je joins une page d'explications pour montrer que c'est simple : 
+			Quelques explications dans une page séparée : 
 			<a href="https://pbalyx.github.io/Carto/pages/Panoramax_minimum.html" target="blank">Panoramax_minimum</a>.
+			</p>
+			<p>	
+			et quelques détails techniques sur l'api Panoramax : 
+			<a href="https://pbalyx.github.io/Carto/pages/Panoramax_api.html" target="blank">Panoramax_api</a>.
 			</p>
 		</div>
 	</div>	
 
-	<div id= "babaDiv" class= "tool_div"> 
-		<h2 id= "h2_gpxView_unfold" class = "unfold"> La prise de vue </h2> 
-		<div id= "gpxview_detail"  class= "detailDiv" >	
-		<p>
-			<a href="https://pbalyx.github.io/Carto/pages/Panoramax_sentiers.html"  
-			target="blank">Contribuer à Panoramax sans matériel spécial</a>
-			<br>
-		</p>
-		</div>
-	</div>
-	<br>
-	<div id= "panoramaDiv" class= "tool_div"> 
-		<h2 id= "h2_gpx_elev_unfold" class = "unfold"> Vues panoramiques </h2>
-		<div id= "gpx_elev_detail"  class= "detailDiv" >
-		<p>
-			Une page séparée car la technique d'insertion dans Panoramax est un tout petit peu plus compliquée.
-		</p>
-		<p>
-			<a href="https://pbalyx.github.io/Carto/pages/Panoramax_panoramique.html" 
-			target="blank">Ajouter des panoramas</a>
-		</p>
-		</div>
-	</div>
 	<br>	
 	<script>
-		h2_gpxView_unfold.addEventListener("click", function() {
-		    if (gpxview_detail.style.display === "block") {
-		  gpxview_detail.style.display = "none";
+		h2_baba_unfold.addEventListener("click", function() {
+		    if (baba_detail.style.display === "block") {
+		  baba_detail.style.display = "none";
 		} else {
-		  gpxview_detail.style.display = "block";
+		  baba_detail.style.display = "block";
 		}
 		});
 		
-		h2_gpx_elev_unfold.addEventListener("click", function() {
-		    if (gpx_elev_detail.style.display === "block") {
-		  gpx_elev_detail.style.display = "none";
+		h2_visionneuse_unfold.addEventListener("click", function() {
+		    if (visionneuse_detail.style.display === "block") {
+		  visionneuse_detail.style.display = "none";
 		} else {
-		  gpx_elev_detail.style.display = "block";
+		  visionneuse_detail.style.display = "block";
 		}
 		});
 
-		h2_gpx_find_unfold.addEventListener("click", function() {
-		    if (gpx_find_detail.style.display === "block") {
-		  gpx_find_detail.style.display = "none";
-		} else {
-		  gpx_find_detail.style.display = "block";
-		}
-		});
 
 	</script>
 </body>
