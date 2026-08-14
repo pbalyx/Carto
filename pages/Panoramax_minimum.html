@@ -88,7 +88,6 @@
 			<ul>
 				<li><a href = "#options">Les options</a></li>
 				<li><a href = "#code">Code source</a></li>
-				<li><a href = "#api">API Panoramax</a></li>
 			</ul>
 	</ol>
 	
@@ -115,7 +114,10 @@
 	<ul>
 		<li>de multiples séquences courtes (quelques dizaines de photos) dans une zone</li>
 		<li>des photos "à plat" prises avec un téléphone. </li>
-		<li>les photos 360° sont prises en charge aussi avec un temps d'affichage un peu plus long (comme sur Panoramax)</li>
+		<li>depuis la version 0.7.9, les photos 360° sont prises en charge aussi. </li>
+		<li>En cas de mélange de photos 360° et de photos plates dans une même séquence, la visualisation est adaptée de façon transparente. Voir par exemple 
+		<a href= "https://pbalyx.github.io/Carto/carto_tools/Carto_tools.html?zoom=16&center=%5B44.19019%2C2.61147%5D" 
+	target="blank">sur ce trajet.</a></li>
 	</ul>	
 </p>	
 <p>
@@ -126,7 +128,7 @@
 <p>
 	Dans une zone donnée, on peut commencer à chercher les photos existantes de deux façons :
 	<ul>
-		<li><i>Chercher sur carte</i> retrouve les éléments sur toute la carte actuelle. La limite est fixée à 1000 pour ne pas trop surcharger. Pour les zooms faibles  la recherche ne donne donc pas forcément tous les éléments, surtout s'il y a des routes. Voir en annexe.</li>
+		<li><i>Chercher sur carte</i> retrouve les éléments sur toute la carte actuelle. La limite est fixée à 1000 par appel pour ne pas trop surcharger. Pour les zones étendues (zoom faible)  la recherche ne donne donc pas forcément tous les éléments, surtout s'il y a des routes. Il aut réduire la zone et chercher à nouveau pour ajouter les points manquants.</li>
 		<li><i>Chercher autour</i>. C'est la meilleure façon de voir les sentiers dans une petite zone. Une fois le point courant positionné par un clic, la recherche donne les éléments trouvés dans un carré de 1000 m de coté autour de ce point.</li>			
 	</ul>
 </p>	
@@ -220,7 +222,7 @@
 </p>
 
 
-<p><small><i>Page mise à jour le 07/08/2026</i></small></p>
+<p><small><i>Page mise à jour le 14/08/2026</i></small></p>
 
 </body>
 </html>

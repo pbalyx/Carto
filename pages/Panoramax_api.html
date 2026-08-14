@@ -88,6 +88,7 @@
 			<ul>
 				<li><a href = "#uuid">Identifiants UUID</a></li>
 				<li><a href = "#parcourir">Parcourir la séquence</a></li>
+				<li><a href = "#panoramique">Photos panoramiques</a></li>
 				<li><a href = "#code">Détails sur la page</a></li>
 			</ul>
 	</ol>
@@ -218,6 +219,17 @@
 	Le chargement de la collection se faisant à partir du premier élément, il peut arriver que les 1000 premiers éléments soient en dehors de la zone d'intérêt. Dans ce cas les éléments ne sont pas chargés et la séquence n'est pas affichée en bleu mais on peut quand même se déplacer dans la séquence. Le code utilise alors les liens <i>next</i> et <i>prev</i>.
 </p>
 
+<h3 id ="panoramique">Photos panoramiques</h3>
+
+<p> 
+	Les photos panoramiques sont traitées avec.
+	<a href= "https://photo-sphere-viewer.js.org/guide/" target="blank"> Photo Sphere Viewer</a>. Le code est directement repris de la page <i>Getting started</i>.
+</p>
+<p> 
+	Pour savoir si la photo est une photo à plat ou une photo 360° et choisir la bonne visualisation, il faut aller chercher dans la clé <i>properties</i> de l'objet JSON la présence de <i>exif.Xmp.GPano.ProjectionType</i> qui doit être <i>equirectangular</i>.<br>
+	<i>Note</i>: Après quelques essais, j'ai vu qu'il fallait aussi rechercher une clé <i>pers:interior_orientation.field_of_view</i> = 360. Pour des séquences prises en voiture sur une route ça peut paraître assez étrange mais ce n'est qu'une ligne de code à rajouter.
+</p>
+
 <h3 id ="code">Détails sur la page</h3>
 
 <p> 
@@ -230,7 +242,7 @@
 </p>
 
 
-<p><small><i>Page mise à jour le 07/08/2026</i></small></p>
+<p><small><i>Page mise à jour le 14/08/2026</i></small></p>
 
 <p>
 
