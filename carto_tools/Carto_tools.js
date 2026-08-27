@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_a"; // 
+const subV = "_f"; // bbox corrigée
 
 // region init 
 
@@ -1849,18 +1849,23 @@ if (isMobile) {
 	
 // region  menu and utils 
 
+var checkbbStr;
+
 async function panoramaxAround(boxSize) {
 	const bbStr = bboxAround(curPtCoordsStr(), boxSize);
+	checkbbStr = bbStr;
 	const dataJson = await px_getFeaturesBbox(bbStr);
 
 	updateCalque(panoxNum, dataJson);
 	// set calque seq above calque panox
 	map.removeLayer(calques[seqNum].layer);
 	map.addLayer(calques[seqNum].layer);
+	return dataJson;
 }
 
 async function panoramaxInBox() {
 	const bbxStr = bboxStr(map.getBounds());
+	checkbbStr = bbxStr;
 	const dataJson = await px_getFeaturesBbox(bbxStr);
 	updateCalque(panoxNum, dataJson);
 	updateInfoMode(false); // set infoDiv on panoramax
@@ -1869,6 +1874,7 @@ async function panoramaxInBox() {
 function panoramaxClear() {
 	calques[panoxNum].clearLayer();
 	calques[seqNum].clearLayer();
+	currentCollectionId = "";
 }
 
 bClosePhoto.onclick = hidePhoto;
@@ -1925,10 +1931,11 @@ var strSplit, lon, lat;
 	strSplit = lonLatStr.split(',');
 	lon = parseFloat(strSplit[0]);
 	lat = parseFloat(strSplit[1]); 
+var latRad = 3.14 / 180 * lat;
 var distDeg = parseFloat(dist) * 180 / 40000000; //halfdist
-bboxStr += (lon - distDeg * Math.cos(lat)).toFixed(7);
+bboxStr += (lon - distDeg / Math.cos(latRad)).toFixed(7);
 bboxStr += ',' + (lat - distDeg).toFixed(7);
-bboxStr += ',' + (lon + distDeg * Math.cos(lat)).toFixed(7);
+bboxStr += ',' + (lon + distDeg / Math.cos(latRad)).toFixed(7);
 bboxStr += ',' + (lat + distDeg).toFixed(7);
 return bboxStr;
 }
@@ -2034,14 +2041,14 @@ async function manageItem(_feature, checkSeq) {
 
 	showImage(_feature);
 	
-	if (!nextLink || !prevLink) {
-		panoramaxAround(400);		
-	}
 	currentFeature = _feature; 
 	currentFeatureUrl = _feature.links.find(obj => obj?.rel === "self").href;
 	currentFeatureImgUrl = _feature.assets.hd.href;
 	updatePanoxInfo(_feature);
 	showSelectedPoint(_feature);	
+	if (!nextLink || !prevLink) {
+		panoramaxAround(400);		
+	}
 }
 
 async function updateCollection(_feature, checkSeq){
@@ -2100,13 +2107,14 @@ function showSelectedPoint(_feature) {
 	curPt_latlng.lat = ptLngLat[1];
 	curPt_latlng.lng = ptLngLat[0];
 }
-		document.addEventListener('newAngle', (e) => {
-			const angledeg = e.detail.angleYaw * 180/Math.PI;
-			var angle = curPt_azimuth + angledeg;
-				if (angle > 360) {angle = angle - 360};
-				if (angle < 0) {angle = angle + 360};				
-			setAzimAngle(angle);
-		});
+
+document.addEventListener('newAngle', (e) => {
+	const angledeg = e.detail.angleYaw * 180/Math.PI;
+	var angle = curPt_azimuth + angledeg;
+		if (angle > 360) {angle = angle - 360};
+		if (angle < 0) {angle = angle + 360};				
+	setAzimAngle(angle);
+});
 
 // endregion
 
@@ -2752,7 +2760,7 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test1;
+b_test.onclick = testBbox;
 
 function test() {
 	alert("no test");
@@ -2762,6 +2770,16 @@ var pointerX_ = 111;
 var contentX_ = 222;
 var marginNeeded_;
 
+function testBbox() {
+const bb = checkbbStr.split(',');
+var polyL = [[bb[1], bb[0]], [bb[1], bb[2]], [bb[3], bb[2]], [bb[3], bb[0]], [bb[1], bb[0]]];
+///console.log(checkbbStr);
+///console.log(polyL);
+var bboxPtr = L.polyline(polyL, {color: 'blue'});
+bboxPtr.addTo(calques[1].layer).addTo(map);//	map.addLayer(calque.layer);
+
+}
+										  
 function test1() {
 	textInfo = '----------';
 /*  textInfo += '---------- <br> pointerX '+ pointerX_.toFixed(2);
