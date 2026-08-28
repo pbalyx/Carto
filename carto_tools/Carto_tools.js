@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_f"; // bbox corrigée
+const subV = "_g"; // 360 style
 
 // region init 
 
@@ -231,25 +231,19 @@ var defaultStyle = {
 	"fill":false
 };
 
-const style1 = {"color": "red",	"fillColor": "Yellow"};
-const style2 = {"color": "Navy",	"fillColor": "Chartreuse",  "radius":"5"};
-const style3 = {"color": "Maroon",	"fillColor": "green"};
-const stylePanox = {"color": "red",	"fillColor": "Yellow"};
+const style1 = {"color": "Maroon",	"fillColor": "green"};
+const style2 = {"color": "Navy", "fillColor": "Chartreuse",  "radius":"5"};
+const style3 = {"color": "red",	"fillColor": "Yellow"};
+const stylePanox = {"color": "red",	"fillColor": "Yellow",  "radius":"5"};
 const styleSeq = {"color": "Blue",	"fillColor": "LightBlue",  "radius":"5"};
-const styles = [style1, style2, style3, stylePanox, styleSeq];
+const stylePanox360 = 
+	{"color": "Coral", "fill": "true", "fillColor": "Yellow",  "radius":"8", "weight":"6"};
+const styleSeq360 = 
+	{"color": "DeepSkyBlue", "fill": "true", "fillColor": "LightBlue",  "radius":"8", "weight":"6"};
+
+const styles = [style1, style2, style3, stylePanox, styleSeq, stylePanox360, styleSeq360];
 
 const styleSelected = {"color": "Blue",	"fillColor": "PowderBlue", "radius":"8"};
-
-function isPresentBad(_feature, _featuresList) {
-	var _isPresent = false;
-		for (var j = 0; j < _featuresList.length; j++) {
-			if (Object.is(_feature, _featuresList[j])) {
-				_isPresent = true;
-				break;
-			}
-		}	
-	return _isPresent;
-}
 
 function isPresent(_feature, _featuresList) {
 	var _isPresent = false;
@@ -286,10 +280,10 @@ function isPresent(_feature, _featuresList) {
 	return _isPresent;
 }
 
-function fillCircleMarkers(_layer) {
+function fillCircleMarkers(_layer) {  // true needed for markers (fill=false for polygons)
 	_layer.eachLayer(function (subLayer) { 	
 		if (subLayer.feature.geometry.type == "Point") {
-			subLayer.setStyle({"fill":true, "weight": 2 });
+			subLayer.setStyle({"fill":true});
 		}		
 	});
 }
@@ -315,7 +309,7 @@ function CalqueObj (_name) {
 	this.updateLayer = function () {
 		this.layer.clearLayers();
 		this.layer.addData(this.layerJson.features);
-		fillCircleMarkers(this.layer); // needed to overwrite fill=false for markers
+		fillCircleMarkers(this.layer); // needed for markers (fill=false for polygons)
 	}
 	this.lastAddedFeaturesList = [];  // used to undo last action
 	this.addFeatures = function(_addedJson) {
@@ -1531,7 +1525,6 @@ function set_events(event) {
 		
 		show_tags(rowIndex - 1, columnIndex, event);
 	currentRow.style.backgroundColor = 'blue';
-//	.setStyle("backgroundColor: red");
 }
 
 function show_tags(row, column,evt) {
@@ -1723,8 +1716,6 @@ var currentFeatureImgUrl;
 var azimuthPtr = L.polyline([], {color: 'blue'});
 var azimuthPtrCoords = [0, 0];
 
-////const azimPtrObj = new AzimPtrObj();
-
 // if prevNextMode new feature is fetched using prev and next url in current feature
 // else new feature is got simply by its index in already loaded collection (faster)
 // prevNextMode is set if feature is not found in the loaded part of the current collection
@@ -1851,12 +1842,27 @@ if (isMobile) {
 
 var checkbbStr;
 
+function setStyleNotSelected(pxNum) {
+	calques[pxNum].layer.eachLayer(function (_subLayer) { 
+		if (Is360(_subLayer.feature)) {
+			_subLayer.setStyle(styles[pxNum + 2]);
+		} else {
+			_subLayer.setStyle(styles[pxNum]);		
+		}
+	});
+}
+
+function updatePxCalque(pxNum, dataJson) { // independent to treat 360
+	updateCalque(pxNum, dataJson);
+	setStyleNotSelected(pxNum);
+}
+
 async function panoramaxAround(boxSize) {
 	const bbStr = bboxAround(curPtCoordsStr(), boxSize);
 	checkbbStr = bbStr;
 	const dataJson = await px_getFeaturesBbox(bbStr);
 
-	updateCalque(panoxNum, dataJson);
+	updatePxCalque(panoxNum, dataJson);
 	// set calque seq above calque panox
 	map.removeLayer(calques[seqNum].layer);
 	map.addLayer(calques[seqNum].layer);
@@ -1867,7 +1873,7 @@ async function panoramaxInBox() {
 	const bbxStr = bboxStr(map.getBounds());
 	checkbbStr = bbxStr;
 	const dataJson = await px_getFeaturesBbox(bbxStr);
-	updateCalque(panoxNum, dataJson);
+	updatePxCalque(panoxNum, dataJson);
 	updateInfoMode(false); // set infoDiv on panoramax
 }
 
@@ -2007,7 +2013,6 @@ bNextPoint.onclick = () => {
 }
 
 async function managePrevNext(prevNextUrl) {
-///	console.log("prevNextUrl", prevNextUrl);
 //  this take more time (500 ms) than direct call 
 	const res = await fetch(prevNextUrl);
 	const data = await res.json();
@@ -2067,9 +2072,9 @@ async function updateCollection(_feature, checkSeq){
 		// dans ce cas imgIndex est négatif et il est inutile de les ajouter
 		if (imgIndex >=0) {
 		// la collection peut dépasser les points déjà chargés
-			updateCalque(panoxNum, dataJson);
+			updatePxCalque(panoxNum, dataJson);
 		// charger la collection dans son calque
-			updateCalque(seqNum, dataJson);
+			updatePxCalque(seqNum, dataJson);
 		}
 	} else {
 		dataJson = calques[seqNum].layerJson;
@@ -2085,27 +2090,30 @@ async function updateCollection(_feature, checkSeq){
 const Y360Div = document.getElementById('Y360Div');
 
 function showSelectedPoint(_feature) {
+	// reset style
+	setStyleNotSelected(seqNum);
 // 	set a larger marker on selected feature
-// 	set map current_point on this feature (useful to search around)
 	calques[seqNum].layer.eachLayer(function (subLayer) { 	
 		if (subLayer.feature && subLayer.feature.id == _feature.id) {
 			subLayer.setStyle(styleSelected);
-		} else {
-			subLayer.setStyle(styles[seqNum]);		
-		}
-	});	
+		} 
+	})
+
+	
+// 	set map current_point on this feature (useful to search around)
+	const ptLngLat = _feature.geometry.coordinates;
+	curPt_latlng.lat = ptLngLat[1];
+	curPt_latlng.lng = ptLngLat[0];
+
 // 	set azimuth if present in feature
 // 	build azimuth pointer
 	const azimuth = _feature.properties["view:azimuth"];
 ///	console.log("azimuth ", azimuth );
-	const ptLngLat = _feature.geometry.coordinates;
 	if (azimuth != undefined) {  
 		curPt_azimuth = azimuth;
 		setAzimPtr(_feature.geometry.coordinates, curPt_azimuth);
 		azimuthPtr.addTo(calques[seqNum].layer)
 	}
-	curPt_latlng.lat = ptLngLat[1];
-	curPt_latlng.lng = ptLngLat[0];
 }
 
 document.addEventListener('newAngle', (e) => {
@@ -2120,14 +2128,22 @@ document.addEventListener('newAngle', (e) => {
 
 // region image
 
+function Is360(_feature) {
+	let _is360 = false;
+	if(_feature) { // azimuthPtr has no feature
+		const exif = _feature.properties.exif;
+		if (exif['Xmp.GPano.ProjectionType'] == 'equirectangular') {_is360 = true};
+		const truc = _feature.properties['pers:interior_orientation'];
+		if ( truc.field_of_view == 360) {_is360 = true};
+///		console.log("_is360", _is360 );
+	}
+	return _is360;
+}
+
+
 function showImage(_feature) {
-	let is360 = false;
 	photoDiv.style.display = "flex";	
-	const exif = _feature.properties.exif;
-	if (exif['Xmp.GPano.ProjectionType'] == 'equirectangular') {is360 = true};
-	const truc = _feature.properties['pers:interior_orientation'];
-	if ( truc.field_of_view == 360) {is360 = true};
-///	console.log("is360", is360 );
+	let is360 = Is360(_feature);
 	bWaiting.style.display = "block";
 	if (!is360) {
 		imageDiv.style.display = "flex";
@@ -2760,11 +2776,23 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = testBbox;
+b_test.onclick = test;
 
 function test() {
 	alert("no test");
 }
+
+function testStyle() {
+ var _layer = calques[panoxNum].layer;
+/// console.log(_layer._layers);
+	_layer.eachLayer(function (subLayer) { 	
+		if (subLayer.feature && Is360(subLayer.feature) ) {
+			subLayer.setStyle({"radius":10, "weight": 5 });
+///			console.log(subLayer.feature.properties);
+		}
+	});
+}
+
 
 var pointerX_ = 111;
 var contentX_ = 222;
