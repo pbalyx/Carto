@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_g"; // 360 style
+const subV = "_h"; // 360 style remove azimuth if absent
 
 // region init 
 
@@ -243,7 +243,7 @@ const styleSeq360 =
 
 const styles = [style1, style2, style3, stylePanox, styleSeq, stylePanox360, styleSeq360];
 
-const styleSelected = {"color": "Blue",	"fillColor": "PowderBlue", "radius":"8"};
+const styleSelected = {"color": "DarkMagenta",	"fillColor": "Fuchsia", "radius":"7", "weight":"2" };
 
 function isPresent(_feature, _featuresList) {
 	var _isPresent = false;
@@ -1713,7 +1713,7 @@ var next_apiUrl, prev_apiUrl;
 var currentFeature;
 var currentFeatureUrl;
 var currentFeatureImgUrl;
-var azimuthPtr = L.polyline([], {color: 'blue'});
+var azimuthPtr = L.polyline([], {color: 'DarkMagenta'});
 var azimuthPtrCoords = [0, 0];
 
 // if prevNextMode new feature is fetched using prev and next url in current feature
@@ -1974,6 +1974,7 @@ function setAzimPtr(coords, angle) {
 		const polyL = buildPolyLine(coords, angle, longueur);
 		azimuthPtrCoords = coords;
 		azimuthPtr.setLatLngs(polyL);
+		azimuthPtr.setStyle({"color": "DarkMagenta"});
 }
 
 function setAzimAngle(newAngle) {
@@ -2113,6 +2114,8 @@ function showSelectedPoint(_feature) {
 		curPt_azimuth = azimuth;
 		setAzimPtr(_feature.geometry.coordinates, curPt_azimuth);
 		azimuthPtr.addTo(calques[seqNum].layer)
+	} else {
+			azimuthPtr.setLatLngs([]);
 	}
 }
 
