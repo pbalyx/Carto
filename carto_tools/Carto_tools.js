@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_h"; // 360 style remove azimuth if absent
+const subV = "_J"; // selectedPoint -> pxSelected
 
 // region init 
 
@@ -242,8 +242,6 @@ const styleSeq360 =
 	{"color": "DeepSkyBlue", "fill": "true", "fillColor": "LightBlue",  "radius":"8", "weight":"6"};
 
 const styles = [style1, style2, style3, stylePanox, styleSeq, stylePanox360, styleSeq360];
-
-const styleSelected = {"color": "DarkMagenta",	"fillColor": "Fuchsia", "radius":"7", "weight":"2" };
 
 function isPresent(_feature, _featuresList) {
 	var _isPresent = false;
@@ -1715,7 +1713,15 @@ var currentFeatureUrl;
 var currentFeatureImgUrl;
 var azimuthPtr = L.polyline([], {color: 'DarkMagenta'});
 var azimuthPtrCoords = [0, 0];
-
+var pxSelectedPtr = new L.CircleMarker([0,0],
+	{
+		radius: 7,
+		fillColor: "Fuchsia",
+		fillOpacity: 0.6,
+		color: "DarkMagenta",
+		weight: 2					
+	}
+)
 // if prevNextMode new feature is fetched using prev and next url in current feature
 // else new feature is got simply by its index in already loaded collection (faster)
 // prevNextMode is set if feature is not found in the loaded part of the current collection
@@ -1842,7 +1848,7 @@ if (isMobile) {
 
 var checkbbStr;
 
-function setStyleNotSelected(pxNum) {
+function set360Style(pxNum) {
 	calques[pxNum].layer.eachLayer(function (_subLayer) { 
 		if (Is360(_subLayer.feature)) {
 			_subLayer.setStyle(styles[pxNum + 2]);
@@ -1854,7 +1860,7 @@ function setStyleNotSelected(pxNum) {
 
 function updatePxCalque(pxNum, dataJson) { // independent to treat 360
 	updateCalque(pxNum, dataJson);
-	setStyleNotSelected(pxNum);
+	set360Style(pxNum);
 }
 
 async function panoramaxAround(boxSize) {
@@ -2091,21 +2097,16 @@ async function updateCollection(_feature, checkSeq){
 const Y360Div = document.getElementById('Y360Div');
 
 function showSelectedPoint(_feature) {
-	// reset style
-	setStyleNotSelected(seqNum);
-// 	set a larger marker on selected feature
-	calques[seqNum].layer.eachLayer(function (subLayer) { 	
-		if (subLayer.feature && subLayer.feature.id == _feature.id) {
-			subLayer.setStyle(styleSelected);
-		} 
-	})
 
-	
 // 	set map current_point on this feature (useful to search around)
 	const ptLngLat = _feature.geometry.coordinates;
 	curPt_latlng.lat = ptLngLat[1];
 	curPt_latlng.lng = ptLngLat[0];
-
+	
+// 	set a different marker on selected feature
+	pxSelectedPtr.setLatLng(curPt_latlng);
+	pxSelectedPtr.addTo(calques[seqNum].layer);
+	
 // 	set azimuth if present in feature
 // 	build azimuth pointer
 	const azimuth = _feature.properties["view:azimuth"];
