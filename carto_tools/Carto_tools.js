@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_J"; // selectedPoint -> pxSelected
+const subV = "_K"; // collection count + km
 
 // region init 
 
@@ -1705,23 +1705,24 @@ const cb_hd = document.getElementById('cb_hd');
 
 var image = document.getElementById("image");
 var currentCollectionId;
-var currentCollectionCount = 0;
-var currentImageIndex = 0;
+let currentCollLoadedCount = 0;
+let currentCollTotalCount = 0;
+let currentCollTotalLength = 0;
+let currentImageIndex = 0;
 var next_apiUrl, prev_apiUrl;
 var currentFeature;
 var currentFeatureUrl;
 var currentFeatureImgUrl;
 var azimuthPtr = L.polyline([], {color: 'DarkMagenta'});
 var azimuthPtrCoords = [0, 0];
-var pxSelectedPtr = new L.CircleMarker([0,0],
-	{
+var pxSelectedPtr = new L.CircleMarker([0,0],	{
 		radius: 7,
 		fillColor: "Fuchsia",
 		fillOpacity: 0.6,
 		color: "DarkMagenta",
 		weight: 2					
-	}
-)
+	});
+
 // if prevNextMode new feature is fetched using prev and next url in current feature
 // else new feature is got simply by its index in already loaded collection (faster)
 // prevNextMode is set if feature is not found in the loaded part of the current collection
@@ -1917,24 +1918,28 @@ function updatePanoxInfo(_feature) {
 	elementInfo_div.innerHTML = "image id: " + _feature.id;
 	elementInfo_div.innerHTML += 
 		"<br>date: " + _feature.properties.datetime.substring(0,10) + 
-		",  time: " + _feature.properties.datetime.substring(11,19);
-	elementInfo_div.innerHTML += 
-		"<br>index in sequence: " + _feature.properties["geovisio:rank_in_collection"];
+		" &nbsp;--- &nbsp; time: " + _feature.properties.datetime.substring(11,19);
 	elementInfo_div.innerHTML += 
 		"<br>provider.name: " + _feature.providers[0].name;
 	elementInfo_div.innerHTML += 
-		"<br>instance: " + _feature.assets.hd.href.substring(0,35) + "...";
-	elementInfo_div.innerHTML += "<br>--------- "
+		"<br>instance: " + _feature.assets.hd.href.substring(8).split("/")[0];
 
+	elementInfo_div.innerHTML += "<br>-------------------- "
+	elementInfo_div.innerHTML += 
+		"<br>index in seq.: " + _feature.properties["geovisio:rank_in_collection"]
+				+ " / " + currentCollLoadedCount;
+	elementInfo_div.innerHTML += 
+		"<br>total count: " + currentCollTotalCount 
+				+ " &nbsp;--- &nbsp; total length: " + currentCollTotalLength + " km";
 	elementInfo_div.innerHTML += 
 		"<br>azimuth: " + _feature.properties["view:azimuth"];
 	elementInfo_div.innerHTML += 
-		"<br>GPSImgDirection: " + _feature.properties.exif["Exif.GPSInfo.GPSImgDirection"];
-	elementInfo_div.innerHTML += 
+		" &nbsp;--- &nbsp;  GPSImgDirection: " + _feature.properties.exif["Exif.GPSInfo.GPSImgDirection"];
+/*	elementInfo_div.innerHTML += 
 		"<br>Xmp.GPano.PoseHeadingDegrees : " + _feature.properties.exif["Xmp.GPano.PoseHeadingDegrees"];
 	elementInfo_div.innerHTML += 
 		"<br>Xmp.GPano.InitialViewHeadingDegrees : " + 
-			_feature.properties.exif["Xmp.GPano.InitialViewHeadingDegrees"];
+			_feature.properties.exif["Xmp.GPano.InitialViewHeadingDegrees"];*/
 }
 
 function bboxAround(lonLatStr, dist) {
@@ -2008,7 +2013,7 @@ bPrevPoint.onclick = () => {
 }
 
 bNextPoint.onclick = () => {
-	if (currentImageIndex < currentCollectionCount) {
+	if (currentImageIndex < currentCollLoadedCount) {
 		currentImageIndex++;
 	}
 	if (prevNextMode) {
@@ -2065,14 +2070,17 @@ async function manageItem(_feature, checkSeq) {
 
 async function updateCollection(_feature, checkSeq){
 	var imgIndex = -1;
-	var dataJson;
+////	var dataJson;
 	const newCollectionId = _feature.collection;
 	if (checkSeq && newCollectionId != currentCollectionId) {
 ///	console.log("collection changed - old", currentCollectionId," - new  ", newCollectionId)		
 		currentCollectionId = newCollectionId;
 		calques[seqNum].clearLayer();
-		dataJson = await px_getFeaturesInCollection(currentCollectionId);
-		currentCollectionCount = dataJson.features.length; 
+		const dataJson = await px_getFeaturesInCollection(currentCollectionId);
+		currentCollLoadedCount = dataJson.features.length; 
+		const collJson = await px_getCollection(currentCollectionId);
+		currentCollTotalCount = collJson['stats:items'].count;	
+		currentCollTotalLength = collJson['geovisio:length_km'];	
 	    imgIndex = dataJson.features.findIndex(checkId);
 		// on a chargé les 1000 premiers points de la collection dans dataJson
 		// si la collection est trop grande ils peuvent être tous hors de la carte
@@ -2381,6 +2389,17 @@ async function px_getFeaturesBbox(bboxString) {
 async function px_getFeaturesInCollection(_collection_id) {
 	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&sortby=ts&limit=1000`;	
 	
+	try {
+		const res = await fetch(apiUrl);
+		const data = await res.json();
+		return data;
+	} catch (e) {
+		  console.error("[Panoramax] erreur", e);
+	}
+}
+
+async function px_getCollection(_collection_id) {
+	const apiUrl = `${panoxUrl}/collections/${_collection_id}`;		
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
@@ -2780,11 +2799,28 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test;
+b_test.onclick = testCount;
 
 function test() {
 	alert("no test");
 }
+
+async function testCount() {
+	console.log(currentCollectionId);
+
+/*	const jsonColl = await px_getCollection(currentCollectionId);
+	currentCollTotalCount = jsonColl['stats:items'].count;
+	console.log(jsonColl);*/
+	console.log("currentCollTotalCount", currentCollTotalCount);
+	console.log("currentCollLoadedCount", currentCollLoadedCount);
+	let cpt = 0;
+	const _layer = calques[panoxNum].layer;
+	_layer.eachLayer(function (subLayer) { 	
+		cpt++;
+	});
+	console.log("layer count", cpt);
+}
+
 
 function testStyle() {
  var _layer = calques[panoxNum].layer;
