@@ -297,7 +297,7 @@
 		display: block;
 	}
 		
-	@media (hover: none) and (pointer: coarse) {   /* mobile display*/
+@media (hover: none) and (pointer: coarse) {   /* mobile display*/
 		.overlayDiv {
 			font-size:0.8em;
 		}
@@ -311,6 +311,18 @@
 		}
 		#infoDiv {
 			width: 80dvw;
+		}
+
+	}
+@media (hover: none) and (pointer: coarse) and (min-width: 768px){   /* mobile display*/
+		.overlayDiv {
+			font-size:1.5em;
+		}
+		#menubar {
+			font-size:1.5em;
+		}
+		#infoDiv {
+			width: 50dvw;
 		}
 
 	}
