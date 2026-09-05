@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_a"; // 
+const subV = "_L"; // adaptation tablette
 
 // region init 
 
@@ -231,25 +231,17 @@ var defaultStyle = {
 	"fill":false
 };
 
-const style1 = {"color": "red",	"fillColor": "Yellow"};
-const style2 = {"color": "Navy",	"fillColor": "Chartreuse",  "radius":"5"};
-const style3 = {"color": "Maroon",	"fillColor": "green"};
-const stylePanox = {"color": "red",	"fillColor": "Yellow"};
+const style1 = {"color": "Maroon",	"fillColor": "green"};
+const style2 = {"color": "Navy", "fillColor": "Chartreuse",  "radius":"5"};
+const style3 = {"color": "red",	"fillColor": "Yellow"};
+const stylePanox = {"color": "red",	"fillColor": "Yellow",  "radius":"5"};
 const styleSeq = {"color": "Blue",	"fillColor": "LightBlue",  "radius":"5"};
-const styles = [style1, style2, style3, stylePanox, styleSeq];
+const stylePanox360 = 
+	{"color": "Coral", "fill": "true", "fillColor": "Yellow",  "radius":"8", "weight":"6"};
+const styleSeq360 = 
+	{"color": "DeepSkyBlue", "fill": "true", "fillColor": "LightBlue",  "radius":"8", "weight":"6"};
 
-const styleSelected = {"color": "Blue",	"fillColor": "PowderBlue", "radius":"8"};
-
-function isPresentBad(_feature, _featuresList) {
-	var _isPresent = false;
-		for (var j = 0; j < _featuresList.length; j++) {
-			if (Object.is(_feature, _featuresList[j])) {
-				_isPresent = true;
-				break;
-			}
-		}	
-	return _isPresent;
-}
+const styles = [style1, style2, style3, stylePanox, styleSeq, stylePanox360, styleSeq360];
 
 function isPresent(_feature, _featuresList) {
 	var _isPresent = false;
@@ -286,10 +278,10 @@ function isPresent(_feature, _featuresList) {
 	return _isPresent;
 }
 
-function fillCircleMarkers(_layer) {
+function fillCircleMarkers(_layer) {  // true needed for markers (fill=false for polygons)
 	_layer.eachLayer(function (subLayer) { 	
 		if (subLayer.feature.geometry.type == "Point") {
-			subLayer.setStyle({"fill":true, "weight": 2 });
+			subLayer.setStyle({"fill":true});
 		}		
 	});
 }
@@ -315,7 +307,7 @@ function CalqueObj (_name) {
 	this.updateLayer = function () {
 		this.layer.clearLayers();
 		this.layer.addData(this.layerJson.features);
-		fillCircleMarkers(this.layer); // needed to overwrite fill=false for markers
+		fillCircleMarkers(this.layer); // needed for markers (fill=false for polygons)
 	}
 	this.lastAddedFeaturesList = [];  // used to undo last action
 	this.addFeatures = function(_addedJson) {
@@ -1531,7 +1523,6 @@ function set_events(event) {
 		
 		show_tags(rowIndex - 1, columnIndex, event);
 	currentRow.style.backgroundColor = 'blue';
-//	.setStyle("backgroundColor: red");
 }
 
 function show_tags(row, column,evt) {
@@ -1714,16 +1705,23 @@ const cb_hd = document.getElementById('cb_hd');
 
 var image = document.getElementById("image");
 var currentCollectionId;
-var currentCollectionCount = 0;
-var currentImageIndex = 0;
+let currentCollLoadedCount = 0;
+let currentCollTotalCount = 0;
+let currentCollTotalLength = 0;
+let currentImageIndex = 0;
 var next_apiUrl, prev_apiUrl;
 var currentFeature;
 var currentFeatureUrl;
 var currentFeatureImgUrl;
-var azimuthPtr = L.polyline([], {color: 'blue'});
+var azimuthPtr = L.polyline([], {color: 'DarkMagenta'});
 var azimuthPtrCoords = [0, 0];
-
-////const azimPtrObj = new AzimPtrObj();
+var pxSelectedPtr = new L.CircleMarker([0,0],	{
+		radius: 7,
+		fillColor: "Fuchsia",
+		fillOpacity: 0.6,
+		color: "DarkMagenta",
+		weight: 2					
+	});
 
 // if prevNextMode new feature is fetched using prev and next url in current feature
 // else new feature is got simply by its index in already loaded collection (faster)
@@ -1849,26 +1847,47 @@ if (isMobile) {
 	
 // region  menu and utils 
 
+var checkbbStr;
+
+function set360Style(pxNum) {
+	calques[pxNum].layer.eachLayer(function (_subLayer) { 
+		if (Is360(_subLayer.feature)) {
+			_subLayer.setStyle(styles[pxNum + 2]);
+		} else {
+			_subLayer.setStyle(styles[pxNum]);		
+		}
+	});
+}
+
+function updatePxCalque(pxNum, dataJson) { // independent to treat 360
+	updateCalque(pxNum, dataJson);
+	set360Style(pxNum);
+}
+
 async function panoramaxAround(boxSize) {
 	const bbStr = bboxAround(curPtCoordsStr(), boxSize);
+	checkbbStr = bbStr;
 	const dataJson = await px_getFeaturesBbox(bbStr);
 
-	updateCalque(panoxNum, dataJson);
+	updatePxCalque(panoxNum, dataJson);
 	// set calque seq above calque panox
 	map.removeLayer(calques[seqNum].layer);
 	map.addLayer(calques[seqNum].layer);
+	return dataJson;
 }
 
 async function panoramaxInBox() {
 	const bbxStr = bboxStr(map.getBounds());
+	checkbbStr = bbxStr;
 	const dataJson = await px_getFeaturesBbox(bbxStr);
-	updateCalque(panoxNum, dataJson);
+	updatePxCalque(panoxNum, dataJson);
 	updateInfoMode(false); // set infoDiv on panoramax
 }
 
 function panoramaxClear() {
 	calques[panoxNum].clearLayer();
 	calques[seqNum].clearLayer();
+	currentCollectionId = "";
 }
 
 bClosePhoto.onclick = hidePhoto;
@@ -1899,24 +1918,28 @@ function updatePanoxInfo(_feature) {
 	elementInfo_div.innerHTML = "image id: " + _feature.id;
 	elementInfo_div.innerHTML += 
 		"<br>date: " + _feature.properties.datetime.substring(0,10) + 
-		",  time: " + _feature.properties.datetime.substring(11,19);
-	elementInfo_div.innerHTML += 
-		"<br>index in sequence: " + _feature.properties["geovisio:rank_in_collection"];
+		" &nbsp;--- &nbsp; time: " + _feature.properties.datetime.substring(11,19);
 	elementInfo_div.innerHTML += 
 		"<br>provider.name: " + _feature.providers[0].name;
 	elementInfo_div.innerHTML += 
-		"<br>instance: " + _feature.assets.hd.href.substring(0,35) + "...";
-	elementInfo_div.innerHTML += "<br>--------- "
+		"<br>instance: " + _feature.assets.hd.href.substring(8).split("/")[0];
 
+	elementInfo_div.innerHTML += "<br>-------------------- "
+	elementInfo_div.innerHTML += 
+		"<br>index in seq.: " + _feature.properties["geovisio:rank_in_collection"]
+				+ " / " + currentCollLoadedCount;
+	elementInfo_div.innerHTML += 
+		"<br>total count: " + currentCollTotalCount 
+				+ " &nbsp;--- &nbsp; total length: " + currentCollTotalLength + " km";
 	elementInfo_div.innerHTML += 
 		"<br>azimuth: " + _feature.properties["view:azimuth"];
 	elementInfo_div.innerHTML += 
-		"<br>GPSImgDirection: " + _feature.properties.exif["Exif.GPSInfo.GPSImgDirection"];
-	elementInfo_div.innerHTML += 
+		" &nbsp;--- &nbsp;  GPSImgDirection: " + _feature.properties.exif["Exif.GPSInfo.GPSImgDirection"];
+/*	elementInfo_div.innerHTML += 
 		"<br>Xmp.GPano.PoseHeadingDegrees : " + _feature.properties.exif["Xmp.GPano.PoseHeadingDegrees"];
 	elementInfo_div.innerHTML += 
 		"<br>Xmp.GPano.InitialViewHeadingDegrees : " + 
-			_feature.properties.exif["Xmp.GPano.InitialViewHeadingDegrees"];
+			_feature.properties.exif["Xmp.GPano.InitialViewHeadingDegrees"];*/
 }
 
 function bboxAround(lonLatStr, dist) {
@@ -1925,10 +1948,11 @@ var strSplit, lon, lat;
 	strSplit = lonLatStr.split(',');
 	lon = parseFloat(strSplit[0]);
 	lat = parseFloat(strSplit[1]); 
+var latRad = 3.14 / 180 * lat;
 var distDeg = parseFloat(dist) * 180 / 40000000; //halfdist
-bboxStr += (lon - distDeg * Math.cos(lat)).toFixed(7);
+bboxStr += (lon - distDeg / Math.cos(latRad)).toFixed(7);
 bboxStr += ',' + (lat - distDeg).toFixed(7);
-bboxStr += ',' + (lon + distDeg * Math.cos(lat)).toFixed(7);
+bboxStr += ',' + (lon + distDeg / Math.cos(latRad)).toFixed(7);
 bboxStr += ',' + (lat + distDeg).toFixed(7);
 return bboxStr;
 }
@@ -1961,6 +1985,7 @@ function setAzimPtr(coords, angle) {
 		const polyL = buildPolyLine(coords, angle, longueur);
 		azimuthPtrCoords = coords;
 		azimuthPtr.setLatLngs(polyL);
+		azimuthPtr.setStyle({"color": "DarkMagenta"});
 }
 
 function setAzimAngle(newAngle) {
@@ -1988,7 +2013,7 @@ bPrevPoint.onclick = () => {
 }
 
 bNextPoint.onclick = () => {
-	if (currentImageIndex < currentCollectionCount) {
+	if (currentImageIndex < currentCollLoadedCount) {
 		currentImageIndex++;
 	}
 	if (prevNextMode) {
@@ -2000,7 +2025,6 @@ bNextPoint.onclick = () => {
 }
 
 async function managePrevNext(prevNextUrl) {
-///	console.log("prevNextUrl", prevNextUrl);
 //  this take more time (500 ms) than direct call 
 	const res = await fetch(prevNextUrl);
 	const data = await res.json();
@@ -2034,35 +2058,38 @@ async function manageItem(_feature, checkSeq) {
 
 	showImage(_feature);
 	
-	if (!nextLink || !prevLink) {
-		panoramaxAround(400);		
-	}
 	currentFeature = _feature; 
 	currentFeatureUrl = _feature.links.find(obj => obj?.rel === "self").href;
 	currentFeatureImgUrl = _feature.assets.hd.href;
 	updatePanoxInfo(_feature);
 	showSelectedPoint(_feature);	
+	if (!nextLink || !prevLink) {
+		panoramaxAround(400);		
+	}
 }
 
 async function updateCollection(_feature, checkSeq){
 	var imgIndex = -1;
-	var dataJson;
+////	var dataJson;
 	const newCollectionId = _feature.collection;
 	if (checkSeq && newCollectionId != currentCollectionId) {
 ///	console.log("collection changed - old", currentCollectionId," - new  ", newCollectionId)		
 		currentCollectionId = newCollectionId;
 		calques[seqNum].clearLayer();
-		dataJson = await px_getFeaturesInCollection(currentCollectionId);
-		currentCollectionCount = dataJson.features.length; 
+		const dataJson = await px_getFeaturesInCollection(currentCollectionId);
+		currentCollLoadedCount = dataJson.features.length; 
+		const collJson = await px_getCollection(currentCollectionId);
+		currentCollTotalCount = collJson['stats:items'].count;	
+		currentCollTotalLength = collJson['geovisio:length_km'];	
 	    imgIndex = dataJson.features.findIndex(checkId);
 		// on a chargé les 1000 premiers points de la collection dans dataJson
 		// si la collection est trop grande ils peuvent être tous hors de la carte
 		// dans ce cas imgIndex est négatif et il est inutile de les ajouter
 		if (imgIndex >=0) {
 		// la collection peut dépasser les points déjà chargés
-			updateCalque(panoxNum, dataJson);
+			updatePxCalque(panoxNum, dataJson);
 		// charger la collection dans son calque
-			updateCalque(seqNum, dataJson);
+			updatePxCalque(seqNum, dataJson);
 		}
 	} else {
 		dataJson = calques[seqNum].layerJson;
@@ -2078,48 +2105,57 @@ async function updateCollection(_feature, checkSeq){
 const Y360Div = document.getElementById('Y360Div');
 
 function showSelectedPoint(_feature) {
-// 	set a larger marker on selected feature
+
 // 	set map current_point on this feature (useful to search around)
-	calques[seqNum].layer.eachLayer(function (subLayer) { 	
-		if (subLayer.feature && subLayer.feature.id == _feature.id) {
-			subLayer.setStyle(styleSelected);
-		} else {
-			subLayer.setStyle(styles[seqNum]);		
-		}
-	});	
+	const ptLngLat = _feature.geometry.coordinates;
+	curPt_latlng.lat = ptLngLat[1];
+	curPt_latlng.lng = ptLngLat[0];
+	
+// 	set a different marker on selected feature
+	pxSelectedPtr.setLatLng(curPt_latlng);
+	pxSelectedPtr.addTo(calques[seqNum].layer);
+	
 // 	set azimuth if present in feature
 // 	build azimuth pointer
 	const azimuth = _feature.properties["view:azimuth"];
 ///	console.log("azimuth ", azimuth );
-	const ptLngLat = _feature.geometry.coordinates;
 	if (azimuth != undefined) {  
 		curPt_azimuth = azimuth;
 		setAzimPtr(_feature.geometry.coordinates, curPt_azimuth);
 		azimuthPtr.addTo(calques[seqNum].layer)
+	} else {
+			azimuthPtr.setLatLngs([]);
 	}
-	curPt_latlng.lat = ptLngLat[1];
-	curPt_latlng.lng = ptLngLat[0];
 }
-		document.addEventListener('newAngle', (e) => {
-			const angledeg = e.detail.angleYaw * 180/Math.PI;
-			var angle = curPt_azimuth + angledeg;
-				if (angle > 360) {angle = angle - 360};
-				if (angle < 0) {angle = angle + 360};				
-			setAzimAngle(angle);
-		});
+
+document.addEventListener('newAngle', (e) => {
+	const angledeg = e.detail.angleYaw * 180/Math.PI;
+	var angle = curPt_azimuth + angledeg;
+		if (angle > 360) {angle = angle - 360};
+		if (angle < 0) {angle = angle + 360};				
+	setAzimAngle(angle);
+});
 
 // endregion
 
 // region image
 
+function Is360(_feature) {
+	let _is360 = false;
+	if(_feature) { // azimuthPtr has no feature
+		const exif = _feature.properties.exif;
+		if (exif['Xmp.GPano.ProjectionType'] == 'equirectangular') {_is360 = true};
+		const truc = _feature.properties['pers:interior_orientation'];
+		if ( truc.field_of_view == 360) {_is360 = true};
+///		console.log("_is360", _is360 );
+	}
+	return _is360;
+}
+
+
 function showImage(_feature) {
-	let is360 = false;
 	photoDiv.style.display = "flex";	
-	const exif = _feature.properties.exif;
-	if (exif['Xmp.GPano.ProjectionType'] == 'equirectangular') {is360 = true};
-	const truc = _feature.properties['pers:interior_orientation'];
-	if ( truc.field_of_view == 360) {is360 = true};
-///	console.log("is360", is360 );
+	let is360 = Is360(_feature);
 	bWaiting.style.display = "block";
 	if (!is360) {
 		imageDiv.style.display = "flex";
@@ -2353,6 +2389,17 @@ async function px_getFeaturesBbox(bboxString) {
 async function px_getFeaturesInCollection(_collection_id) {
 	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&sortby=ts&limit=1000`;	
 	
+	try {
+		const res = await fetch(apiUrl);
+		const data = await res.json();
+		return data;
+	} catch (e) {
+		  console.error("[Panoramax] erreur", e);
+	}
+}
+
+async function px_getCollection(_collection_id) {
+	const apiUrl = `${panoxUrl}/collections/${_collection_id}`;		
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
@@ -2752,16 +2799,55 @@ function saveGpx() {
 
 // endregion
 
-b_test.onclick = test1;
+b_test.onclick = testCount;
 
 function test() {
 	alert("no test");
 }
 
+async function testCount() {
+	console.log(currentCollectionId);
+
+/*	const jsonColl = await px_getCollection(currentCollectionId);
+	currentCollTotalCount = jsonColl['stats:items'].count;
+	console.log(jsonColl);*/
+	console.log("currentCollTotalCount", currentCollTotalCount);
+	console.log("currentCollLoadedCount", currentCollLoadedCount);
+	let cpt = 0;
+	const _layer = calques[panoxNum].layer;
+	_layer.eachLayer(function (subLayer) { 	
+		cpt++;
+	});
+	console.log("layer count", cpt);
+}
+
+
+function testStyle() {
+ var _layer = calques[panoxNum].layer;
+/// console.log(_layer._layers);
+	_layer.eachLayer(function (subLayer) { 	
+		if (subLayer.feature && Is360(subLayer.feature) ) {
+			subLayer.setStyle({"radius":10, "weight": 5 });
+///			console.log(subLayer.feature.properties);
+		}
+	});
+}
+
+
 var pointerX_ = 111;
 var contentX_ = 222;
 var marginNeeded_;
 
+function testBbox() {
+const bb = checkbbStr.split(',');
+var polyL = [[bb[1], bb[0]], [bb[1], bb[2]], [bb[3], bb[2]], [bb[3], bb[0]], [bb[1], bb[0]]];
+///console.log(checkbbStr);
+///console.log(polyL);
+var bboxPtr = L.polyline(polyL, {color: 'blue'});
+bboxPtr.addTo(calques[1].layer).addTo(map);//	map.addLayer(calque.layer);
+
+}
+										  
 function test1() {
 	textInfo = '----------';
 /*  textInfo += '---------- <br> pointerX '+ pointerX_.toFixed(2);
