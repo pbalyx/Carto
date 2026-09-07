@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_K"; // collection count + km
+const subV = "_m"; // adaptation tablette
 
 // region init 
 

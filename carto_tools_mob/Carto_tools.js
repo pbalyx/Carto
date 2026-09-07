@@ -1,6 +1,6 @@
 //
 const version ="0.7.9";
-const subV = "_M"; // adaptation tablette
+const subV = "_m"; // adaptation tablette
 
 // region init 
 
