@@ -1,6 +1,6 @@
 //
-const version ="0.7.9";
-const subV = "_m"; // adaptation tablette
+const version ="0.7.10";
+const subV = ""; // 
 
 // region init 
 
@@ -1909,8 +1909,7 @@ bInfo.onclick = () => {
 }
 
 bPanox.onclick = () => {
-var pxUrl = 'https://api.panoramax.xyz/fr/index?focus=pic&pic='
-	pxUrl += currentFeature.id;
+var pxUrl = panoxUrl+'?focus=pic&pic='+currentFeature.id;
 	window.open(pxUrl);  
 }
 
@@ -2369,14 +2368,14 @@ if (isMobile) {
 
 //region panoramax api calls -----
 
-const metaCatalogUrl = "https://api.panoramax.xyz/api"
-const osmUrl = "https://panoramax.openstreetmap.fr/api"
-const ignUrl = "https://panoramax.ign.fr/api"
+const metaCatalogUrl = "https://api.panoramax.xyz/"
+const osmUrl = "https://panoramax.openstreetmap.fr/"
+const ignUrl = "https://panoramax.ign.fr/"
 
 var panoxUrl = metaCatalogUrl;
 
 async function px_getFeaturesBbox(bboxString) {
-	const apiUrl = `${panoxUrl}/search?bbox=${bboxString}&limit=1000`;
+	const apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
@@ -2387,7 +2386,7 @@ async function px_getFeaturesBbox(bboxString) {
 }
 
 async function px_getFeaturesInCollection(_collection_id) {
-	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&sortby=ts&limit=1000`;	
+	const apiUrl = `${panoxUrl}api/search?collections=${_collection_id}&sortby=ts&limit=1000`;	
 	
 	try {
 		const res = await fetch(apiUrl);
@@ -2399,7 +2398,7 @@ async function px_getFeaturesInCollection(_collection_id) {
 }
 
 async function px_getCollection(_collection_id) {
-	const apiUrl = `${panoxUrl}/collections/${_collection_id}`;		
+	const apiUrl = `${panoxUrl}api/collections/${_collection_id}`;		
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
