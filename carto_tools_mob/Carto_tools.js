@@ -1,6 +1,6 @@
 //
-const version ="0.7.9";
-const subV = "_m"; // adaptation tablette
+const version ="0.7.11";
+const subV = ""; // redirect
 
 // region init 
 
@@ -1909,8 +1909,7 @@ bInfo.onclick = () => {
 }
 
 bPanox.onclick = () => {
-var pxUrl = 'https://api.panoramax.xyz/fr/index?focus=pic&pic='
-	pxUrl += currentFeature.id;
+var pxUrl = panoxUrl+'?focus=pic&pic='+currentFeature.id;
 	window.open(pxUrl);  
 }
 
@@ -1997,7 +1996,7 @@ function setAzimAngle(newAngle) {
 //-------- core -----------
 
 function panox_click(e) {
-	manageItem(e.target.feature, true);
+	manageItem(e.target.feature, true, true);
 }
 
 bPrevPoint.onclick = () => {
@@ -2008,7 +2007,7 @@ bPrevPoint.onclick = () => {
 		managePrevNext(prev_apiUrl);
 	} else {
 		const _feature = calques[seqNum].layerJson.features[currentImageIndex];
-		manageItem(_feature, true);
+		manageItem(_feature, true, true);
 	}
 }
 
@@ -2020,7 +2019,7 @@ bNextPoint.onclick = () => {
 		managePrevNext(next_apiUrl);
 	} else {
 		const _feature = calques[seqNum].layerJson.features[currentImageIndex];
-		manageItem(_feature, true);
+		manageItem(_feature, true, true);
 	}
 }
 
@@ -2028,11 +2027,11 @@ async function managePrevNext(prevNextUrl) {
 //  this take more time (500 ms) than direct call 
 	const res = await fetch(prevNextUrl);
 	const data = await res.json();
-	manageItem(data, false);
+	manageItem(data, false, true);
 }
 
 // check what to do with new feature	
-async function manageItem(_feature, checkSeq) {
+async function manageItem(_feature, checkSeq, _redirect) {
     const imgIndex = await updateCollection(_feature, checkSeq);	
 	if (imgIndex < 0) {  //feature is not in loaded part of the collection
 		prevNextMode = true;
@@ -2063,8 +2062,10 @@ async function manageItem(_feature, checkSeq) {
 	currentFeatureImgUrl = _feature.assets.hd.href;
 	updatePanoxInfo(_feature);
 	showSelectedPoint(_feature);	
-	if (!nextLink || !prevLink) {
-		panoramaxAround(400);		
+	if ((!nextLink || !prevLink)& _redirect) {
+		searchRedirect(300);
+	} else {
+		clearRedirect();
 	}
 }
 
@@ -2110,7 +2111,7 @@ function showSelectedPoint(_feature) {
 	const ptLngLat = _feature.geometry.coordinates;
 	curPt_latlng.lat = ptLngLat[1];
 	curPt_latlng.lng = ptLngLat[0];
-	
+	curPtMark.setLatLng(curPt_latlng);
 // 	set a different marker on selected feature
 	pxSelectedPtr.setLatLng(curPt_latlng);
 	pxSelectedPtr.addTo(calques[seqNum].layer);
@@ -2367,16 +2368,246 @@ if (isMobile) {
 
 // endregion
 
+// region redirect
+
+function coordsToLatlng(_coords) {
+  const ll = L.latLng([_coords[1],_coords[0]]);
+  return ll;
+}
+
+let redirectJSON = {features:[]};
+let redirectlayer = L.geoJSON(redirectJSON, {
+		onEachFeature: redirect_onEachFeatureDo,
+		opacity: 0.4,
+		color: "DarkMagenta",
+		weight: 13					
+	}).addTo(map);
+
+function redirect_onEachFeatureDo(feature, layer) {
+	layer.on('click', onRedirectClick);
+
+}
+
+function onRedirectClick(e) {
+	let _layer = e.target.feature;
+	let _partSeq = allPartSeq[_layer.index];
+	let startPoint = _partSeq.features[0];
+///	console.log(startPoint);
+	manageItem(startPoint, true, false); // check collection, no redirect
+}
+
+function partSeq(colId) {
+	this.id = colId;
+	this.index = 0;
+	this.features = [];
+	this.buildJsonLine = function() {
+		let jsonTxt = '{"type": "Feature","geometry": {"type":"LineString","coordinates": ['
+		for (var i = 0; i < this.features.length; i++) {
+			let coords = this.features[i].geometry.coordinates;
+			jsonTxt += '[' + coords +']';
+			if (i < this.features.length - 1) {jsonTxt += ',';}
+
+		};
+		jsonTxt += ']}}';
+		let jsonObj = JSON.parse(jsonTxt);
+		jsonObj.index = this.index;
+		
+///		console.log(jsonTxt);
+		return jsonObj;
+	}
+}
+
+/*
+var redirectDiv = document.getElementById("redirectDiv");
+var bRight = document.getElementById("bRight");
+var partSeqPtr;
+var truc = true;
+bCloseRedirect.onclick = () => {
+	redirectDiv.style.visibility = "hidden";
+}
+*/
+
+function clearRedirect() {
+/*	redirectDiv.style.visibility = "hidden";
+	if (partSeqPtr) {
+		partSeqPtr.setLatLngs([]);
+		partSeqPtr.remove();
+		console.log(partSeqPtr);
+	};*/
+	redirectJSON.features = [];
+	redirectlayer.clearLayers();
+}
+
+async function searchRedirect(_box) {
+	const jsonAround = await panoramaxAround(200);
+////	redirectDiv.style.visibility = "visible";
+	searchCollections(jsonAround.features);
+	for (var i = 0; i < allPartSeq.length; i++) {
+		let truc = allPartSeq[i].buildJsonLine();
+		redirectJSON.features.push(truc);
+///		addSeqLine(allPartSeq[i])
+	}
+	redirectlayer.addData(redirectJSON.features);
+}
+var allPartSeq = [];
+
+function searchCollections(allFeatures) {
+var currenPartId;
+let	nextPartId = allFeatures[0].collection;
+///	console.log(nextPartId);
+	allPartSeq = [];
+	let cpt = 0;
+	let seqFound = [];
+	for (i = 0; i < allFeatures.length; i++) {
+		seqFound.push(false);
+	}
+	while (nextPartId != "") {
+		cpt++;
+		currenPartId = nextPartId;
+		let newPartSeq = new partSeq(currenPartId);
+		nextPartId = "";
+		for (i = 0; i < allFeatures.length; i++) {
+			if (allFeatures[i].collection == currenPartId) {
+				newPartSeq.features.push(allFeatures[i]);
+				seqFound[i] = true;
+			} else {
+				if (!seqFound[i] && nextPartId == "") { nextPartId = allFeatures[i].collection };		
+			}
+		}
+		allPartSeq.push(newPartSeq);
+		newPartSeq.index = allPartSeq.length -1;
+///		console.log(cpt, seqFound);
+		if (cpt > 20) {
+		break;
+		}
+		
+	}
+///	console.log(allPartSeq);
+
+}
+
+
+// endregion
+
+// region poub
+//	for (var i = 0; i < allRedirectCol.length; i++) {	
+//		addColLine(allRedirectCol[i])
+//	}
+////bboxPtr.addTo(calques[1].layer).addTo(map);//	map.addLayer(calque.layer);
+/*
+function seqPolyL(partSeq) {
+	var _polyL = [];
+	for (var i = 0; i < partSeq.length; i++) {
+		var ll = coordsToLatlng(partSeq[i].geometry.coordinates);
+		_polyL.push(ll);
+	}
+	return _polyL;
+}
+
+function addSeqLine(partSeq) {
+///	console.log(partSeq);
+	if (partSeq.features.length >1 ) {
+		var polyL = seqPolyL(partSeq.features);;
+////		partSeqPtr = L.polyline(polyL, {color: 'red', weight: '10', opacity: '0.4'});
+////		partSeqPtr.addTo(calques[seqNum].layer);	
+			redirectJSON.features.push(polyL);
+			console.log(redirectlayer);
+			redirectlayer.addData(redirectJSON.features);
+			console.log(redirectlayer);
+	} else {
+		var coord_latlng = coordsToLatlng(partSeq.features[0].geometry.coordinates);
+		var nextPtMark = new L.CircleMarker(coord_latlng,
+			{
+				radius: 20,
+				fillColor: "blue",
+				fillOpacity: 0.6,
+				color: "black",
+				weight: 1					
+			}
+		);
+		nextPtMark.addTo(calques[seqNum].layer)
+	
+	}
+}
+*/
+
+/*
+
+function addSeqLine(partSeq) {
+///	console.log(partSeq);
+	if (partSeq.length >1 ) {
+		var polyL = colPolyL(partSeq);;
+		partSeqPtr = L.polyline(polyL, {color: 'blue', weight: '10', opacity: '0.4'});
+		partSeqPtr.addTo(calques[seqNum].layer);	
+	} else {
+////		var coord_latlng = [partSeq[0].geometry.coordinates[1], partSeq[i].geometry.coordinates[0]];
+		var coord_latlng = coordsToLatlng(partSeq[0].geometry.coordinates);
+		var nextPtMark = new L.CircleMarker(coord_latlng,
+			{
+				radius: 20,
+				fillColor: "blue",
+				fillOpacity: 0.6,
+				color: "black",
+				weight: 1					
+			}
+		);
+		nextPtMark.addTo(calques[seqNum].layer)
+	
+	}
+}
+
+
+var allRedirectCol = [];
+var nextColId, currentColId;
+
+function searchCollections(allFeatures) {
+///	console.log(allFeatures);
+	nextColId = allFeatures[0].collection;
+///	console.log(nextColId);
+	allRedirectCol = [];
+	var cpt = 0;
+	var colFound = [];
+	for (i = 0; i < allFeatures.length; i++) {
+		colFound.push(false);
+	}
+	while (nextColId != "") {
+		cpt++;
+		currentColId = nextColId;
+		let newCol = [];
+		nextColId = "";
+		for (i = 0; i < allFeatures.length; i++) {
+			if (allFeatures[i].collection == currentColId) {
+				newCol.push(allFeatures[i]);
+				colFound[i] = true;
+			} else {
+				if (!colFound[i] && nextColId == "") { nextColId = allFeatures[i].collection };		
+			}
+		}
+		allRedirectCol.push(newCol);
+///		console.log(cpt, colFound);
+		if (cpt > 20) {
+		break;
+		}
+		
+	}
+///	console.log(allRedirectCol);
+
+}
+
+*/
+
+// endregion
+
 //region panoramax api calls -----
 
-const metaCatalogUrl = "https://api.panoramax.xyz/api"
-const osmUrl = "https://panoramax.openstreetmap.fr/api"
-const ignUrl = "https://panoramax.ign.fr/api"
+const metaCatalogUrl = "https://api.panoramax.xyz/"
+const osmUrl = "https://panoramax.openstreetmap.fr/"
+const ignUrl = "https://panoramax.ign.fr/"
 
 var panoxUrl = metaCatalogUrl;
 
 async function px_getFeaturesBbox(bboxString) {
-	const apiUrl = `${panoxUrl}/search?bbox=${bboxString}&limit=1000`;
+	const apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
@@ -2387,7 +2618,7 @@ async function px_getFeaturesBbox(bboxString) {
 }
 
 async function px_getFeaturesInCollection(_collection_id) {
-	const apiUrl = `${panoxUrl}/search?collections=${_collection_id}&sortby=ts&limit=1000`;	
+	const apiUrl = `${panoxUrl}api/search?collections=${_collection_id}&sortby=ts&limit=1000`;	
 	
 	try {
 		const res = await fetch(apiUrl);
@@ -2399,7 +2630,7 @@ async function px_getFeaturesInCollection(_collection_id) {
 }
 
 async function px_getCollection(_collection_id) {
-	const apiUrl = `${panoxUrl}/collections/${_collection_id}`;		
+	const apiUrl = `${panoxUrl}api/collections/${_collection_id}`;		
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
