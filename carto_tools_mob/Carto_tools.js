@@ -1,6 +1,6 @@
 //
 const version ="0.7.11";
-const subV = "_b"; // redirect
+const subV = "_c"; // redirect
 
 // region init 
 
@@ -2382,6 +2382,7 @@ function partSeq(colId, _curPt_latlng) {
 }
 
 function buildLineLayer(_partSeq) {
+
 		let jsonTxt = '{"type": "Feature","geometry": {"type":"LineString","coordinates": ['
 		for (var i = 0; i < _partSeq.features.length; i++) {
 			let coords = _partSeq.features[i].geometry.coordinates;
@@ -2398,18 +2399,29 @@ function buildLineLayer(_partSeq) {
 		});
 	}
 
+function buildCircleLayer(_partSeq) {
+		let has360 = false;
+		for (var i = 0; i < _partSeq.features.length; i++) {
+			if (Is360(_partSeq.features[i]))  { has360 = true};			
+		}
+		let _center = coordsToLatlng(_partSeq.features[0].geometry.coordinates); // first is nearest
+		let _radius = (has360 ? 12 : 10);
+		let _newLayer = new L.CircleMarker(_center,	{
+		radius: _radius,
+		fillColor: "Fuchsia",
+		fillOpacity: 0.6,
+		color: "DarkMagenta",
+		weight: 4					
+	}); 
+	return _newLayer;
+}
+
 function buildPartLayer(_partSeq) {
 	var newLayer;
 	if (_partSeq.extent() > 20) {
 		newLayer = buildLineLayer(_partSeq);
 	} else {
-		newLayer = new L.CircleMarker(curPt_latlng,	{
-		radius: 20,
-		fillColor: "Fuchsia",
-		fillOpacity: 0.6,
-		color: "DarkMagenta",
-		weight: 6					
-	}); 
+		newLayer = buildCircleLayer(_partSeq);
 	}
 	newLayer.on('click',  () =>{
 			redirectClick(_partSeq.features[0])
