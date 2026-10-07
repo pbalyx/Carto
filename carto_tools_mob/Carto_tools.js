@@ -1,6 +1,6 @@
 //
 const version ="0.7.11";
-const subV = ""; // redirect
+const subV = "_b"; // redirect
 
 // region init 
 
@@ -435,16 +435,6 @@ map.on("moveend", function () {
 		if (overlayMaps[layerName]) {
 			map.addLayer(overlayMaps[overlaysVis[i]]);
 		} 
-/*		
-//// todo : manage calque name change
-		else {
-			for (var j=0; j < calques.length; j++) {
-				if (calques[j].name == layerName) {
-					map.addLayer(calques[i].layer);
-				}
-			}
-		}
-*/
 	}
 	map_moving = false;
 	saveView();
@@ -475,6 +465,7 @@ map.on("click", function(e){
 //		console.log(curPt_latlng);
 		curPtMark.setLatLng(curPt_latlng);
 		if (coordsMode) { update3DCoords();} 
+		clearRedirect();
 	}
 });
 
@@ -959,7 +950,6 @@ var	ptStrs ;
 		latPrm = 'lat=' + ptStrs[1].trim();
 	}
 	URLFull = URLbase + lonPrm + '&' +latPrm + '&zonly=true';  
-////	URLFull = URLbase + lonPrm + '&' +latPrm ;  
 	curPtElev.style.backgroundColor = "Red";
 	var httpRequest = new XMLHttpRequest();
 	httpRequest.open('GET', URLFull);
@@ -1266,8 +1256,6 @@ function show_hideOsm(){
 // region Overpass
 
 var overpassUrl = 'https://overpass-api.de/api/interpreter';
-////var overpassUrl = 'https://overpass.openstreetmap.fr/api/interpreter';
-////var overpassUrl = 'https://api-overpass.pikamap.fr/api/interpreter';
 
 var queryType = ""; // type enum ?? (around, meta, import)
 var queryOk = true;
@@ -1996,7 +1984,7 @@ function setAzimAngle(newAngle) {
 //-------- core -----------
 
 function panox_click(e) {
-	manageItem(e.target.feature, true, true);
+	manageItem(e.target.feature, true, false);
 }
 
 bPrevPoint.onclick = () => {
@@ -2071,7 +2059,6 @@ async function manageItem(_feature, checkSeq, _redirect) {
 
 async function updateCollection(_feature, checkSeq){
 	var imgIndex = -1;
-////	var dataJson;
 	const newCollectionId = _feature.collection;
 	if (checkSeq && newCollectionId != currentCollectionId) {
 ///	console.log("collection changed - old", currentCollectionId," - new  ", newCollectionId)		
@@ -2375,83 +2362,85 @@ function coordsToLatlng(_coords) {
   return ll;
 }
 
-let redirectJSON = {features:[]};
-let redirectlayer = L.geoJSON(redirectJSON, {
-		onEachFeature: redirect_onEachFeatureDo,
-		opacity: 0.4,
-		color: "DarkMagenta",
-		weight: 13					
-	}).addTo(map);
+let redirectGroup = L.featureGroup([]).addTo(map);
 
-function redirect_onEachFeatureDo(feature, layer) {
-	layer.on('click', onRedirectClick);
+var allPartSeq = [];
 
-}
-
-function onRedirectClick(e) {
-	let _layer = e.target.feature;
-	let _partSeq = allPartSeq[_layer.index];
-	let startPoint = _partSeq.features[0];
-///	console.log(startPoint);
-	manageItem(startPoint, true, false); // check collection, no redirect
-}
-
-function partSeq(colId) {
+function partSeq(colId, _curPt_latlng) {
 	this.id = colId;
-	this.index = 0;
 	this.features = [];
-	this.buildJsonLine = function() {
-		let jsonTxt = '{"type": "Feature","geometry": {"type":"LineString","coordinates": ['
+	this.extent = function() {
+		let maxDist = 0;
+		var dist;
 		for (var i = 0; i < this.features.length; i++) {
 			let coords = this.features[i].geometry.coordinates;
-			jsonTxt += '[' + coords +']';
-			if (i < this.features.length - 1) {jsonTxt += ',';}
+			dist = distSphere(_curPt_latlng, L.latLng(coords[1], coords[0]));
+			if (maxDist < dist) { maxDist = dist };
+		}
+		return maxDist;
+	}
+}
 
+function buildLineLayer(_partSeq) {
+		let jsonTxt = '{"type": "Feature","geometry": {"type":"LineString","coordinates": ['
+		for (var i = 0; i < _partSeq.features.length; i++) {
+			let coords = _partSeq.features[i].geometry.coordinates;
+			jsonTxt += '[' + coords +']';
+			if (i < _partSeq.features.length - 1) {jsonTxt += ',';}
 		};
 		jsonTxt += ']}}';
 		let jsonObj = JSON.parse(jsonTxt);
-		jsonObj.index = this.index;
-		
-///		console.log(jsonTxt);
-		return jsonObj;
+		jsonObj.index = _partSeq.index;
+		return L.geoJSON(jsonObj, {
+					opacity: 0.4,
+			color: "DarkMagenta",
+			weight: 13					
+		});
 	}
+
+function buildPartLayer(_partSeq) {
+	var newLayer;
+	if (_partSeq.extent() > 20) {
+		newLayer = buildLineLayer(_partSeq);
+	} else {
+		newLayer = new L.CircleMarker(curPt_latlng,	{
+		radius: 20,
+		fillColor: "Fuchsia",
+		fillOpacity: 0.6,
+		color: "DarkMagenta",
+		weight: 6					
+	}); 
+	}
+	newLayer.on('click',  () =>{
+			redirectClick(_partSeq.features[0])
+		});
+	return newLayer;
 }
 
-/*
-var redirectDiv = document.getElementById("redirectDiv");
-var bRight = document.getElementById("bRight");
-var partSeqPtr;
-var truc = true;
-bCloseRedirect.onclick = () => {
-	redirectDiv.style.visibility = "hidden";
+function redirectClick(startPoint) {
+	manageItem(startPoint, true, false); // check collection, no redirect*/
 }
-*/
+
+async function searchRedirect(_boxSize) {
+	const jsonAround = await panoramaxAround(_boxSize);
+	searchCollections(jsonAround.features, curPt_latlng);
+	fillRedirectLayer();
+}
 
 function clearRedirect() {
-/*	redirectDiv.style.visibility = "hidden";
-	if (partSeqPtr) {
-		partSeqPtr.setLatLngs([]);
-		partSeqPtr.remove();
-		console.log(partSeqPtr);
-	};*/
-	redirectJSON.features = [];
-	redirectlayer.clearLayers();
+	redirectGroup.clearLayers();
 }
 
-async function searchRedirect(_box) {
-	const jsonAround = await panoramaxAround(200);
-////	redirectDiv.style.visibility = "visible";
-	searchCollections(jsonAround.features);
+function fillRedirectLayer() {
 	for (var i = 0; i < allPartSeq.length; i++) {
-		let truc = allPartSeq[i].buildJsonLine();
-		redirectJSON.features.push(truc);
-///		addSeqLine(allPartSeq[i])
+		if (allPartSeq[i].id != currentCollectionId) {
+			let partLayer = buildPartLayer(allPartSeq[i]);
+			redirectGroup.addLayer(partLayer);
+		}
 	}
-	redirectlayer.addData(redirectJSON.features);
 }
-var allPartSeq = [];
 
-function searchCollections(allFeatures) {
+function searchCollections(allFeatures, _curPt_latlng) {
 var currenPartId;
 let	nextPartId = allFeatures[0].collection;
 ///	console.log(nextPartId);
@@ -2464,14 +2453,16 @@ let	nextPartId = allFeatures[0].collection;
 	while (nextPartId != "") {
 		cpt++;
 		currenPartId = nextPartId;
-		let newPartSeq = new partSeq(currenPartId);
+		let newPartSeq = new partSeq(currenPartId, _curPt_latlng);
 		nextPartId = "";
 		for (i = 0; i < allFeatures.length; i++) {
 			if (allFeatures[i].collection == currenPartId) {
 				newPartSeq.features.push(allFeatures[i]);
 				seqFound[i] = true;
 			} else {
-				if (!seqFound[i] && nextPartId == "") { nextPartId = allFeatures[i].collection };		
+				if (!seqFound[i] && nextPartId == "") { 
+					nextPartId = allFeatures[i].collection 
+				};
 			}
 		}
 		allPartSeq.push(newPartSeq);
@@ -2479,122 +2470,14 @@ let	nextPartId = allFeatures[0].collection;
 ///		console.log(cpt, seqFound);
 		if (cpt > 20) {
 		break;
-		}
-		
+		}		
 	}
-///	console.log(allPartSeq);
-
 }
 
 
 // endregion
 
 // region poub
-//	for (var i = 0; i < allRedirectCol.length; i++) {	
-//		addColLine(allRedirectCol[i])
-//	}
-////bboxPtr.addTo(calques[1].layer).addTo(map);//	map.addLayer(calque.layer);
-/*
-function seqPolyL(partSeq) {
-	var _polyL = [];
-	for (var i = 0; i < partSeq.length; i++) {
-		var ll = coordsToLatlng(partSeq[i].geometry.coordinates);
-		_polyL.push(ll);
-	}
-	return _polyL;
-}
-
-function addSeqLine(partSeq) {
-///	console.log(partSeq);
-	if (partSeq.features.length >1 ) {
-		var polyL = seqPolyL(partSeq.features);;
-////		partSeqPtr = L.polyline(polyL, {color: 'red', weight: '10', opacity: '0.4'});
-////		partSeqPtr.addTo(calques[seqNum].layer);	
-			redirectJSON.features.push(polyL);
-			console.log(redirectlayer);
-			redirectlayer.addData(redirectJSON.features);
-			console.log(redirectlayer);
-	} else {
-		var coord_latlng = coordsToLatlng(partSeq.features[0].geometry.coordinates);
-		var nextPtMark = new L.CircleMarker(coord_latlng,
-			{
-				radius: 20,
-				fillColor: "blue",
-				fillOpacity: 0.6,
-				color: "black",
-				weight: 1					
-			}
-		);
-		nextPtMark.addTo(calques[seqNum].layer)
-	
-	}
-}
-*/
-
-/*
-
-function addSeqLine(partSeq) {
-///	console.log(partSeq);
-	if (partSeq.length >1 ) {
-		var polyL = colPolyL(partSeq);;
-		partSeqPtr = L.polyline(polyL, {color: 'blue', weight: '10', opacity: '0.4'});
-		partSeqPtr.addTo(calques[seqNum].layer);	
-	} else {
-////		var coord_latlng = [partSeq[0].geometry.coordinates[1], partSeq[i].geometry.coordinates[0]];
-		var coord_latlng = coordsToLatlng(partSeq[0].geometry.coordinates);
-		var nextPtMark = new L.CircleMarker(coord_latlng,
-			{
-				radius: 20,
-				fillColor: "blue",
-				fillOpacity: 0.6,
-				color: "black",
-				weight: 1					
-			}
-		);
-		nextPtMark.addTo(calques[seqNum].layer)
-	
-	}
-}
-
-
-var allRedirectCol = [];
-var nextColId, currentColId;
-
-function searchCollections(allFeatures) {
-///	console.log(allFeatures);
-	nextColId = allFeatures[0].collection;
-///	console.log(nextColId);
-	allRedirectCol = [];
-	var cpt = 0;
-	var colFound = [];
-	for (i = 0; i < allFeatures.length; i++) {
-		colFound.push(false);
-	}
-	while (nextColId != "") {
-		cpt++;
-		currentColId = nextColId;
-		let newCol = [];
-		nextColId = "";
-		for (i = 0; i < allFeatures.length; i++) {
-			if (allFeatures[i].collection == currentColId) {
-				newCol.push(allFeatures[i]);
-				colFound[i] = true;
-			} else {
-				if (!colFound[i] && nextColId == "") { nextColId = allFeatures[i].collection };		
-			}
-		}
-		allRedirectCol.push(newCol);
-///		console.log(cpt, colFound);
-		if (cpt > 20) {
-		break;
-		}
-		
-	}
-///	console.log(allRedirectCol);
-
-}
-
-*/
 
 // endregion
 
