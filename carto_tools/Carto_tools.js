@@ -1,6 +1,6 @@
 //
-const version ="0.7.10";
-const subV = ""; // 
+const version ="0.7.12";
+const subV = ""; // redirect
 
 // region init 
 
@@ -435,16 +435,6 @@ map.on("moveend", function () {
 		if (overlayMaps[layerName]) {
 			map.addLayer(overlayMaps[overlaysVis[i]]);
 		} 
-/*		
-//// todo : manage calque name change
-		else {
-			for (var j=0; j < calques.length; j++) {
-				if (calques[j].name == layerName) {
-					map.addLayer(calques[i].layer);
-				}
-			}
-		}
-*/
 	}
 	map_moving = false;
 	saveView();
@@ -475,6 +465,7 @@ map.on("click", function(e){
 //		console.log(curPt_latlng);
 		curPtMark.setLatLng(curPt_latlng);
 		if (coordsMode) { update3DCoords();} 
+		clearRedirect();
 	}
 });
 
@@ -959,7 +950,6 @@ var	ptStrs ;
 		latPrm = 'lat=' + ptStrs[1].trim();
 	}
 	URLFull = URLbase + lonPrm + '&' +latPrm + '&zonly=true';  
-////	URLFull = URLbase + lonPrm + '&' +latPrm ;  
 	curPtElev.style.backgroundColor = "Red";
 	var httpRequest = new XMLHttpRequest();
 	httpRequest.open('GET', URLFull);
@@ -1266,8 +1256,6 @@ function show_hideOsm(){
 // region Overpass
 
 var overpassUrl = 'https://overpass-api.de/api/interpreter';
-////var overpassUrl = 'https://overpass.openstreetmap.fr/api/interpreter';
-////var overpassUrl = 'https://api-overpass.pikamap.fr/api/interpreter';
 
 var queryType = ""; // type enum ?? (around, meta, import)
 var queryOk = true;
@@ -1996,7 +1984,7 @@ function setAzimAngle(newAngle) {
 //-------- core -----------
 
 function panox_click(e) {
-	manageItem(e.target.feature, true);
+	manageItem(e.target.feature, true, false);
 }
 
 bPrevPoint.onclick = () => {
@@ -2007,7 +1995,7 @@ bPrevPoint.onclick = () => {
 		managePrevNext(prev_apiUrl);
 	} else {
 		const _feature = calques[seqNum].layerJson.features[currentImageIndex];
-		manageItem(_feature, true);
+		manageItem(_feature, true, true);
 	}
 }
 
@@ -2019,7 +2007,7 @@ bNextPoint.onclick = () => {
 		managePrevNext(next_apiUrl);
 	} else {
 		const _feature = calques[seqNum].layerJson.features[currentImageIndex];
-		manageItem(_feature, true);
+		manageItem(_feature, true, true);
 	}
 }
 
@@ -2027,11 +2015,11 @@ async function managePrevNext(prevNextUrl) {
 //  this take more time (500 ms) than direct call 
 	const res = await fetch(prevNextUrl);
 	const data = await res.json();
-	manageItem(data, false);
+	manageItem(data, false, true);
 }
 
 // check what to do with new feature	
-async function manageItem(_feature, checkSeq) {
+async function manageItem(_feature, checkSeq, _redirect) {
     const imgIndex = await updateCollection(_feature, checkSeq);	
 	if (imgIndex < 0) {  //feature is not in loaded part of the collection
 		prevNextMode = true;
@@ -2062,14 +2050,15 @@ async function manageItem(_feature, checkSeq) {
 	currentFeatureImgUrl = _feature.assets.hd.href;
 	updatePanoxInfo(_feature);
 	showSelectedPoint(_feature);	
-	if (!nextLink || !prevLink) {
-		panoramaxAround(400);		
+	if ((!nextLink || !prevLink)& _redirect) {
+		searchRedirect(300);
+	} else {
+		clearRedirect();
 	}
 }
 
 async function updateCollection(_feature, checkSeq){
 	var imgIndex = -1;
-////	var dataJson;
 	const newCollectionId = _feature.collection;
 	if (checkSeq && newCollectionId != currentCollectionId) {
 ///	console.log("collection changed - old", currentCollectionId," - new  ", newCollectionId)		
@@ -2109,7 +2098,7 @@ function showSelectedPoint(_feature) {
 	const ptLngLat = _feature.geometry.coordinates;
 	curPt_latlng.lat = ptLngLat[1];
 	curPt_latlng.lng = ptLngLat[0];
-	
+	curPtMark.setLatLng(curPt_latlng);
 // 	set a different marker on selected feature
 	pxSelectedPtr.setLatLng(curPt_latlng);
 	pxSelectedPtr.addTo(calques[seqNum].layer);
@@ -2363,6 +2352,144 @@ if (isMobile) {
   });
 }
 
+
+// endregion
+
+// region redirect
+
+function coordsToLatlng(_coords) {
+  const ll = L.latLng([_coords[1],_coords[0]]);
+  return ll;
+}
+
+let redirectGroup = L.featureGroup([]).addTo(map);
+
+var allPartSeq = [];
+
+function partSeq(colId, _curPt_latlng) {
+	this.id = colId;
+	this.features = [];
+	this.extent = function() {
+		let maxDist = 0;
+		var dist;
+		for (var i = 0; i < this.features.length; i++) {
+			let coords = this.features[i].geometry.coordinates;
+			dist = distSphere(_curPt_latlng, L.latLng(coords[1], coords[0]));
+			if (maxDist < dist) { maxDist = dist };
+		}
+		return maxDist;
+	}
+}
+
+function buildLineLayer(_partSeq) {
+
+		let jsonTxt = '{"type": "Feature","geometry": {"type":"LineString","coordinates": ['
+		for (var i = 0; i < _partSeq.features.length; i++) {
+			let coords = _partSeq.features[i].geometry.coordinates;
+			jsonTxt += '[' + coords +']';
+			if (i < _partSeq.features.length - 1) {jsonTxt += ',';}
+		};
+		jsonTxt += ']}}';
+		let jsonObj = JSON.parse(jsonTxt);
+		jsonObj.index = _partSeq.index;
+		return L.geoJSON(jsonObj, {
+					opacity: 0.4,
+			color: "DarkMagenta",
+			weight: 13					
+		});
+	}
+
+function buildCircleLayer(_partSeq) {
+		let has360 = false;
+		for (var i = 0; i < _partSeq.features.length; i++) {
+			if (Is360(_partSeq.features[i]))  { has360 = true};			
+		}
+		let _center = coordsToLatlng(_partSeq.features[0].geometry.coordinates); // first is nearest
+		let _radius = (has360 ? 13 : 10);
+		let _newLayer = new L.CircleMarker(_center,	{
+		radius: _radius,
+		fillColor: "Fuchsia",
+		fillOpacity: 0.6,
+		color: "DarkMagenta",
+		weight: 4					
+	}); 
+	return _newLayer;
+}
+
+function buildPartLayer(_partSeq) {
+	var newLayer;
+	if (_partSeq.extent() > 20) {
+		newLayer = buildLineLayer(_partSeq);
+	} else {
+		newLayer = buildCircleLayer(_partSeq);
+	}
+	newLayer.on('click',  () =>{
+			redirectClick(_partSeq.features[0])
+		});
+	return newLayer;
+}
+
+function redirectClick(startPoint) {
+	manageItem(startPoint, true, false); // check collection, no redirect*/
+}
+
+async function searchRedirect(_boxSize) {
+	const jsonAround = await panoramaxAround(_boxSize);
+	searchCollections(jsonAround.features, curPt_latlng);
+	fillRedirectLayer();
+}
+
+function clearRedirect() {
+	redirectGroup.clearLayers();
+}
+
+function fillRedirectLayer() {
+	for (var i = 0; i < allPartSeq.length; i++) {
+		if (allPartSeq[i].id != currentCollectionId) {
+			let partLayer = buildPartLayer(allPartSeq[i]);
+			redirectGroup.addLayer(partLayer);
+		}
+	}
+}
+
+function searchCollections(allFeatures, _curPt_latlng) {
+var currenPartId;
+let	nextPartId = allFeatures[0].collection;
+///	console.log(nextPartId);
+	allPartSeq = [];
+	let cpt = 0;
+	let seqFound = [];
+	for (i = 0; i < allFeatures.length; i++) {
+		seqFound.push(false);
+	}
+	while (nextPartId != "") {
+		cpt++;
+		currenPartId = nextPartId;
+		let newPartSeq = new partSeq(currenPartId, _curPt_latlng);
+		nextPartId = "";
+		for (i = 0; i < allFeatures.length; i++) {
+			if (allFeatures[i].collection == currenPartId) {
+				newPartSeq.features.push(allFeatures[i]);
+				seqFound[i] = true;
+			} else {
+				if (!seqFound[i] && nextPartId == "") { 
+					nextPartId = allFeatures[i].collection 
+				};
+			}
+		}
+		allPartSeq.push(newPartSeq);
+		newPartSeq.index = allPartSeq.length -1;
+///		console.log(cpt, seqFound);
+		if (cpt > 20) {
+		break;
+		}		
+	}
+}
+
+
+// endregion
+
+// region poub
 
 // endregion
 
