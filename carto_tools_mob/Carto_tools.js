@@ -1,6 +1,6 @@
 //
 const version ="0.7.11";
-const subV = "_c"; // redirect
+const subV = "_d"; // redirect
 
 // region init 
 
@@ -2405,7 +2405,7 @@ function buildCircleLayer(_partSeq) {
 			if (Is360(_partSeq.features[i]))  { has360 = true};			
 		}
 		let _center = coordsToLatlng(_partSeq.features[0].geometry.coordinates); // first is nearest
-		let _radius = (has360 ? 12 : 10);
+		let _radius = (has360 ? 13 : 10);
 		let _newLayer = new L.CircleMarker(_center,	{
 		radius: _radius,
 		fillColor: "Fuchsia",
