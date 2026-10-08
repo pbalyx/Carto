@@ -2391,7 +2391,6 @@ function buildLineLayer(_partSeq) {
 		};
 		jsonTxt += ']}}';
 		let jsonObj = JSON.parse(jsonTxt);
-		jsonObj.index = _partSeq.index;
 		return L.geoJSON(jsonObj, {
 					opacity: 0.4,
 			color: "DarkMagenta",
@@ -2424,13 +2423,15 @@ function buildPartLayer(_partSeq) {
 		newLayer = buildCircleLayer(_partSeq);
 	}
 	newLayer.on('click',  () =>{
-			redirectClick(_partSeq.features[0])
+			redirectClick(_partSeq)
 		});
 	return newLayer;
 }
 
-function redirectClick(startPoint) {
-	manageItem(startPoint, true, false); // check collection, no redirect*/
+function redirectClick(_partSeq) {
+	let startPoint = _partSeq.features[0];
+	let _redirectAgain = (_partSeq.features.length < 2);
+	manageItem(startPoint, true, _redirectAgain); // check collection, redirect only if isolated
 }
 
 async function searchRedirect(_boxSize) {
@@ -2478,7 +2479,6 @@ let	nextPartId = allFeatures[0].collection;
 			}
 		}
 		allPartSeq.push(newPartSeq);
-		newPartSeq.index = allPartSeq.length -1;
 ///		console.log(cpt, seqFound);
 		if (cpt > 20) {
 		break;
