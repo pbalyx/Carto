@@ -80,6 +80,9 @@
 
 <body>
 	<h1>Utiliser l'api Panoramax<br><small>Panoramax des sentiers</small></h1>
+	<p>
+	<i><small> 10/10/2026 </small></i>
+	</p>
 	<div id="gototop"><a href = "#">Top</a></div>
 	<ol>
 		<li><a href = "#l_api">L'essentiel sur l'api</a></li>	
@@ -92,6 +95,7 @@
 		<li><a href = "#details">Quelques détails de plus</a></li>
 			<ul>
 				<li><a href = "#uuid">Identifiants UUID</a></li>
+				<li><a href = "#metadonnees">Métadonnées d'une séquence</a></li>
 				<li><a href = "#parcourir">Parcourir la séquence</a></li>
 				<li><a href = "#panoramique">Photos panoramiques</a></li>
 				<li><a href = "#code">Détails sur la page</a></li>
@@ -108,12 +112,16 @@
 
 		<h3 id = "javascript">L'api en javascript</h3>
 <p>
-	La recherche des photos se fait au moyen de l'api à l'adresse 
-	<i>https://api.panoramax.xyz/api/</i> pour le métacatalogue (ou <i>https://panoramax.openstreetmap.fr/api</i> et <i>https://panoramax.ign.fr/api</i> pour les instances OSM ou IGN).
+	La recherche des photos se fait au moyen de l'api à l'adresse <i>instUrl</i>. Cette adresse dépend de l'instance que l'on veut interroger.
+	<ul>
+		<li><i>instUrl</i> = <i>https://api.panoramax.xyz/</i> pour le métacatalogue</li>
+		<li><i>instUrl</i> = <i>https://panoramax.openstreetmap.fr/</i> pour l'instance OSM</li>
+		<li><i>instUrl</i> = <i>https://panoramax.openstreetmap.fr/</i> pour l'instance IGN</li>
+	</ul>
 
 </p>
 <p>
-	En Javascript cette recherche tient en quelques lignes pour définir une fonction asynchrone <br>
+	En Javascript la recherche tient en quelques lignes pour définir une fonction asynchrone <br>
 	<pre style ="  margin: 0.5em 0";>
 	async function px_xxx() {
 		const apiUrl = 
@@ -128,7 +136,7 @@
 		<h3 id ="bbox">Rechercher des éléments dans une zone</h3>
 <p>
 	Pour récupérer les éléments contenus dans une zone rectangulaire (bbox) la syntaxe est:
-	<pre>	apiUrl = "https://api.panoramax.xyz/api/search?bbox=${bboxString}&limit=${limit}"</pre>
+	<pre>	apiUrl = <i>instUrl</i> + "api/search?bbox=${bboxString}&limit=${limit}"</pre>
 	avec les paramètres
 	<ul>
 		<li><i>bboxString</i>: rectangle de recherche - format: <i>SW_lng,SW_lat,NE_lng,NE_lat</i></li>
@@ -139,7 +147,7 @@
 	La réponse est un objet JSON contenant 
 		<ul>
 			<li><i>features</i>: tableau (<i>array</i>) des éléments trouvés	</li>
-			<li><i>links</i>: tableau vide	</li>							
+			<li><i>links</i>: tableau généralement vide	</li>							
 		</ul>
 
 	<div style="position: relative; left:5%"">
@@ -156,7 +164,7 @@
 		<h3 id ="sequence">Récupérer les éléments d'une séquence</h3>
 <p>
 	A partir de l'identifiant d'une <i>collection</i>, on peut récupérer les élements qui en font partie . La syntaxe est:
-	<pre>apiUrl = "https://api.panoramax.xyz/api/search?collections=${collectionId}&sortby=ts&limit=${limit}</pre>
+	<pre>apiUrl = <i>instUrl</i> + "api/search?collections=${collectionId}&sortby=ts&limit=${limit}</pre>
 	cette fonction renvoie aussi un objet contenant un tableau dans lequel tous les éléments ont le même identifiant de collection
 </p>
 	<div style="position: relative; left:5%"">
@@ -195,6 +203,7 @@
 			<ul>
 				<li><i>exif</i>: métadonnées exif	</li>
 				<li><i>created</i>: date de prise de vue	</li>			
+				<li><i>geovisio:rank_in_collection</i>: index de l'image dans la séquence	</li>
 				<li><i>view:azimuth</i>: orientation de la prise de vue en degrés	</li>
 			</ul>
 	</ul>
@@ -212,12 +221,25 @@
 	<a href= "https://fr.wikipedia.org/wiki/Universally_unique_identifier" target="_blank">Wikipedia</a>.
 </p>
 
+<h3 id ="metadonnees">Métadonnées d'une séquence</h3>
+<p>
+On peut obtenir plus d'information sur une séquence en interrogeant les métadonnées. Syntaxe :
+	<pre>apiUrl = <i>instUrl</i> + "api/collection/${collectionId}</pre>
+</p>
+<p>	Les éléments supplémentaires que l'on peut récupérer sont :
+	<ul>
+		<li>le nombre d'éléments dans la séquence dans <i>stats:items.count</i></li>
+		<li>la longueur totale de la séquence dans <i>geovisio:length_km</i><br>
+		Maleureusement les intervalles entre points supérieurs à 75 m (ceux qui n'apparaissent pas en trait bleu) ne sont pas pris en compte. La longueur est donc souvent sous-évaluée</li>
+	</ul>
+</p>
+
 <h3 id ="parcourir">Parcourir la séquence</h3>
 <p>
 	Losqu'une photo est affichée, pour passer à la suivante ou  la précédente, il semblerait logique d'utiliser les liens <i>next</i> ou <i>prev</i> mais ces liens rappellent l'api pour recharger l'élément ce qui ralentit l'affichage.
 </p>
 <p>	
-	Pour les séquences "normales" pour cette application (ne dépassant pas les 1000 éléments), au premier clic sur un des éléments, tous les autres éléments sont chargés dans un tableau sous forme d'objets json. Il est donc plus rapide de passer à l'élément suivant ou précédent dans le tableau et d'accéder directement au stockage de la photo par le lien <i>assets.sd</i>.
+	Pour les séquences "normales" pour cette application (ne dépassant pas les 1000 éléments), au premier clic sur un des éléments, tous les autres éléments sont chargés dans un tableau sous forme d'objets json. Il est donc plus rapide de passer à l'élément suivant ou précédent dans le tableau et d'accéder au stockage de la photo par le lien direct <i>assets.sd</i> ou <i>assets.hd</i> .
 </p>
 <p>
 	Cependant, certaines séquences, sur des routes en particulier, peuvent avoir plusieurs milliers d'éléments. <br>
@@ -242,15 +264,11 @@
 </p>
 <p>
 	Pour le code complet, les sources sont 
-	<a href="https://github.com/pbalyx/Carto/tree/main/carto_tools" >ici</a> .
-.
+	<a href="https://github.com/pbalyx/Carto/tree/main/carto_tools" >ici</a>.
 </p>
 
-
-<p><small><i>Page mise à jour le 14/08/2026</i></small></p>
-
 <p>
-
+.
 </p>
 
 <script data-goatcounter="https://pbalyx.goatcounter.com/count"
