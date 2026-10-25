@@ -1,6 +1,6 @@
 //
-const version ="0.7.12";
-const subV = ""; // redirect
+const version ="0.8.0";
+const subV = ""; // filtrer sentiers
 
 // region init 
 
@@ -2509,13 +2509,12 @@ const ignUrl = "https://panoramax.ign.fr/"
 var panoxUrl = metaCatalogUrl;
 
 async function px_getFeaturesBbox(bboxString) {
-////	const apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;
-	let apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;
-	
+	let apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;	
 	if (isFiltered) {
 		let filter = `&filter="semantics.transport"='walk'` ;
 		apiUrl += filter;
 	}
+
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
