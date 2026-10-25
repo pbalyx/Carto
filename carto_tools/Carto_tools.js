@@ -663,6 +663,7 @@ b_panoramaxAround.onclick =  ()=>{
 	updateInfoMode(false); // set infoDiv on panoramax
 }
 
+b_filterWalk.onclick = toggleFilter;
 b_panoramaxInBox.onclick = panoramaxInBox;
 b_panoramaxClear.onclick = panoramaxClear;
 
@@ -1690,6 +1691,7 @@ const seqNum = 4;
 const photoDiv = document.getElementById('photoDiv');
 const photoHeader = document.getElementById('photoHeader');
 const cb_hd = document.getElementById('cb_hd');
+let isFiltered = true;
 
 var image = document.getElementById("image");
 var currentCollectionId;
@@ -1836,6 +1838,11 @@ if (isMobile) {
 // region  menu and utils 
 
 var checkbbStr;
+
+function toggleFilter() {
+	isFiltered = !isFiltered;
+	b_filterWalk.innerHTML =  isFiltered? "Filtrer sentiers -x-":"Filtrer sentiers";
+}
 
 function set360Style(pxNum) {
 	calques[pxNum].layer.eachLayer(function (_subLayer) { 
@@ -2502,7 +2509,13 @@ const ignUrl = "https://panoramax.ign.fr/"
 var panoxUrl = metaCatalogUrl;
 
 async function px_getFeaturesBbox(bboxString) {
-	const apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;
+////	const apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;
+	let apiUrl = `${panoxUrl}api/search?bbox=${bboxString}&limit=1000`;
+	
+	if (isFiltered) {
+		let filter = `&filter="semantics.transport"='walk'` ;
+		apiUrl += filter;
+	}
 	try {
 		const res = await fetch(apiUrl);
 		const data = await res.json();
