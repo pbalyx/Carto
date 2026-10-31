@@ -1691,7 +1691,7 @@ const seqNum = 4;
 const photoDiv = document.getElementById('photoDiv');
 const photoHeader = document.getElementById('photoHeader');
 const cb_hd = document.getElementById('cb_hd');
-let isFiltered = true;
+let isFiltered = false;
 
 var image = document.getElementById("image");
 var currentCollectionId;
